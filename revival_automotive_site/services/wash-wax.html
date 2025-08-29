@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wash & Wax — Revival Automotive</title>
+  <meta name="description" content="Wash & Wax in Cape Town by Revival Automotive. Gentle wash, decon, and premium wax for gloss and protection.">
+  <link href="../styles.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <img src="../assets/logo_revival.jpg" alt="Revival Automotive logo"/>
+        <h1>Revival Automotive</h1>
+      </div>
+      <nav class="links">
+        <a href="../index.html">Home</a>
+        <a href="../services.html" style="color:#fff">Services</a>
+        <a href="../polishing.html">Polishing</a>
+        <a href="../gallery.html">Gallery</a>
+        <a href="../contact.html">Contact</a>
+        <a class="btn" href="../https://wa.me/27624954909" target="_blank" rel="noopener">Book on WhatsApp</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero"><div class="bg" style="--img:url('../assets/car1.jpg')"></div>
+    <div class="container hero-inner reveal">
+      <span class="pill kicker">Service</span>
+      <h2>Wash & Wax</h2>
+      <p>Gentle wash, decon, and premium wax for gloss and protection.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container two-col reveal">
+      <div>
+        <table class="prices">
+          <thead><tr><th>Size</th><th>Price</th></tr></thead>
+          <tbody><tr><td>Compact</td><td class='price'>R350</td></tr><tr><td>Standard</td><td class='price'>R400</td></tr><tr><td>Large</td><td class='price'>R450</td></tr></tbody>
+        </table>
+        <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+          <a class="btn" href="https://wa.me/27624954909" target="_blank" rel="noopener">Book on WhatsApp</a>
+          <a class="btn outline" href="../services.html">Back to Services</a>
+        </div>
+      </div>
+      <aside class="card" style="overflow:hidden">
+        <div class="media" style="height:260px;background-image:url('../assets/car1.jpg')"></div>
+        <div class="body">
+          <h3>What’s Included</h3>
+          <ul style="margin:0 0 0 18px;line-height:1.7">
+            <li>Premium products & safe methods</li>
+            <li>Attention to high‑touch areas</li>
+            <li>Final inspection with you</li>
+            <li>Care tips after service</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>© <span id="y"></span> Revival Automotive. All rights reserved.</div>
+        <div>Website by <span style="color:var(--accent)">Revival</span></div>
+      </div>
+      <div style="width:100%;color:var(--muted)">
+        <a href="../https://instagram.com/revivalcpt" target="_blank" rel="noopener">Instagram</a> ·
+        <a href="../https://facebook.com/revivalauto" target="_blank" rel="noopener">Facebook</a> ·
+        <a href="../https://www.youtube.com/@revivalauto" target="_blank" rel="noopener">YouTube</a> ·
+        <a href="../https://www.tiktok.com/@revivalautomotive" target="_blank" rel="noopener">TikTok</a> ·
+        <a href="../https://www.linkedin.com/company/revivalautomotive" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+  <div class="sticky-wa"><a href="../https://wa.me/27624954909" target="_blank" rel="noopener">Book on WhatsApp</a></div>
+  <div class="floating-cta"><a href="../https://wa.me/27624954909" aria-label="Book Now" target="_blank" rel="noopener">WA</a></div>
+  <script>
+    // Reveal on scroll
+    const io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  </script>
+
+</body>
+</html>

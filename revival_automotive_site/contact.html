@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact & Booking — Revival Automotive</title>
+  <meta name="description" content="Book a car detail in Cape Town via WhatsApp. Send your vehicle, size, service, and preferred date.">
+  <link href="styles.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    header .nav { padding: 10px 0; }
+    header .brand { gap: 0; }
+    header .brand a { display:inline-flex; align-items:center; }
+    header .brand img { height:42px; width:auto; border-radius:8px; border:1px solid var(--line); background:#111 }
+    header .links { display:flex; align-items:center; gap:22px; }
+    header .links a { color: var(--muted); }
+    header .links a:hover { color: var(--text); }
+    /* remove any leftover spacing from where the button used to be */
+    header .links .btn { display:none !important; }
+  </style>
+
+</head>
+<body>
+
+  <header>
+  <div class="container nav">
+    <div class="brand">
+      <a href="index.html"><img src="assets/logo_revival.jpg" alt="Revival Automotive logo"></a>
+    </div>
+    <nav class="links">
+      <a href="index.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="polishing.html">Polishing</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="contact.html" style="color:#fff">Contact</a>
+    </nav>
+  </div>
+</header>
+
+
+  <section class="hero"><div class="bg" style="--img:url('assets/car3.jpg')"></div>
+    <div class="container hero-inner reveal">
+      <span class="pill kicker">Bookings</span>
+      <h2>WhatsApp to Book</h2>
+      <p>We run all bookings on WhatsApp for fast confirmations.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container two-col reveal">
+      <div>
+        <form id="waForm">
+          <div class="inline">
+            <div><label for="name">Your Name</label><input id="name" name="name" placeholder="Name" required></div>
+            <div><label for="phone">Your Phone</label><input id="phone" name="phone" placeholder="+27 …" required></div>
+          </div>
+          <div class="inline">
+            <div><label for="vehicle">Vehicle</label><input id="vehicle" name="vehicle" placeholder="e.g., BMW X2 M35i" required></div>
+            <div><label for="size">Size</label><select id="size" name="size" required>
+              <option value="">Select</option><option>Compact</option><option>Standard</option><option>Large</option>
+            </select></div>
+          </div>
+          <div class="inline">
+            <div><label for="service">Service</label><select id="service" name="service" required>
+              <option value="">Select</option>
+              <option>Wash & Wax</option>
+              <option>Interior Detail</option>
+              <option>Headlight Restoration</option>
+              <option>Engine Bay Detail</option>
+              <option>1‑Step Polish</option>
+              <option>2‑Step Polish</option>
+              <option>Window Polish</option>
+            </select></div>
+            <div><label for="date">Preferred Date</label><input id="date" name="date" type="date" required></div>
+          </div>
+          <div><label for="notes">Notes</label><textarea id="notes" name="notes" rows="4" placeholder="Location, special requests, add‑ons…"></textarea></div>
+          <div style="display:flex;gap:12px;align-items:center;margin-top:6px">
+            <button class="btn" type="submit">Open WhatsApp</button>
+            <a class="btn outline" href="https://wa.me/27624954909" target="_blank" rel="noopener">Chat Now</a>
+          </div>
+        </form>
+      </div>
+      <aside class="card">
+        <div class="media" style="height:220px;background-image:url('assets/logo_revival.jpg')"></div>
+        <div class="body">
+          <h3>Contact</h3>
+          <p style="margin:0 0 8px">Phone/WhatsApp: <a href="https://wa.me/27624954909" target="_blank" rel="noopener">Tap to open</a></p>
+          <p style="color:var(--muted);margin:0">Cape Town • Mobile & Studio • By appointment only</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+
+  <footer>
+    <div class="container" style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>© <span id="y"></span> Revival Automotive. All rights reserved.</div>
+        <div>Website by <span style="color:var(--accent)">Revival</span></div>
+      </div>
+      <div style="width:100%;color:var(--muted)">
+        <a href="https://instagram.com/revivalcpt" target="_blank" rel="noopener">Instagram</a> ·
+        <a href="https://facebook.com/revivalauto" target="_blank" rel="noopener">Facebook</a> ·
+        <a href="https://www.youtube.com/@revivalauto" target="_blank" rel="noopener">YouTube</a> ·
+        <a href="https://www.tiktok.com/@revivalautomotive" target="_blank" rel="noopener">TikTok</a> ·
+        <a href="https://www.linkedin.com/company/revivalautomotive" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+<div class="floating-cta">
+  <a href="https://wa.me/27624954909" aria-label="Book Now" target="_blank" rel="noopener">
+    <img src="assets/whatsapp-white-icon.png" alt="WhatsApp" style="width:28px;height:28px;">
+  </a>
+</div>
+  <script>
+    // Reveal on scroll
+    const io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  </script>
+
+<script>
+document.getElementById('waForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  function esc(s) { return encodeURIComponent(s || ""); }
+  var msg = "Booking request:%0A"
+    + "Name: " + esc(document.getElementById('name').value) + "%0A"
+    + "Phone: " + esc(document.getElementById('phone').value) + "%0A"
+    + "Vehicle: " + esc(document.getElementById('vehicle').value) + "%0A"
+    + "Size: " + esc(document.getElementById('size').value) + "%0A"
+    + "Service: " + esc(document.getElementById('service').value) + "%0A"
+    + "Preferred date: " + esc(document.getElementById('date').value) + "%0A"
+    + "Notes: " + esc(document.getElementById('notes').value);
+  window.open("https://wa.me/27624954909?text=" + msg, "_blank");
+});
+</script>
+</body>
+</html>

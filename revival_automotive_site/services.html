@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Services & Pricing — Revival Automotive</title>
+  <meta name="description" content="Detailing services and pricing in Cape Town: Wash & Wax, Interior, Engine Bay, Headlight Restoration, Paint Correction, Window Polish.">
+  <link href="styles.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+    header .nav { padding: 10px 0; }
+    header .brand { gap: 0; }
+    header .brand a { display:inline-flex; align-items:center; }
+    header .brand img { height:42px; width:auto; border-radius:8px; border:1px solid var(--line); background:#111 }
+    header .links { display:flex; align-items:center; gap:22px; }
+    header .links a { color: var(--muted); }
+    header .links a:hover { color: var(--text); }
+    /* remove any leftover spacing from where the button used to be */
+    header .links .btn { display:none !important; }
+  </style>
+</head>
+<body>
+
+ <header>
+  <div class="container nav">
+    <div class="brand">
+      <a href="index.html"><img src="assets/logo_revival.jpg" alt="Revival Automotive logo"></a>
+    </div>
+    <nav class="links">
+      <a href="index.html">Home</a>
+      <a href="services.html" style="color:#fff">Services</a>
+      <a href="polishing.html">Polishing</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+
+  <section class="hero"><div class="bg" style="--img:url('assets/car1.jpg')"></div>
+    <div class="container hero-inner reveal">
+      <span class="pill kicker">Our Packages</span>
+      <h2>Services & Pricing</h2>
+      <p>Transparent pricing by vehicle size. Book via WhatsApp.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <p style="color:var(--muted);max-width:850px">
+        Revival Automotive offers professional car detailing in Cape Town with a focus on finish quality and paint safety. Below are our most‑booked services.
+        Tap a card for full details and inclusions.
+      </p>
+      <div class="grid" style="margin-top:26px">
+        <a href="services/wash-wax.html" class="card"><div class="media" style="background-image:url('assets/car1.jpg')"></div><div class="body"><h3>Wash & Wax</h3><p>R350 • R400 • R450</p></div></a>
+        <a href="services/interior.html" class="card"><div class="media" style="background-image:url('assets/Interior.jpg')"></div><div class="body"><h3>Interior Detail</h3><p>R250 • R300 • R350</p></div></a>
+        <a href="services/engine.html" class="card"><div class="media" style="background-image:url('assets/EngineBay.png')"></div><div class="body"><h3>Engine Bay Detail</h3><p>R200 • R225 • R250</p></div></a>
+        <a href="services/headlights.html" class="card"><div class="media" style="background-image:url('assets/Audi Headlight.jpg')"></div><div class="body"><h3>Headlight Restoration</h3><p>R400 (pair)</p></div></a>
+        <a href="services/polish-1step.html" class="card"><div class="media" style="background-image:url('assets/car3.jpg')"></div><div class="body"><h3>1‑Step Polish</h3><p>R1850 • R2000 • R2175</p></div></a>
+        <a href="services/polish-2step.html" class="card"><div class="media" style="background-image:url('assets/Golf Bonnet.png')"></div><div class="body"><h3>2‑Step Polish</h3><p>R2750 • R3000 • R3250</p></div></a>
+        <a href="services/window-polish.html" class="card"><div class="media" style="background-image:url('assets/car2.jpg')"></div><div class="body"><h3>Window Polish</h3><p>R325 • R350 • R375</p></div></a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>© <span id="y"></span> Revival Automotive. All rights reserved.</div>
+        <div>Website by <span style="color:var(--accent)">Revival</span></div>
+      </div>
+      <div style="width:100%;color:var(--muted)">
+        <a href="https://instagram.com/revivalcpt" target="_blank" rel="noopener">Instagram</a> ·
+        <a href="https://facebook.com/revivalauto" target="_blank" rel="noopener">Facebook</a> ·
+        <a href="https://www.youtube.com/@revivalauto" target="_blank" rel="noopener">YouTube</a> ·
+        <a href="https://www.tiktok.com/@revivalautomotive" target="_blank" rel="noopener">TikTok</a> ·
+        <a href="https://www.linkedin.com/company/revivalautomotive" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+<div class="floating-cta">
+  <a href="https://wa.me/27624954909" aria-label="Book Now" target="_blank" rel="noopener">
+    <img src="assets/whatsapp-white-icon.png" alt="WhatsApp" style="width:28px;height:28px;">
+  </a>
+</div>
+  <script>
+    // Reveal on scroll
+    const io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  </script>
+
+</body>
+</html>
