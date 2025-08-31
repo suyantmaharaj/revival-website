@@ -78,11 +78,13 @@
           </div>
           <div>
             <label>Vehicle Size</label>
-            <!-- 3-button selector -->
             <div class="segmented" role="radiogroup" aria-label="Vehicle size">
-              <input type="radio" id="size-compact"   name="size" value="Compact"  required><label for="size-compact">Compact</label>
-              <input type="radio" id="size-standard"  name="size" value="Standard"><label for="size-standard">Standard</label>
-              <input type="radio" id="size-large"     name="size" value="Large"><label for="size-large">Large</label>
+              <input type="radio" id="size-compact" name="size" value="Compact" required>
+              <label for="size-compact">Compact</label>
+              <input type="radio" id="size-standard" name="size" value="Standard">
+              <label for="size-standard">Standard</label>
+              <input type="radio" id="size-large" name="size" value="Large">
+              <label for="size-large">Large</label>
             </div>
             <div class="help">Pick the closest size. Unsure? Choose Standard.</div>
           </div>
@@ -113,9 +115,8 @@
           <textarea id="notes" name="notes" rows="4" placeholder="Location, special requests, add-ons…"></textarea>
         </div>
 
-        <div style="display:flex;gap:12px;align-items:center;margin-top:6px">
-          <button class="btn" type="submit">Open WhatsApp</button>
-          <a class="btn outline" href="https://wa.me/27624954909" target="_blank" rel="noopener">Chat Now</a>
+        <div style="margin-top:12px">
+          <button class="btn" type="submit">Send Booking via WhatsApp</button>
         </div>
         <div class="form-note">We confirm availability and final pricing on WhatsApp.</div>
       </form>
@@ -160,19 +161,16 @@
   // WhatsApp submission
   document.getElementById('waForm').addEventListener('submit', function(e) {
     e.preventDefault();
-
-    // Basic validation for the segmented buttons (size)
     const sizeEl = document.querySelector('input[name="size"]:checked');
     if (!sizeEl) {
       alert('Please select your vehicle size.');
       return;
     }
-
     function esc(s){ return encodeURIComponent(s || ""); }
     const name    = document.getElementById('name').value.trim();
     const phone   = document.getElementById('phone').value.trim();
     const vehicle = document.getElementById('vehicle').value.trim();
-    const size    = sizeEl ? sizeEl.value : '';
+    const size    = sizeEl.value;
     const service = document.getElementById('service').value;
     const date    = document.getElementById('date').value;
     const notes   = document.getElementById('notes').value.trim();
@@ -187,13 +185,12 @@
       + "Preferred date: " + esc(date) + "%0A"
       + "Notes: " + esc(notes);
 
-    // Your WhatsApp number (international format)
     const wa = "https://wa.me/27624954909?text=" + msg;
     window.open(wa, "_blank");
   });
 </script>
 
-<!-- Keep ONLY the gold floating WhatsApp CTA with icon -->
+<!-- Floating gold WhatsApp button with icon -->
 <div class="floating-cta">
   <a href="https://wa.me/27624954909" aria-label="Book Now" target="_blank" rel="noopener">
     <img src="assets/whatsapp-white-icon.png" alt="WhatsApp" style="width:28px;height:28px;display:block;margin:auto;">
