@@ -1,13 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Contact & Booking — Revival Automotive</title>
-  <meta name="description" content="Book a car detail in Cape Town via WhatsApp. Send your vehicle, size, service, and preferred date.">
-  <link href="styles.css" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Contact & Booking | Revival Automotive</title>
+
+  <!-- SEO -->
+  <meta name="description" content="Book a premium car detail in Cape Town. Fast WhatsApp confirmations. Provide your vehicle, service, date, and access to water/electricity.">
+  <meta name="robots" content="index,follow">
+  <meta name="theme-color" content="#0b0b0c">
+  <link rel="canonical" href="https://revivalautomotive.co.za/contact.html">
+
+  <!-- Favicon / App Icons -->
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/assets/favicon-32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/assets/favicon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" sizes="180x180">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:title" content="Contact & Booking | Revival Automotive">
+  <meta property="og:description" content="Book your car detailing appointment with Revival Automotive in Cape Town. Quick WhatsApp booking with details on service, date, and site access.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://revivalautomotive.co.za/contact.html">
+  <meta property="og:image" content="https://revivalautomotive.co.za/assets/logo_revival.jpg">
+  <meta property="og:image:alt" content="Revival Automotive logo">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Contact & Booking | Revival Automotive">
+  <meta name="twitter:description" content="Book via WhatsApp. Share your vehicle, service, preferred date, and confirm access to electricity/water.">
+  <meta name="twitter:image" content="https://revivalautomotive.co.za/assets/logo_revival.jpg">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Site styles (root-absolute) -->
+  <link href="/styles.css" rel="stylesheet">
 
   <!-- Keep nav spacing consistent with the site -->
   <style>
@@ -35,20 +64,20 @@
 <header>
   <div class="container nav">
     <div class="brand">
-      <a href="index.html"><img src="assets/logo_revival.jpg" alt="Revival Automotive logo"></a>
+      <a href="/index.html"><img src="/assets/logo_revival.jpg" alt="Revival Automotive logo"></a>
     </div>
     <nav class="links">
-      <a href="index.html">Home</a>
-      <a href="services.html">Services</a>
-      <a href="polishing.html">Polishing</a>
-      <a href="gallery.html">Gallery</a>
-      <a href="contact.html" style="color:#fff">Contact</a>
+      <a href="/index.html">Home</a>
+      <a href="/services.html">Services</a>
+      <a href="/polishing.html">Polishing</a>
+      <a href="/gallery.html">Gallery</a>
+      <a href="/contact.html" style="color:#fff">Contact</a>
     </nav>
   </div>
 </header>
 
 <section class="hero">
-  <div class="bg" style="--img:url('assets/car3.jpg')"></div>
+  <div class="bg" style="--img:url('/assets/car3.jpg')"></div>
   <div class="container hero-inner reveal">
     <span class="pill kicker">Bookings</span>
     <h2>WhatsApp to Book</h2>
@@ -110,7 +139,29 @@
           </div>
         </div>
 
+        <!-- Electricity access -->
         <div>
+          <label>Do you have access to electricity?</label>
+          <div class="segmented" role="radiogroup" aria-label="Electricity access">
+            <input type="radio" id="electricity-yes" name="electricity" value="Yes" required>
+            <label for="electricity-yes">Yes</label>
+            <input type="radio" id="electricity-no" name="electricity" value="No">
+            <label for="electricity-no">No</label>
+          </div>
+        </div>
+
+        <!-- Water access -->
+        <div style="margin-top:12px">
+          <label>Do you have access to water?</label>
+          <div class="segmented" role="radiogroup" aria-label="Water access">
+            <input type="radio" id="water-yes" name="water" value="Yes" required>
+            <label for="water-yes">Yes</label>
+            <input type="radio" id="water-no" name="water" value="No">
+            <label for="water-no">No</label>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
           <label for="notes">Notes</label>
           <textarea id="notes" name="notes" rows="4" placeholder="Location, special requests, add-ons…"></textarea>
         </div>
@@ -123,7 +174,7 @@
     </div>
 
     <aside class="card" style="overflow:hidden">
-      <div class="media" style="height:220px;background-image:url('assets/logo_revival.jpg')"></div>
+      <div class="media" style="height:220px;background-image:url('/assets/logo_revival.jpg')"></div>
       <div class="body">
         <h3>Contact</h3>
         <p style="margin:0 0 8px">WhatsApp: <a href="https://wa.me/27624952909" target="_blank" rel="noopener">Tap to open</a></p>
@@ -162,8 +213,10 @@
   document.getElementById('waForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const sizeEl = document.querySelector('input[name="size"]:checked');
-    if (!sizeEl) {
-      alert('Please select your vehicle size.');
+    const elecEl = document.querySelector('input[name="electricity"]:checked');
+    const waterEl = document.querySelector('input[name="water"]:checked');
+    if (!sizeEl || !elecEl || !waterEl) {
+      alert('Please complete all required fields.');
       return;
     }
     function esc(s){ return encodeURIComponent(s || ""); }
@@ -173,6 +226,8 @@
     const size    = sizeEl.value;
     const service = document.getElementById('service').value;
     const date    = document.getElementById('date').value;
+    const electricity = elecEl.value;
+    const water = waterEl.value;
     const notes   = document.getElementById('notes').value.trim();
 
     const msg = 
@@ -183,6 +238,8 @@
       + "Size: " + esc(size) + "%0A"
       + "Service: " + esc(service) + "%0A"
       + "Preferred date: " + esc(date) + "%0A"
+      + "Electricity access: " + esc(electricity) + "%0A"
+      + "Water access: " + esc(water) + "%0A"
       + "Notes: " + esc(notes);
 
     const wa = "https://wa.me/27624952909?text=" + msg;
@@ -193,7 +250,7 @@
 <!-- Floating gold WhatsApp button with icon -->
 <div class="floating-cta">
   <a href="https://wa.me/27624952909" aria-label="Book Now" target="_blank" rel="noopener">
-    <img src="assets/whatsapp-white-icon.png" alt="WhatsApp" style="width:28px;height:28px;display:block;margin:auto;">
+    <img src="/assets/whatsapp-white-icon.png" alt="WhatsApp" style="width:28px;height:28px;display:block;margin:auto;">
   </a>
 </div>
 

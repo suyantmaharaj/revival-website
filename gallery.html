@@ -1,14 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gallery — Revival Automotive</title>
-  <meta name="description" content="Before and after photos from Revival Automotive detailing jobs in Cape Town.">
-  <link href="styles.css" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Gallery | Revival Automotive</title>
+
+  <!-- SEO -->
+  <meta name="description" content="See Revival Automotive’s detailing gallery. Before-and-after photos of paint correction, ceramic coatings, interior restoration, and premium car care in Cape Town.">
+  <meta name="robots" content="index,follow">
+  <meta name="theme-color" content="#0b0b0c">
+  <link rel="canonical" href="https://revivalautomotive.co.za/gallery.html">
+
+  <!-- Favicon / App Icons -->
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="assets/favicon-32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="assets/favicon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" sizes="180x180">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:title" content="Gallery | Revival Automotive">
+  <meta property="og:description" content="Explore our detailing portfolio. Stunning transformations with exterior polishing, ceramic coatings, and interior rejuvenation in Cape Town.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://revivalautomotive.co.za/gallery.html">
+  <meta property="og:image" content="https://revivalautomotive.co.za/assets/logo_revival.jpg">
+  <meta property="og:image:alt" content="Revival Automotive logo">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Gallery | Revival Automotive">
+  <meta name="twitter:description" content="Before-and-after results from Revival Automotive’s premium detailing work in Cape Town.">
+  <meta name="twitter:image" content="https://revivalautomotive.co.za/assets/logo_revival.jpg">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 
+  <!-- Styles -->
+  <link href="styles.css" rel="stylesheet">
+
+  <!-- Page header tweaks -->
   <style>
     header .nav { padding: 10px 0; }
     header .brand { gap: 0; }
@@ -17,7 +47,6 @@
     header .links { display:flex; align-items:center; gap:22px; }
     header .links a { color: var(--muted); }
     header .links a:hover { color: var(--text); }
-    /* remove any leftover spacing from where the button used to be */
     header .links .btn { display:none !important; }
   </style>
 </head>
@@ -39,7 +68,8 @@
 </header>
 
 
-  <section class="hero"><div class="bg" style="--img:url('assets/car2.jpg')"></div>
+  <section class="hero">
+    <div class="bg" style="--img:url('assets/car2.jpg')"></div>
     <div class="container hero-inner reveal">
       <span class="pill kicker">Results</span>
       <h2>Gallery</h2>
@@ -74,11 +104,11 @@
     </div>
   </footer>
   <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
-<div class="floating-cta">
-  <a href="https://wa.me/27624952909" aria-label="Book Now" target="_blank" rel="noopener">
-    <img src="assets/whatsapp-white-icon.png" alt="WhatsApp" style="width:28px;height:28px;">
-  </a>
-</div>
+  <div class="floating-cta">
+    <a href="https://wa.me/27624952909" aria-label="Book Now" target="_blank" rel="noopener">
+      <img src="assets/whatsapp-white-icon.png" alt="WhatsApp" style="width:28px;height:28px;">
+    </a>
+  </div>
   <script>
     // Reveal on scroll
     const io = new IntersectionObserver(function(entries) {
