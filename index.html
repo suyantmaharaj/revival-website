@@ -12,11 +12,12 @@
   <meta name="theme-color" content="#0b0b0c">
   <link rel="canonical" href="https://revivalautomotive.co.za/">
 
-  <!-- Favicon / App Icons -->
-  <link rel="icon" href="assets/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" href="assets/favicon-32.png" sizes="32x32">
-  <link rel="icon" type="image/png" href="assets/favicon-192.png" sizes="192x192">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" sizes="180x180">
+  <!-- Favicon / App Icons (root-absolute) -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/assets/favicon-32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/assets/favicon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" sizes="180x180">
 
   <!-- Open Graph / Social -->
   <meta property="og:title" content="Revival Automotive | Premium Car Detailing Cape Town">
@@ -57,8 +58,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Styles -->
-  <link href="styles.css" rel="stylesheet">
+  <!-- Styles (root-absolute to avoid path issues) -->
+  <link href="/styles.css" rel="stylesheet">
 
   <!-- Header spacing to match other pages -->
   <style>
@@ -84,16 +85,16 @@
 <header>
   <div class="container nav">
     <div class="brand">
-      <a href="index.html" aria-label="Go to Home">
-        <img src="assets/logo_revival.jpg" alt="Revival Automotive logo"/>
+      <a href="/index.html" aria-label="Go to Home">
+        <img src="/assets/logo_revival.jpg" alt="Revival Automotive logo"/>
       </a>
     </div>
     <nav class="links">
-      <a href="index.html" style="color:#fff">Home</a>
-      <a href="services.html">Services</a>
-      <a href="polishing.html">Polishing</a>
-      <a href="gallery.html">Gallery</a>
-      <a href="contact.html">Contact</a>
+      <a href="/index.html" style="color:#fff">Home</a>
+      <a href="/services.html">Services</a>
+      <a href="/polishing.html">Polishing</a>
+      <a href="/gallery.html">Gallery</a>
+      <a href="/contact.html">Contact</a>
     </nav>
   </div>
 </header>
@@ -101,11 +102,11 @@
 <!-- HERO with rotating background slides -->
 <section class="hero">
   <div class="slides" aria-hidden="true">
-    <div class="slide active" style="background-image:url('assets/car1.jpg')"></div>
-    <div class="slide" style="background-image:url('assets/car3.jpg')"></div>
-    <div class="slide" style="background-image:url('assets/RSQ8Front.PNG')"></div>
-    <div class="slide" style="background-image:url('assets/car4.jpg')"></div>
-    <div class="slide" style="background-image:url('assets/RSQ8Back.PNG')"></div>
+    <div class="slide active" style="background-image:url('/assets/car1.jpg')"></div>
+    <div class="slide" style="background-image:url('/assets/car3.jpg')"></div>
+    <div class="slide" style="background-image:url('/assets/RSQ8Front.PNG')"></div>
+    <div class="slide" style="background-image:url('/assets/car4.jpg')"></div>
+    <div class="slide" style="background-image:url('/assets/RSQ8Back.PNG')"></div>
   </div>
 
   <div class="container hero-inner reveal" style="text-align:center">
@@ -116,7 +117,7 @@
       Bookings via WhatsApp only.
     </p>
     <div class="hero-cta" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <a class="btn" href="services.html">View Services & Pricing</a>
+      <a class="btn" href="/services.html">View Services & Pricing</a>
       <a class="btn outline" href="https://wa.me/27624952909" target="_blank" rel="noopener">WhatsApp to Book</a>
     </div>
   </div>
@@ -147,15 +148,15 @@
     <p style="color:var(--muted);max-width:800px">We share real client details and short clips of our process. Follow us and DM to book.</p>
     <div class="grid" style="margin-top:16px">
       <a class="card" href="https://instagram.com/revivalcpt" target="_blank" rel="noopener">
-        <div class="media" style="background-image:url('assets/RSQ8 Rear Panel.jpg')"></div>
+        <div class="media" style="background-image:url('/assets/RSQ8 Rear Panel.jpg')"></div>
         <div class="body"><h3>Instagram</h3><p>Tap to view our feed</p></div>
       </a>
       <a class="card" href="https://www.tiktok.com/@revivalautomotive" target="_blank" rel="noopener">
-        <div class="media" style="background-image:url('assets/car2.jpg')"></div>
+        <div class="media" style="background-image:url('/assets/car2.jpg')"></div>
         <div class="body"><h3>TikTok</h3><p>Follow our journey</p></div>
       </a>
       <a class="card" href="https://www.linkedin.com/company/revivalautomotive" target="_blank" rel="noopener">
-        <div class="media" style="background-image:url('assets/Interior.png')"></div>
+        <div class="media" style="background-image:url('/assets/Interior.png')"></div>
         <div class="body"><h3>LinkedIn</h3><p>Stay posted for job opportunities</p></div>
       </a>
     </div>
@@ -204,7 +205,7 @@
 <!-- Keep ONLY the gold floating WhatsApp CTA with your icon -->
 <div class="floating-cta">
   <a href="https://wa.me/27624952909" aria-label="Book Now" target="_blank" rel="noopener">
-    <img src="assets/whatsapp-white-icon.png" alt="WhatsApp" style="width:28px;height:28px;display:block;margin:auto;">
+    <img src="/assets/whatsapp-white-icon.png" alt="WhatsApp" style="width:28px;height:28px;display:block;margin:auto;">
   </a>
 </div>
 
