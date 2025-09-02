@@ -169,3 +169,15 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted)}
   z-index: 1;
   text-align: center;
 }
+
+/* --- Hero stacking + readability fix (global) --- */
+.hero .hero-inner { position: relative; z-index: 2; }  /* text above all */
+.hero::after { z-index: 1; }                           /* dark overlay */
+.hero .video-bg { z-index: 0; }                        /* video behind */
+.hero .bg {                                           /* image heroes */
+  position: absolute; inset: 0;
+  background: center/cover no-repeat;
+  background-image: var(--img);
+  z-index: 0;
+}
+             
