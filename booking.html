@@ -187,6 +187,9 @@
     @media (min-width:1400px){
       .booking-wrap > .container{ grid-template-columns: minmax(760px,1fr) 400px !important; }
     }
+
+    /* === Clear Cart visibility: hidden by default, toggled via JS on Services step === */
+    #clearCart{ display:none; }
   </style>
 </head>
 <body>
@@ -760,6 +763,14 @@
       Array.from(progressSteps).forEach((el,i)=>{
         el.classList.toggle('active', i===idx);
       });
+
+      // Show "Clear Cart" ONLY on Services step
+      const clearBtn = document.getElementById('clearCart');
+      if (state.step === 'services') {
+        clearBtn.style.display = 'inline-block';
+      } else {
+        clearBtn.style.display = 'none';
+      }
     }
     function gotoFromHashOrState(){
       const step = parseHashStep() || state.step || 'who';
