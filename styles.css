@@ -268,3 +268,25 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted)}
    (add .segmented--auto to a group if you prefer content width)
 */
 .booking-wrap .segmented.segmented--auto label{ flex:0 0 auto !important; }
+
+/* Vehicle size tooltip */
+.hint{ display:inline-flex; align-items:center; gap:8px; position:relative; }
+.hint .info{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:18px; height:18px; border-radius:999px;
+  border:1px solid var(--line); background:#0f0f13; color:var(--muted);
+  font-size:12px; cursor:default; position:relative; line-height:1;
+}
+.hint .bubble{
+  position:absolute; left:0; top:26px; z-index:20;
+  display:none; min-width:260px; max-width:320px;
+  background:#121214; color:var(--text);
+  border:1px solid var(--line); border-radius:10px; padding:10px; box-shadow:var(--shadow);
+}
+.hint:hover .bubble,
+.hint .info:focus + .bubble { display:block; }
+
+.hint .bubble table{ width:100%; border-collapse:collapse; }
+.hint .bubble td{ padding:4px 6px; border-bottom:1px solid var(--line); font-size:12px; color:var(--muted); }
+.hint .bubble tr:last-child td{ border-bottom:none; }
+.hint .bubble td:first-child{ color:#fff; font-weight:700; width:36%; }

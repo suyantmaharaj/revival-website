@@ -196,26 +196,6 @@
 
     /* === Clear Cart visibility: hidden by default, toggled via JS on Services step === */
     #clearCart{ display:none; }
-
-    /* === Vehicle size tooltip === */
-    .hint{ display:inline-flex; align-items:center; gap:8px; }
-    .hint .info{
-      display:inline-flex; align-items:center; justify-content:center;
-      width:18px; height:18px; border-radius:999px;
-      border:1px solid var(--line); background:#0f0f13; color:#muted;
-      font-size:12px; cursor:default; position:relative;
-    }
-    .hint .bubble{
-      position:absolute; left:0; top:26px; z-index:10;
-      display:none; min-width:260px; max-width:320px;
-      background:#121214; color:var(--text);
-      border:1px solid var(--line); border-radius:10px; padding:10px; box-shadow:var(--shadow);
-    }
-    .hint:hover .bubble, .info:focus + .bubble{ display:block; }
-    .bubble table{ width:100%; border-collapse:collapse; }
-    .bubble td{ padding:4px 6px; border-bottom:1px solid var(--line); font-size:12px; color:var(--muted) }
-    .bubble tr:last-child td{ border-bottom:none; }
-    .bubble td:first-child{ color:#fff; font-weight:700; width:36% }
   </style>
 </head>
 <body>
