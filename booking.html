@@ -1,0 +1,974 @@
+<!-- booking.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Book a Detail | Revival Automotive</title>
+
+  <!-- Inherit site theme -->
+  <link href="/styles.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <meta name="theme-color" content="#0b0b0c" />
+  <meta name="description" content="Simple multi-step booking for Revival Automotive (Cape Town). Choose services, pick a time, and confirm via WhatsApp." />
+
+  <style>
+    /* ====== Scoped booking UI that inherits your site variables ====== */
+    :root{
+      /* Uses your existing variables from styles.css:
+         --bg, --bg-elev, --text, --muted, --line, --accent, --accent-2, --radius, --shadow */
+    }
+    body{ background:var(--bg); color:var(--text); }
+    .booking-wrap{ max-width:1200px; margin:0 auto 80px; padding:0 20px; }
+
+    /* Progress */
+    .progress{background:rgba(255,255,255,.02); border:1px solid var(--line); border-radius:14px; padding:14px; position:relative; box-shadow:var(--shadow)}
+    .progress-rail{height:6px; background:#1a1a1e; border-radius:999px; overflow:hidden}
+    .progress-bar{height:100%; width:0; background:linear-gradient(90deg,var(--accent),var(--accent-2)); transition:width .3s}
+    .progress-steps{display:flex; justify-content:space-between; margin-top:10px; font-size:12px; color:var(--muted)}
+    .progress-steps span.active{color:#fff; font-weight:600}
+
+    /* Cards/sections */
+    .card{ background:rgba(255,255,255,.02); border:1px solid var(--line); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow) }
+    .step{ display:none }
+    .step.active{ display:block }
+
+    /* Grid helpers */
+    .grid{ display:grid; gap:14px }
+    .grid-2{ grid-template-columns:1fr 1fr }
+    .grid-3{ grid-template-columns:repeat(3,1fr) }
+    @media (max-width: 960px){ .grid-2,.grid-3{ grid-template-columns:1fr } }
+
+    /* Inputs */
+    .field{ display:grid; gap:6px }
+    .field label{ color:var(--muted); font-weight:600; font-size:14px }
+    input[type="text"],input[type="email"],input[type="tel"],input[type="date"],input[type="number"],select,textarea{
+      width:100%; padding:12px; border:1px solid var(--line); border-radius:10px;
+      background:#0f0f13; color:var(--text); outline:none
+    }
+    input:focus,select:focus,textarea:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(199,167,104,.25) }
+
+    /* Segmented controls */
+    .segmented{ display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:#0f0f13 }
+    .segmented input{ display:none }
+    .segmented label{ padding:8px 14px; cursor:pointer; border-right:1px solid var(--line) }
+    .segmented label:last-child{ border-right:none }
+    .segmented input:checked + label{ background:var(--accent); color:#0b0b0c; border-color:var(--accent) }
+
+    /* Services */
+    .chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px }
+    .chip{ padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:#0f0f13; color:var(--muted); cursor:pointer; font-size:13px }
+    .chip.active{ background:#151518; color:#fff; border-color:var(--accent) }
+
+    .svc-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px }
+    @media (max-width: 960px){ .svc-grid{ grid-template-columns:1fr 1fr } }
+    @media (max-width: 520px){ .svc-grid{ grid-template-columns:1fr } }
+
+    .svc-card{
+      border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#0f0f13;
+      display:flex; flex-direction:column; position:relative; transition:transform .15s, box-shadow .15s, border-color .15s;
+    }
+    .svc-card:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.25) }
+    .svc-media{ height:128px; background:
+      linear-gradient(120deg, rgba(199,167,104,.12), rgba(199,167,104,.06)),
+      linear-gradient(30deg, #151518, #0f0f13);
+    }
+    .svc-body{ padding:12px; display:grid; gap:8px }
+    .svc-title{ font-weight:700 }
+    .svc-desc{ color:var(--muted); font-size:13px }
+    .svc-meta{ display:flex; justify-content:space-between; align-items:center; font-weight:700 }
+    .svc-meta small{ font-weight:500; color:var(--muted) }
+    .svc-actions{ margin-top:8px }
+    .btn-mini{ padding:8px 10px; border-radius:10px; background:var(--accent); color:#0b0b0c; border:none; cursor:pointer }
+
+    .badge{
+      position:absolute; top:10px; left:10px; background:var(--accent); color:#0b0b0c;
+      border-radius:999px; font-size:12px; padding:4px 8px; display:none; font-weight:800
+    }
+    .svc-card.selected{ border-color:var(--accent) }
+    .svc-card.selected .badge{ display:inline-flex }
+
+    /* Cart */
+    aside.cart{ position:sticky; top:12px; height:fit-content; align-self:start; background:#0f0f13;
+      border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px }
+    .cart-header{ display:flex; justify-content:space-between; align-items:center }
+    .cart-items{ display:grid; gap:10px; margin-top:10px }
+    .line{ display:grid; grid-template-columns:1fr auto; gap:6px; align-items:center; border-bottom:1px dashed #27272f; padding-bottom:8px }
+    .line h4{ margin:0; font-size:14px }
+    .qty{ display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:#0f0f13 }
+    .qty button{ background:#0f0f13; border:none; padding:6px 10px; cursor:pointer; color:var(--text) }
+    .qty input{ width:66px; padding:6px 0; border:none; text-align:center; background:#0f0f13; color:var(--text) }
+    .line small{ color:var(--muted) }
+    .totals{ margin-top:12px; border-top:1px solid var(--line); padding-top:10px; display:grid; gap:6px }
+    .totals .row{ display:flex; justify-content:space-between; align-items:center }
+    .remove{ color:#f87171; font-size:12px; background:transparent; border:none; cursor:pointer }
+
+    /* Mobile cart sheet */
+    .cart-toggle{ display:none; border:1px solid var(--line); background:#0f0f13; border-radius:999px; padding:8px 12px; box-shadow:var(--shadow); color:var(--text) }
+    @media (max-width:960px){
+      aside.cart{ position:fixed; left:0; right:0; bottom:0; top:auto; transform:translateY(calc(100% - 56px));
+        border-top-left-radius:14px; border-top-right-radius:14px; padding:12px 16px; z-index:30; }
+      aside.cart.open{ transform:translateY(0) }
+      aside.cart .grab{ width:38px; height:5px; background:#26262d; border-radius:999px; margin:0 auto 6px }
+      .cart-header .title{ font-weight:700 }
+      .booking-wrap{ padding-bottom:280px }
+      .cart-toggle{ display:inline-flex; position:fixed; right:16px; bottom:16px; z-index:40 }
+    }
+
+    /* Buttons */
+    .btn{ display:inline-block; padding:14px 22px; border-radius:12px; background:var(--accent); color:#0b0b0c; border:none; cursor:pointer; font-weight:800 }
+    .btn.secondary{ background:transparent; color:var(--text); border:1px solid var(--line) }
+    .btn.ghost{ background:transparent; border:1px dashed var(--line); color:var(--text) }
+    .btn.block{ width:100% }
+
+    /* Tables */
+    table{ width:100%; border-collapse:collapse }
+    th,td{ padding:10px 8px; border-bottom:1px solid var(--line); text-align:left }
+    tfoot td{ font-weight:700 }
+
+    /* Alerts */
+    .alert{ padding:10px 12px; border:1px solid var(--line); border-left:4px solid #f59e0b; background:#1a1409; border-radius:8px; color:#f8d493 }
+    .ok{ border-left-color:#10b981; background:#0d1a17; color:#b6ffe8 }
+    .err{ border-left-color:#ef4444; background:#1a0d0d; color:#ffb3b3 }
+
+    .nav-inline{ margin-top:16px; display:flex; justify-content:space-between; gap:10px }
+    .help{ color:var(--muted); font-size:12px }
+    .pill{ display:inline-block; padding:8px 14px; border:1px solid var(--line); border-radius:999px; color:var(--muted); font-size:12px; letter-spacing:.08em; text-transform:uppercase }
+
+    /* ---- FIX: service card sizing & responsive grid ---- */
+    .svc-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+      gap:14px;
+      align-items: stretch;
+    }
+    .svc-card{
+      display:grid !important;
+      grid-template-rows: 150px 1fr auto;
+      height:100%;
+      min-width:0;
+    }
+    .svc-card *{ min-width:0 }
+    .svc-media{
+      inline-size:100%;
+      block-size:100%;
+      aspect-ratio: 16 / 9;
+      background:
+        linear-gradient(120deg, rgba(199,167,104,.12), rgba(199,167,104,.06)),
+        linear-gradient(30deg, #151518, #0f0f13);
+    }
+    .svc-body{ display:grid; gap:8px }
+    .svc-meta{ margin-top:auto; display:flex; justify-content:space-between; align-items:center }
+    @media (max-width: 520px){
+      .svc-grid{ grid-template-columns: repeat(auto-fit, minmax(220px,1fr)) !important; }
+      .svc-card{ grid-template-rows: 140px 1fr auto; }
+    }
+    .svc-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .svc-card .btn-mini{ white-space:nowrap; }
+
+    /* === LAYOUT FIX: prevent left pane squashing === */
+    .booking-wrap > .container{
+      max-width:none !important;
+      width:100% !important;
+      padding-left:0 !important;
+      padding-right:0 !important;
+      display:grid !important;
+      grid-template-columns: minmax(700px, 1fr) 380px !important;
+      gap:24px !important;
+    }
+    .grid-2{ grid-template-columns: repeat(2, minmax(260px,1fr)) !important; }
+    @media (max-width:1100px){
+      .booking-wrap > .container{ grid-template-columns:1fr !important; }
+      aside.cart{ position:static; }
+    }
+    @media (min-width:1400px){
+      .booking-wrap > .container{ grid-template-columns: minmax(760px,1fr) 400px !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== Site Header ====== -->
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <a href="/index.html"><img src="/assets/logo_revival.jpg" alt="Revival Automotive logo"></a>
+      </div>
+      <nav class="links">
+        <a href="/index.html">Home</a>
+        <a href="/services.html">Services</a>
+        <a href="/coating.html">Ceramic Coating</a>
+        <a href="/gallery.html">Gallery</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ====== Page Heading ====== -->
+  <section class="hero" style="min-height:36vh; display:grid; place-items:center; border-bottom:1px solid var(--line);">
+    <div class="slides" aria-hidden="true"></div>
+    <div class="container hero-inner reveal visible" style="text-align:center">
+      <span class="pill kicker">Cape Town • Mobile & Studio</span>
+      <h2 style="margin:10px 0 8px">Book Your Detailing</h2>
+      <p style="max-width:860px;margin:0 auto;color:var(--muted)">Choose services, pick a time, and confirm on WhatsApp. Prices adjust by vehicle size.</p>
+    </div>
+  </section>
+
+  <main class="booking-wrap">
+    <!-- Progress -->
+    <section class="progress" aria-label="Booking progress">
+      <div class="progress-rail"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+      <div class="progress-steps" id="progressSteps">
+        <span data-step-label="who">Who & Where</span>
+        <span data-step-label="services">Services</span>
+        <span data-step-label="extras">Extras</span>
+        <span data-step-label="schedule">Schedule</span>
+        <span data-step-label="review">Review</span>
+      </div>
+    </section>
+
+    <div class="container" style="display:grid; grid-template-columns: 1fr 360px; gap:24px; margin-top:20px">
+      <!-- Left column: wizard -->
+      <div class="grid" style="gap:20px">
+        <!-- Step 1 -->
+        <section class="card step active" data-step="who" aria-labelledby="h-who">
+          <h3 id="h-who">1) Who & Where</h3>
+          <div class="grid grid-2">
+            <div class="field"><label for="fullName">Full name</label><input id="fullName" type="text" required placeholder="Your name"></div>
+            <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" required placeholder="+27…"></div>
+            <div class="field"><label for="email">Email <span class="help">(optional)</span></label><input id="email" type="email" placeholder="you@example.com"></div>
+            <div class="field"><label for="city">City</label><input id="city" type="text" value="Cape Town"></div>
+            <div class="field"><label for="address1">Address</label><input id="address1" type="text" required placeholder="Street and number"></div>
+            <div class="field"><label for="suburb">Suburb</label><input id="suburb" type="text" required placeholder="Suburb"></div>
+            <div class="field"><label for="postal">Postal code</label><input id="postal" type="text" inputmode="numeric" pattern="[0-9]{4}" placeholder="0000"></div>
+            <div class="field">
+              <label>Preferred contact</label>
+              <div class="segmented" role="radiogroup" aria-label="Preferred contact">
+                <input type="radio" name="contact" id="cWhatsApp" value="WhatsApp" checked><label for="cWhatsApp">WhatsApp</label>
+                <input type="radio" name="contact" id="cPhone" value="Phone"><label for="cPhone">Phone</label>
+                <input type="radio" name="contact" id="cEmail" value="Email"><label for="cEmail">Email</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-2" style="margin-top:12px">
+            <div class="field">
+              <label>Who is the booking for?</label>
+              <div class="segmented" role="radiogroup">
+                <input type="radio" name="for" id="forMe" value="Myself" checked><label for="forMe">Myself</label>
+                <input type="radio" name="for" id="forOther" value="Someone else"><label for="forOther">Someone else</label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Vehicle size (affects price)</label>
+              <div class="segmented" role="radiogroup" id="sizeGroup">
+                <input type="radio" name="vsize" id="sizeCompact" value="Compact" checked><label for="sizeCompact">Compact</label>
+                <input type="radio" name="vsize" id="sizeStandard" value="Standard"><label for="sizeStandard">Standard</label>
+                <input type="radio" name="vsize" id="sizeLarge" value="Large"><label for="sizeLarge">Large</label>
+              </div>
+            </div>
+          </div>
+
+          <div id="recipient" class="grid grid-2" style="display:none;margin-top:10px">
+            <div class="field"><label for="recName">Recipient name</label><input id="recName" type="text" placeholder="Recipient full name"></div>
+            <div class="field"><label for="recPhone">Recipient phone</label><input id="recPhone" type="tel" placeholder="+27…"></div>
+          </div>
+
+          <div class="nav-inline">
+            <span></span>
+            <button class="btn" id="next1">Next: Services →</button>
+          </div>
+        </section>
+
+        <!-- Step 2 -->
+        <section class="card step" data-step="services" aria-labelledby="h-services">
+          <h3 id="h-services">2) Services</h3>
+          <p class="help">Tap a card to add. Adjust quantities in the cart. Filter to narrow down.</p>
+          <div class="chips" id="chips"></div>
+          <div class="svc-grid" id="svcGrid" aria-live="polite"></div>
+          <div class="nav-inline">
+            <button class="btn secondary" data-prev>← Back</button>
+            <button class="btn" data-next>Next: Extras →</button>
+          </div>
+        </section>
+
+        <!-- Step 3 -->
+        <section class="card step" data-step="extras" aria-labelledby="h-extras">
+          <h3 id="h-extras">3) Access & Notes</h3>
+          <div class="grid grid-2">
+            <div class="field">
+              <label>Access to water on-site?</label>
+              <div class="segmented" role="radiogroup">
+                <input type="radio" name="water" id="waterYes" value="Yes"><label for="waterYes">Yes</label>
+                <input type="radio" name="water" id="waterNo" value="No"><label for="waterNo">No</label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Access to electricity on-site?</label>
+              <div class="segmented" role="radiogroup">
+                <input type="radio" name="power" id="powerYes" value="Yes"><label for="powerYes">Yes</label>
+                <input type="radio" name="power" id="powerNo" value="No"><label for="powerNo">No</label>
+              </div>
+            </div>
+            <div class="field"><label class="help"><input id="parking" type="checkbox"> On-site parking available</label></div>
+          </div>
+          <div class="field" style="margin-top:8px"><label for="notes">Notes</label><textarea id="notes" rows="4" placeholder="Special requests, gate access, pets, etc."></textarea></div>
+          <div class="nav-inline">
+            <button class="btn secondary" data-prev>← Back</button>
+            <button class="btn" data-next>Next: Schedule →</button>
+          </div>
+        </section>
+
+        <!-- Step 4 -->
+        <section class="card step" data-step="schedule" aria-labelledby="h-schedule">
+          <h3 id="h-schedule">4) Schedule</h3>
+          <div class="alert" id="durationAlert" style="display:none"></div>
+          <div class="grid grid-3">
+            <div class="field"><label for="date">Date</label><input id="date" type="date" required><small class="help">We’ll confirm availability after you submit.</small></div>
+            <div class="field"><label for="time">Start time</label><select id="time"></select></div>
+            <div class="field"><label>Estimated duration</label><div class="pill" id="durationLabel">—</div><small class="help">Items = 0.5 hr each. Size doesn't change duration.</small></div>
+          </div>
+          <p class="help" id="rangeHelp" style="margin-top:6px"></p>
+          <div class="nav-inline">
+            <button class="btn secondary" data-prev>← Back</button>
+            <button class="btn" data-next>Next: Review →</button>
+          </div>
+        </section>
+
+        <!-- Step 5 -->
+        <section class="card step" data-step="review" aria-labelledby="h-review">
+          <h3 id="h-review">5) Review & Confirm</h3>
+          <div id="summary"></div>
+          <label class="help" style="display:flex;gap:8px;align-items:center;margin-top:10px">
+            <input type="checkbox" id="terms"> I accept the booking terms and agree to be contacted by Revival Automotive.
+          </label>
+          <div id="termsErr" class="err alert" style="display:none;margin-top:8px">Please accept the terms to continue.</div>
+          <div class="nav-inline">
+            <button class="btn secondary" data-prev>← Back</button>
+            <button class="btn" id="confirmBtn">Confirm Booking on WhatsApp</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right column: cart -->
+      <aside class="cart" id="cart" aria-label="Selected services">
+        <div class="grab" aria-hidden="true"></div>
+        <div class="cart-header">
+          <div class="title">Your Cart</div>
+          <button class="btn ghost" id="clearCart" title="Clear cart">Clear</button>
+        </div>
+        <div id="cartItems" class="cart-items" role="list"></div>
+        <div class="totals">
+          <div class="row"><span>Subtotal</span><strong id="subTotal">R 0.00</strong></div>
+          <div class="row"><span>VAT (15%)</span><strong id="vatTotal">R 0.00</strong></div>
+          <div class="row" style="font-size:18px"><span>Total</span><strong id="grandTotal">R 0.00</strong></div>
+        </div>
+        <p class="help" style="margin-top:8px">Prices in ZAR. Final confirmation via WhatsApp.</p>
+      </aside>
+    </div>
+
+    <button class="cart-toggle" id="cartToggle" aria-expanded="false">Cart • <span id="cartCount">0</span> items</button>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div>&copy; <span id="yr"></span> Revival Automotive</div>
+      <div class="help">Cape Town • Mobile & Studio</div>
+    </div>
+  </footer>
+
+  <script>
+  ;(() => {
+    // ====== Config ======
+    const BUSINESS_NAME = "Revival Automotive";
+    const CITY = "Cape Town";
+    const CURRENCY = "ZAR";
+    const WHATSAPP_NUMBER_E164 = "+27624952909"; // update if needed
+
+    const VEHICLE_SIZES = ["Compact","Standard","Large"];
+
+    // Services (size-based where applicable)
+    const SERVICES = [
+      { id:'washwax', name:'Wash & Wax', cat:'Exterior', desc:'Gentle wash, decon & premium wax.', unit:'item',
+        prices: { Compact:400, Standard:450, Large:500 } },
+      { id:'interior', name:'Interior Detail', cat:'Interior', desc:'Deep clean & fresh finish.', unit:'item',
+        prices: { Compact:250, Standard:300, Large:350 } },
+      { id:'engine', name:'Engine Bay Detail', cat:'Add-ons', desc:'Degrease & dress engine bay.', unit:'item',
+        prices: { Compact:200, Standard:225, Large:250 } },
+      { id:'window', name:'Window Polish', cat:'Add-ons', desc:'Polish & restore clarity.', unit:'item',
+        prices: { Compact:325, Standard:350, Large:375 } },
+      { id:'polish1', name:'1-Step Polish', cat:'Exterior', desc:'Gloss enhancement; reduces swirls.', unit:'item',
+        prices: { Compact:1850, Standard:2000, Large:2175 } },
+      { id:'polish2', name:'2-Step Polish', cat:'Exterior', desc:'Cut & refine for deeper correction.', unit:'item',
+        prices: { Compact:2750, Standard:3000, Large:3250 } },
+      { id:'headlight', name:'Headlight Restoration', cat:'Add-ons', desc:'Sand, polish & seal (pair).', unit:'pair',
+        prices: { Any:400 } },
+    ];
+    const CATS = ['All','Interior','Exterior','Add-ons'];
+
+    // ====== State ======
+    const initialState = {
+      step: 'who',
+      vehicleSize: 'Compact',
+      customer: {
+        fullName:'', phone:'', email:'', address1:'', suburb:'', city: CITY, postal:'', contact:'WhatsApp',
+        for:'Myself', recName:'', recPhone:''
+      },
+      cart: {}, // {id: {id, qty}}
+      extras: { notes:'', water:null, power:null, parking:false },
+      schedule: { date:'', time:'' }
+    };
+    let state = loadState() || initialState;
+
+    // --- normalize/migrate persisted state (handles old versions) ---
+    if (!state.vehicleSize || !["Compact","Standard","Large"].includes(state.vehicleSize)) state.vehicleSize = "Compact";
+    if (!state.customer) state.customer = initialState.customer;
+    if (!state.cart) state.cart = {};
+    // migrate extras
+    state.extras = {
+      notes: state.extras?.notes || '',
+      water: (state.extras?.water ?? null),
+      power: (state.extras?.power ?? null),
+      parking: !!state.extras?.parking
+    };
+    if (!state.schedule) state.schedule = initialState.schedule;
+    saveState();
+
+    // ====== Elements ======
+    const steps = Array.from(document.querySelectorAll('.step'));
+    const progressBar = document.getElementById('progressBar');
+    const progressSteps = document.getElementById('progressSteps').children;
+
+    const svcGrid = document.getElementById('svcGrid');
+    const chipsWrap = document.getElementById('chips');
+
+    const cartEl = document.getElementById('cart');
+    const cartItemsEl = document.getElementById('cartItems');
+    const subTotalEl = document.getElementById('subTotal');
+    const vatTotalEl = document.getElementById('vatTotal');
+    const grandTotalEl = document.getElementById('grandTotal');
+    const cartToggle = document.getElementById('cartToggle');
+    const cartCount = document.getElementById('cartCount');
+    const clearCartBtn = document.getElementById('clearCart');
+
+    // Who fields
+    const f = (id)=>document.getElementById(id);
+    const fullName=f('fullName'), phone=f('phone'), email=f('email'), address1=f('address1'), suburb=f('suburb'), city=f('city'), postal=f('postal');
+    const recipientWrap = f('recipient'), recName=f('recName'), recPhone=f('recPhone');
+
+    // Vehicle size radios
+    const sizeGroup = document.getElementById('sizeGroup');
+    sizeGroup.querySelectorAll('input[name="vsize"]').forEach(r=>{
+      r.checked = (r.value === (state.vehicleSize || 'Compact'));
+      r.addEventListener('change', ()=>{
+        if(r.checked){ state.vehicleSize = r.value; saveState(); renderServices(); renderCart(); renderSummary(); }
+      });
+    });
+
+    // Extras (new)
+    const notes=f('notes'), parking=f('parking');
+    const waterYes=f('waterYes'), waterNo=f('waterNo'), powerYes=f('powerYes'), powerNo=f('powerNo');
+
+    // Schedule
+    const dateEl=f('date'), timeEl=f('time'), durationAlert=f('durationAlert'), durationLabel=f('durationLabel'), rangeHelp=f('rangeHelp');
+
+    // Review
+    const summary=f('summary'), terms=f('terms'), termsErr=f('termsErr'), confirmBtn=f('confirmBtn');
+
+    // Navigation
+    document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>goNext()));
+    document.querySelectorAll('[data-prev]').forEach(b=>b.addEventListener('click',()=>goPrev()));
+    f('next1').addEventListener('click',()=>{ if(validateWho()){ goTo('services'); } });
+
+    // Mobile cart toggle
+    cartToggle.addEventListener('click', ()=>{
+      cartEl.classList.toggle('open');
+      cartToggle.setAttribute('aria-expanded', cartEl.classList.contains('open'));
+    });
+
+    clearCartBtn.addEventListener('click', ()=>{ state.cart={}; saveState(); renderCart(); renderServices(); });
+
+    // ====== Init ======
+    bindWho();
+    bindExtras();
+    buildChips();
+    buildServices();
+    buildTimeOptions();
+    primeDate();
+    gotoFromHashOrState();
+    renderCart();
+    updateProgress();
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // Persist on hash navigation
+    window.addEventListener('hashchange', ()=>{
+      const step = parseHashStep();
+      if(step) goTo(step, false);
+    });
+
+    // ====== Builders ======
+    function buildChips(){
+      chipsWrap.innerHTML='';
+      CATS.forEach(c=>{
+        const b=document.createElement('button');
+        b.className='chip'+(c==='All'?' active':'');
+        b.textContent=c;
+        b.dataset.cat=c;
+        b.addEventListener('click', ()=>{
+          chipsWrap.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+          b.classList.add('active');
+          renderServices();
+        });
+        chipsWrap.appendChild(b);
+      });
+    }
+    function buildServices(){ renderServices(); }
+    function priceForSize(svc){
+      const size = ["Compact","Standard","Large"].includes(state.vehicleSize) ? state.vehicleSize : "Compact";
+      if(svc.unit==='pair') return svc.prices.Any;
+      return svc.prices[size] ?? 0;
+    }
+    function unitLabel(svc){ return (svc.unit==='pair') ? 'per pair' : 'per vehicle'; }
+
+    function renderServices(){
+      const active = chipsWrap.querySelector('.chip.active')?.dataset.cat || 'All';
+      const inCart = state.cart;
+      svcGrid.innerHTML='';
+      SERVICES.filter(s=>active==='All'||s.cat===active).forEach(s=>{
+        const price = priceForSize(s);
+        const card = document.createElement('div');
+        card.className='svc-card'+(inCart[s.id]?' selected':'');
+        card.innerHTML = `
+          <span class="badge">Selected</span>
+          <div class="svc-media" role="img" aria-label="${s.name} image"></div>
+          <div class="svc-body">
+            <div class="svc-title">${s.name}</div>
+            <div class="svc-desc">${s.desc}</div>
+            <div class="svc-meta">
+              <div>R ${price.toFixed(0)} <small>${unitLabel(s)}</small></div>
+              <button class="btn-mini add">${inCart[s.id]?'Added':'Add'}</button>
+            </div>
+          </div>`;
+        card.querySelector('.add').addEventListener('click', (e)=>{
+          e.stopPropagation();
+          toggleService(s);
+        });
+        card.addEventListener('click', ()=>toggleService(s));
+        svcGrid.appendChild(card);
+      });
+    }
+    function toggleService(svc){
+      if(state.cart[svc.id]){
+        delete state.cart[svc.id];
+      } else {
+        state.cart[svc.id] = { id: svc.id, qty: 1 };
+      }
+      saveState(); renderCart(); renderServices();
+    }
+
+    function renderCart(){
+      const items = Object.values(state.cart);
+      cartItemsEl.innerHTML='';
+      if(!items.length){
+        cartItemsEl.innerHTML = `<div class="help">No services selected yet.</div>`;
+      } else {
+        items.forEach(it=>{
+          const svc = SERVICES.find(s=>s.id===it.id);
+          const line = document.createElement('div');
+          line.className='line';
+          const step = 1; // integer qty for all size-based items
+          line.innerHTML=`
+            <div>
+              <h4>${svc.name}</h4>
+              <small>${svc.unit==='pair'?'Pair':'Qty'} • ${unitLabel(svc)}</small>
+              <div class="help">Line: ${fmtCurrency(lineTotal(it, svc))}</div>
+              <button class="remove" aria-label="Remove ${svc.name}">Remove</button>
+            </div>
+            <div>
+              <div class="qty" role="group" aria-label="Quantity">
+                <button aria-label="Decrease">−</button>
+                <input type="number" step="${step}" min="${step}" value="${it.qty}">
+                <button aria-label="Increase">+</button>
+              </div>
+            </div>`;
+          const [dec, inp, inc] = line.querySelectorAll('.qty *');
+          dec.addEventListener('click', ()=>{
+            it.qty = Math.max(Number(inp.step), (Number(it.qty) - Number(inp.step)));
+            if(it.qty<=0){ delete state.cart[it.id]; }
+            saveState(); renderCart();
+          });
+          inc.addEventListener('click', ()=>{
+            it.qty = Number(it.qty) + Number(inp.step);
+            saveState(); renderCart();
+          });
+          inp.addEventListener('change', ()=>{
+            let v = Number(inp.value);
+            if(isNaN(v) || v<=0) v = Number(inp.step);
+            it.qty = v;
+            saveState(); renderCart();
+          });
+          line.querySelector('.remove').addEventListener('click', ()=>{
+            delete state.cart[it.id]; saveState(); renderCart(); renderServices();
+          });
+          cartItemsEl.appendChild(line);
+        });
+      }
+      // Totals
+      const {subtotal, vat, total} = computeTotals();
+      subTotalEl.textContent = fmtCurrency(subtotal);
+      vatTotalEl.textContent = fmtCurrency(vat);
+      grandTotalEl.textContent = fmtCurrency(total);
+      cartCount.textContent = items.length;
+
+      // Duration view (size does not affect duration)
+      updateDurationView();
+    }
+
+    // ====== Form bind/persist ======
+    function bindWho(){
+      fullName.value=state.customer.fullName||'';
+      phone.value=state.customer.phone||'';
+      email.value=state.customer.email||'';
+      address1.value=state.customer.address1||'';
+      suburb.value=state.customer.suburb||'';
+      city.value=state.customer.city||CITY;
+      postal.value=state.customer.postal||'';
+      document.querySelectorAll('input[name="contact"]').forEach(r=>r.checked=(r.value===state.customer.contact));
+      document.querySelectorAll('input[name="for"]').forEach(r=>r.checked=(r.value===state.customer.for));
+      (state.customer.for==='Someone else') && (recipientWrap.style.display='grid');
+      recName.value=state.customer.recName||'';
+      recPhone.value=state.customer.recPhone||'';
+
+      [fullName,phone,email,address1,suburb,city,postal,recName,recPhone].forEach(el=>{
+        el.addEventListener('input', ()=>{ state.customer[el.id] = el.value; saveState(); });
+      });
+      document.querySelectorAll('input[name="contact"]').forEach(r=>r.addEventListener('change', ()=>{
+        if(r.checked){ state.customer.contact=r.value; saveState(); }
+      }));
+      document.querySelectorAll('input[name="for"]').forEach(r=>r.addEventListener('change', ()=>{
+        if(r.checked){
+          state.customer.for=r.value; recipientWrap.style.display = r.value==='Someone else'?'grid':'none';
+          saveState();
+        }
+      }));
+    }
+    function bindExtras(){
+      notes.value = state.extras.notes||'';
+      parking.checked = !!state.extras.parking;
+
+      // restore radios
+      if(state.extras.water==='Yes') waterYes.checked = true;
+      else if(state.extras.water==='No') waterNo.checked = true;
+
+      if(state.extras.power==='Yes') powerYes.checked = true;
+      else if(state.extras.power==='No') powerNo.checked = true;
+
+      notes.addEventListener('input', ()=>{ state.extras.notes=notes.value; saveState(); });
+      parking.addEventListener('change', ()=>{ state.extras.parking = parking.checked; saveState(); });
+
+      [waterYes,waterNo].forEach(r=>r.addEventListener('change', ()=>{
+        if(r.checked){ state.extras.water = r.value; saveState(); }
+      }));
+      [powerYes,powerNo].forEach(r=>r.addEventListener('change', ()=>{
+        if(r.checked){ state.extras.power = r.value; saveState(); }
+      }));
+    }
+
+    // ====== Schedule ======
+    function buildTimeOptions(){
+      timeEl.innerHTML='';
+      const times=[];
+      for(let h=8;h<=18;h++){
+        for(let m=0;m<60;m+=30){
+          if(h===18 && m>0) continue;
+          times.push(`${pad(h)}:${pad(m)}`);
+        }
+      }
+      times.forEach(t=>{
+        const opt=document.createElement('option'); opt.value=t; opt.textContent=t;
+        timeEl.appendChild(opt);
+      });
+      timeEl.addEventListener('change', ()=>{
+        state.schedule.time=timeEl.value; saveState(); updateDurationView();
+      });
+    }
+    function primeDate(){
+      dateEl.min = todayISO();
+      const d = nextBusinessDay(new Date());
+      dateEl.value = toISO(d);
+      state.schedule.date = state.schedule.date || dateEl.value;
+      saveState();
+      dateEl.addEventListener('change', ()=>{
+        state.schedule.date = dateEl.value; saveState();
+      });
+      if(state.schedule.date) dateEl.value = state.schedule.date;
+      if(state.schedule.time) timeEl.value = state.schedule.time;
+      updateDurationView();
+    }
+    function updateDurationView(){
+      const dur = computeDurationHours();
+      if(dur<=0){
+        durationLabel.textContent='Select services to estimate';
+        durationAlert.style.display='block';
+        durationAlert.textContent='Add at least one service to continue.';
+      } else {
+        durationAlert.style.display='none';
+        durationLabel.textContent = `${dur.toFixed(1)} hr${dur>=2?'s':''}`;
+      }
+      const t = state.schedule.time || timeEl.value;
+      if(dur>0 && t){
+        const end = addHoursToTime(t, dur);
+        rangeHelp.textContent = `Estimated window: ${t}–${end}`;
+      } else {
+        rangeHelp.textContent = '';
+      }
+    }
+
+    // ====== Navigation ======
+    function stepIndex(key){ return ['who','services','extras','schedule','review'].indexOf(key); }
+    function goTo(key, pushHash=true){
+      state.step = key; saveState();
+      steps.forEach(s=>s.classList.toggle('active', s.dataset.step===key));
+      updateProgress();
+      if(key==='review'){ renderSummary(); }
+      if(pushHash) location.hash = '#'+key;
+      if(cartEl.classList.contains('open')) { cartEl.classList.remove('open'); cartToggle.setAttribute('aria-expanded','false'); }
+    }
+    function goNext(){
+      const order = ['who','services','extras','schedule','review'];
+      const idx = order.indexOf(state.step);
+      if(idx<order.length-1){
+        const next = order[idx+1];
+        if(next==='extras' && !hasCart()) { flash(durationAlert, 'Please add at least one service.'); return; }
+        if(next==='schedule' && !hasCart()) { flash(durationAlert, 'Please add at least one service.'); return; }
+        if(next==='review' && !validateSchedule()) return;
+        goTo(next);
+      }
+    }
+    function goPrev(){
+      const order = ['who','services','extras','schedule','review'];
+      const idx = order.indexOf(state.step);
+      if(idx>0) goTo(order[idx-1]);
+    }
+    function updateProgress(){
+      const idx = stepIndex(state.step);
+      const pct = (idx)/(4)*100;
+      progressBar.style.width = pct+'%';
+      Array.from(progressSteps).forEach((el,i)=>{
+        el.classList.toggle('active', i===idx);
+      });
+    }
+    function gotoFromHashOrState(){
+      const step = parseHashStep() || state.step || 'who';
+      goTo(step,false);
+    }
+    function parseHashStep(){
+      const h = location.hash.replace('#','');
+      if(['who','services','extras','schedule','review'].includes(h)) return h;
+      return null;
+    }
+
+    // ====== Validation ======
+    function validateWho(){
+      const req = [fullName, phone, address1, suburb];
+      let ok = true;
+      req.forEach(el=>{
+        if(!el.value.trim()){
+          ok=false; shake(el); el.focus();
+        }
+      });
+      return ok;
+    }
+    function validateSchedule(){
+      if(!hasCart()){
+        flash(durationAlert,'Add at least one service.'); return false;
+      }
+      if(!dateEl.value){ shake(dateEl); return false; }
+      if(!timeEl.value){ shake(timeEl); return false; }
+      return true;
+    }
+
+    // ====== Review & WhatsApp ======
+    function renderSummary(){
+      const cust = state.customer;
+      const size = state.vehicleSize;
+      const items = Object.values(state.cart).map(it => {
+        const s = SERVICES.find(x=>x.id===it.id);
+        const unitPrice = priceForSize(s);
+        return { name:s.name, unit:s.unit==='pair'?'pair':'qty', unitLabel:(s.unit==='pair'?'per pair':'per vehicle'), unitPrice, qty:it.qty, total: unitPrice*it.qty };
+      });
+      const totals = computeTotals();
+
+      const custHtml = `
+        <div class="card" style="padding:12px">
+          <strong>${escapeHTML(cust.fullName||'')}</strong><br>
+          ${escapeHTML(cust.phone||'')} ${cust.email?('• '+escapeHTML(cust.email)) : ''}<br>
+          ${escapeHTML(cust.address1||'')}, ${escapeHTML(cust.suburb||'')}, ${escapeHTML(cust.city||CITY)} ${escapeHTML(cust.postal||'')}
+          <div class="help">Contact: ${escapeHTML(cust.contact||'WhatsApp')} • Vehicle size: ${escapeHTML(size)}
+            ${cust.for==='Someone else' && cust.recName?` • For: ${escapeHTML(cust.recName)} (${escapeHTML(cust.recPhone||'')})`:''}
+          </div>
+        </div>`;
+
+      let rows = items.map(it=>`
+        <tr>
+          <td>${escapeHTML(it.name)}</td>
+          <td>${it.unit}</td>
+          <td>${it.qty}</td>
+          <td>${fmtCurrency(it.unitPrice)}</td>
+          <td>${fmtCurrency(it.total)}</td>
+        </tr>`).join('');
+
+      const extrasBits = [
+        state.extras.water ? `Water: ${escapeHTML(state.extras.water)}` : 'Water: Not specified',
+        state.extras.power ? `Electricity: ${escapeHTML(state.extras.power)}` : 'Electricity: Not specified',
+        state.extras.parking ? 'Parking: On-site available' : 'Parking: Not specified',
+        state.extras.notes ? `Notes: ${escapeHTML(state.extras.notes)}` : ''
+      ].filter(Boolean);
+
+      const scheduleStr = `${state.schedule.date} at ${state.schedule.time} (${computeDurationHours().toFixed(1)} hrs est)`;
+
+      summary.innerHTML = `
+        ${custHtml}
+        <div style="height:10px"></div>
+        <div class="pill">Scheduled: ${scheduleStr}</div>
+        <div class="help" style="margin-top:6px">${extrasBits.join(' • ')}</div>
+        <div style="height:10px"></div>
+        <div class="card" style="padding:0">
+          <table aria-label="Order summary">
+            <thead><tr><th>Service</th><th>Unit</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+            <tbody>${rows || '<tr><td colspan="5">No services selected.</td></tr>'}</tbody>
+            <tfoot>
+              <tr><td colspan="4">Subtotal</td><td>${fmtCurrency(totals.subtotal)}</td></tr>
+              <tr><td colspan="4">VAT (15%)</td><td>${fmtCurrency(totals.vat)}</td></tr>
+              <tr><td colspan="4">Grand Total</td><td>${fmtCurrency(totals.total)}</td></tr>
+            </tfoot>
+          </table>
+        </div>
+      `;
+    }
+
+    confirmBtn.addEventListener('click', ()=>{
+      if(!terms.checked){ termsErr.style.display='block'; setTimeout(()=>termsErr.style.display='none', 2500); return; }
+      const msg = buildWhatsAppMessage();
+      const url = `https://wa.me/${encodeURIComponent(WHATSAPP_NUMBER_E164.replace(/\D/g,''))}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank', 'noopener');
+    });
+
+    function buildWhatsAppMessage(){
+      const cust = state.customer;
+      const size = state.vehicleSize;
+      const items = Object.values(state.cart).map(it => {
+        const s = SERVICES.find(x=>x.id===it.id);
+        const up = priceForSize(s);
+        return `${s.name} x ${it.qty} @ ${fmtCurrency(up)}`;
+      });
+      const totals = computeTotals();
+      const scheduleStr = `${state.schedule.date} ${state.schedule.time} (${computeDurationHours().toFixed(1)} hrs)`;
+
+      let lines = [
+        `New booking via ${BUSINESS_NAME}`,
+        `Customer: ${cust.fullName} | ${cust.phone}${cust.email? ' | '+cust.email:''}`,
+        `For: ${cust.for}${cust.for==='Someone else'&&cust.recName? ' → '+cust.recName+' ('+(cust.recPhone||'')+')':''}`,
+        `Address: ${cust.address1}, ${cust.suburb}, ${cust.city} ${cust.postal||''}`,
+        `Vehicle size: ${size}`,
+        `Contact via: ${cust.contact}`,
+        `Schedule: ${scheduleStr}`,
+        `Access: Water=${state.extras.water ?? 'n/a'}, Electricity=${state.extras.power ?? 'n/a'}${state.extras.parking ? ', Parking=On-site' : ''}`,
+        `Services:`,
+        ...items.map(x=>'• '+x),
+        `Subtotal: ${fmtCurrency(totals.subtotal)}`,
+        `VAT (15%): ${fmtCurrency(totals.vat)}`,
+        `Total: ${fmtCurrency(totals.total)}`,
+        state.extras.notes ? `Notes: ${truncate(state.extras.notes, 180)}` : null
+      ].filter(Boolean);
+
+      let msg = lines.join('\n');
+      if(msg.length>1000){
+        msg = msg.replace(/\nNotes:[\s\S]*/,'');
+        if(msg.length>1000){
+          const count = Object.keys(state.cart).length;
+          msg = msg.replace(/Services:[\s\S]*?Subtotal:/, `Services: ${count} item(s)\nSubtotal:`)
+        }
+        msg = msg.slice(0,1000);
+      }
+      return msg;
+    }
+
+    // ====== Totals & Helpers ======
+    function computeTotals(){
+      const items = Object.values(state.cart);
+      const subtotal = items.reduce((acc,it)=>{
+        const s = SERVICES.find(x=>x.id===it.id);
+        return acc + (priceForSize(s) * Number(it.qty||0));
+      },0);
+      const vat = subtotal * 0.15;
+      const total = subtotal + vat;
+      return {subtotal, vat, total};
+    }
+    function lineTotal(it, svc){ return Number(it.qty||0) * priceForSize(svc); }
+    function hasCart(){ return Object.keys(state.cart).length>0; }
+
+    function computeDurationHours(){
+      const items = Object.values(state.cart);
+      if(!items.length) return 0;
+      // Each selected line ~0.5 hr; polishing ~1.0 hr per qty.
+      let hrs = 0;
+      items.forEach(it=>{
+        const s = SERVICES.find(x=>x.id===it.id);
+        const weight = (s.id==='polish1' || s.id==='polish2') ? 1.0 : 0.5;
+        hrs += weight * Number(it.qty||0);
+      });
+      return Math.max(0.5, Math.round(hrs*2)/2);
+    }
+
+    // ====== Storage ======
+    function saveState(){ localStorage.setItem('revival_booking', JSON.stringify(state)); }
+    function loadState(){ try{ const raw=localStorage.getItem('revival_booking'); return raw?JSON.parse(raw):null }catch(e){ return null } }
+
+    // ====== Small utils ======
+    function fmtCurrency(n){
+      try{
+        return new Intl.NumberFormat('en-ZA',{style:'currency',currency:CURRENCY, minimumFractionDigits:0}).format(n||0);
+      } catch { return `R ${Number(n||0).toFixed(0)}`; }
+    }
+    function todayISO(){ return toISO(new Date()); }
+    function toISO(d){ const z = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); return z.toISOString().slice(0,10); }
+    function nextBusinessDay(d){
+      const dt = new Date(d); dt.setDate(dt.getDate()+1);
+      while([0,6].includes(dt.getDay())){ dt.setDate(dt.getDate()+1); }
+      return dt;
+    }
+    function pad(n){ return String(n).padStart(2,'0'); }
+    function addHoursToTime(t, hrs){
+      const [h,m] = t.split(':').map(Number);
+      const minutes = Math.round(hrs*60);
+      let total = h*60 + m + minutes;
+      let hh = Math.floor(total/60), mm = total%60;
+      if(hh>23) hh = hh%24;
+      return `${pad(hh)}:${pad(mm)}`;
+    }
+    function flash(el, msg){ el.textContent = msg; el.style.display='block'; setTimeout(()=>el.style.display='none', 2200); }
+    function shake(el){ el.style.transition='transform .1s'; el.style.transform='translateX(4px)'; setTimeout(()=>{ el.style.transform='translateX(-4px)' },100); setTimeout(()=>{ el.style.transform='translateX(0)' },200); }
+    function escapeHTML(s){ return String(s||'').replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+    function truncate(s, n){ s=String(s||''); return s.length>n? s.slice(0,n-1)+'…' : s; }
+
+    // Guard: prevent skipping required steps via hash
+    steps.forEach(sec=>{
+      const obs = new MutationObserver(()=>{
+        if(sec.classList.contains('active')){
+          const k = sec.dataset.step;
+          if(k!=='who' && !validateWho()) { goTo('who'); }
+          if(['extras','schedule','review'].includes(k) && !hasCart()) { goTo('services'); }
+          if(['review'].includes(k) && !validateSchedule()) { goTo('schedule'); }
+        }
+      });
+      obs.observe(sec, {attributes:true, attributeFilter:['class']});
+    });
+
+  })();
+  </script>
+</body>
+</html>
