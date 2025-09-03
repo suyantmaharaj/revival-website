@@ -17,9 +17,7 @@
 
   <style>
     /* ====== Scoped booking UI that inherits your site variables ====== */
-    :root{
-      /* Uses your existing variables from styles.css */
-    }
+    :root{ }
     body{ background:var(--bg); color:var(--text); }
     .booking-wrap{ max-width:1200px; margin:0 auto 80px; padding:0 20px; }
 
@@ -200,13 +198,11 @@
     #clearCart{ display:none; }
 
     /* === Vehicle size tooltip === */
-    .hint{
-      display:inline-flex; align-items:center; gap:8px;
-    }
+    .hint{ display:inline-flex; align-items:center; gap:8px; }
     .hint .info{
       display:inline-flex; align-items:center; justify-content:center;
       width:18px; height:18px; border-radius:999px;
-      border:1px solid var(--line); background:#0f0f13; color:var(--muted);
+      border:1px solid var(--line); background:#0f0f13; color:#muted;
       font-size:12px; cursor:default; position:relative;
     }
     .hint .bubble{
@@ -271,7 +267,7 @@
           <h3 id="h-who">1) Who & Where</h3>
           <div class="grid grid-2">
             <div class="field" id="field-fullName">
-              <label for="fullName">Full name</label>
+              <label for="fullName">Full Name</label>
               <input id="fullName" type="text" required placeholder="Your name" autocomplete="name" inputmode="text" />
               <small class="err-msg">Only letters, spaces, and hyphens (e.g., “Jean-Pierre”).</small>
             </div>
@@ -301,12 +297,12 @@
               <small class="err-msg">Suburb is required.</small>
             </div>
             <div class="field" id="field-postal">
-              <label for="postal">Postal code</label>
+              <label for="postal">Postal Code</label>
               <input id="postal" type="text" inputmode="numeric" maxlength="4" placeholder="0000" />
               <small class="err-msg">Postal code must be 4 digits.</small>
             </div>
             <div class="field">
-              <label>Preferred contact</label>
+              <label>Preferred Contact</label>
               <div class="segmented" role="radiogroup" aria-label="Preferred contact">
                 <input type="radio" name="contact" id="cWhatsApp" value="WhatsApp" checked><label for="cWhatsApp">WhatsApp</label>
                 <input type="radio" name="contact" id="cPhone" value="Phone"><label for="cPhone">Phone</label>
@@ -325,7 +321,7 @@
             </div>
             <div class="field">
               <label class="hint">
-                Vehicle size (affects price)
+                Vehicle Size
                 <span class="info" tabindex="0" aria-label="Vehicle size examples">?</span>
                 <span class="bubble" role="tooltip" aria-live="polite">
                   <table>
@@ -344,8 +340,8 @@
           </div>
 
           <div id="recipient" class="grid grid-2" style="display:none;margin-top:10px">
-            <div class="field"><label for="recName">Recipient name</label><input id="recName" type="text" placeholder="Recipient full name"></div>
-            <div class="field"><label for="recPhone">Recipient phone</label><input id="recPhone" type="tel" placeholder="+27…"></div>
+            <div class="field"><label for="recName">Recipient Name</label><input id="recName" type="text" placeholder="Recipient full name"></div>
+            <div class="field"><label for="recPhone">Recipient Phone</label><input id="recPhone" type="tel" placeholder="+27…"></div>
           </div>
 
           <div class="nav-inline">
@@ -434,10 +430,9 @@
         <div id="cartItems" class="cart-items" role="list"></div>
         <div class="totals">
           <div class="row"><span>Subtotal</span><strong id="subTotal">R 0.00</strong></div>
-          <div class="row"><span>VAT (15%)</span><strong id="vatTotal">R 0.00</strong></div>
           <div class="row" style="font-size:18px"><span>Total</span><strong id="grandTotal">R 0.00</strong></div>
         </div>
-        <p class="help" style="margin-top:8px">Prices in ZAR. Final confirmation via WhatsApp.</p>
+        <p class="help" style="margin-top:8px">Please note these are estimated prices in ZAR. Final confirmation via WhatsApp.</p>
       </aside>
     </div>
 
@@ -457,7 +452,7 @@
     const BUSINESS_NAME = "Revival Automotive";
     const CITY = "Cape Town";
     const CURRENCY = "ZAR";
-    const WHATSAPP_NUMBER_E164 = "+27624952909"; // update if needed
+    const WHATSAPP_NUMBER_E164 = "+27624952909";
 
     const VEHICLE_SIZES = ["Compact","Standard","Large"];
 
@@ -518,7 +513,6 @@
     const cartEl = document.getElementById('cart');
     const cartItemsEl = document.getElementById('cartItems');
     const subTotalEl = document.getElementById('subTotal');
-    const vatTotalEl = document.getElementById('vatTotal');
     const grandTotalEl = document.getElementById('grandTotal');
     const cartToggle = document.getElementById('cartToggle');
     const cartCount = document.getElementById('cartCount');
@@ -687,10 +681,9 @@
           cartItemsEl.appendChild(line);
         });
       }
-      // Totals
-      const {subtotal, vat, total} = computeTotals();
+      // Totals (no VAT)
+      const {subtotal, total} = computeTotals();
       subTotalEl.textContent = fmtCurrency(subtotal);
-      vatTotalEl.textContent = fmtCurrency(vat);
       grandTotalEl.textContent = fmtCurrency(total);
       cartCount.textContent = items.length;
 
@@ -716,13 +709,11 @@
       // Persist while typing
       [fullName,phone,email,address1,suburb,city,postal,recName,recPhone].forEach(el=>{
         el.addEventListener('input', ()=>{
-          // live scrubbing for some fields
           if(el===phone){ el.value = (el.value||'').replace(/\D/g,'').slice(0,10); }
           if(el===postal){ el.value = (el.value||'').replace(/\D/g,'').slice(0,4); }
           state.customer[el.id] = el.value;
           saveState();
         });
-        // validate on blur
         el.addEventListener('blur', ()=>validateField(el));
       });
 
@@ -810,7 +801,7 @@
     }
 
     // ====== Validation helpers ======
-    const NAME_CITY_RE = /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/; // letters with spaces/hyphen only
+    const NAME_CITY_RE = /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/;
     const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     function setValidity(el, valid, msgSel='.err-msg'){
@@ -836,7 +827,7 @@
         return setValidity(el, /^\d{10}$/.test(el.value));
       }
       if(el===email){
-        if(!el.value.trim()) { // optional
+        if(!el.value.trim()) {
           el.removeAttribute('aria-invalid');
           const wrap = el.closest('.field'); wrap?.classList.remove('invalid','valid');
           return true;
@@ -855,14 +846,12 @@
       return true;
     }
 
-    // Validate the whole "Who" step
     function validateWho(){
       const fields = [fullName, phone, email, address1, suburb, city, postal];
       let ok = true;
       fields.forEach(el=>{
         if(!validateField(el)) ok = false;
       });
-      // required-only check: email is optional, but if invalid it's already marked
       if(!fullName.value.trim()) ok=false;
       if(!phone.value.match(/^\d{10}$/)) ok=false;
       if(!address1.value.trim()) ok=false;
@@ -981,7 +970,6 @@
             <tbody>${rows || '<tr><td colspan="5">No services selected.</td></tr>'}</tbody>
             <tfoot>
               <tr><td colspan="4">Subtotal</td><td>${fmtCurrency(totals.subtotal)}</td></tr>
-              <tr><td colspan="4">VAT (15%)</td><td>${fmtCurrency(totals.vat)}</td></tr>
               <tr><td colspan="4">Grand Total</td><td>${fmtCurrency(totals.total)}</td></tr>
             </tfoot>
           </table>
@@ -991,7 +979,6 @@
 
     confirmBtn.addEventListener('click', ()=>{
       if(!terms.checked){ termsErr.style.display='block'; setTimeout(()=>termsErr.style.display='none', 2500); return; }
-      // safety: validate again before sending
       if(!validateWho()){ goTo('who'); return; }
       const msg = buildWhatsAppMessage();
       const url = `https://wa.me/${encodeURIComponent(WHATSAPP_NUMBER_E164.replace(/\D/g,''))}?text=${encodeURIComponent(msg)}`;
@@ -1021,7 +1008,6 @@
         `Services:`,
         ...items.map(x=>'• '+x),
         `Subtotal: ${fmtCurrency(totals.subtotal)}`,
-        `VAT (15%): ${fmtCurrency(totals.vat)}`,
         `Total: ${fmtCurrency(totals.total)}`,
         state.extras.notes ? `Notes: ${truncate(state.extras.notes, 180)}` : null
       ].filter(Boolean);
@@ -1038,16 +1024,15 @@
       return msg;
     }
 
-    // ====== Totals & Helpers ======
+    // ====== Totals & Helpers (NO VAT) ======
     function computeTotals(){
       const items = Object.values(state.cart);
       const subtotal = items.reduce((acc,it)=>{
         const s = SERVICES.find(x=>x.id===it.id);
         return acc + (priceForSize(s) * Number(it.qty||0));
       },0);
-      const vat = subtotal * 0.15;
-      const total = subtotal + vat;
-      return {subtotal, vat, total};
+      const total = subtotal; // no VAT
+      return {subtotal, total};
     }
     function lineTotal(it, svc){ return Number(it.qty||0) * priceForSize(svc); }
     function hasCart(){ return Object.keys(state.cart).length>0; }
