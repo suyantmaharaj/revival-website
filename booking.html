@@ -18,8 +18,7 @@
   <style>
     /* ====== Scoped booking UI that inherits your site variables ====== */
     :root{
-      /* Uses your existing variables from styles.css:
-         --bg, --bg-elev, --text, --muted, --line, --accent, --accent-2, --radius, --shadow */
+      /* Uses your existing variables from styles.css */
     }
     body{ background:var(--bg); color:var(--text); }
     .booking-wrap{ max-width:1200px; margin:0 auto 80px; padding:0 20px; }
@@ -50,6 +49,15 @@
       background:#0f0f13; color:var(--text); outline:none
     }
     input:focus,select:focus,textarea:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(199,167,104,.25) }
+
+    /* Validation UI */
+    .field.invalid input,
+    .field.invalid select,
+    .field.invalid textarea{ border-color:#ef4444; }
+    .err-msg{ color:#ffb3b3; font-size:12px; display:none }
+    .field.invalid .err-msg{ display:block }
+    .ok-msg{ color:#b6ffe8; font-size:12px; display:none }
+    .field.valid .ok-msg{ display:block }
 
     /* Segmented controls */
     .segmented{ display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:#0f0f13 }
@@ -190,6 +198,28 @@
 
     /* === Clear Cart visibility: hidden by default, toggled via JS on Services step === */
     #clearCart{ display:none; }
+
+    /* === Vehicle size tooltip === */
+    .hint{
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .hint .info{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:18px; height:18px; border-radius:999px;
+      border:1px solid var(--line); background:#0f0f13; color:var(--muted);
+      font-size:12px; cursor:default; position:relative;
+    }
+    .hint .bubble{
+      position:absolute; left:0; top:26px; z-index:10;
+      display:none; min-width:260px; max-width:320px;
+      background:#121214; color:var(--text);
+      border:1px solid var(--line); border-radius:10px; padding:10px; box-shadow:var(--shadow);
+    }
+    .hint:hover .bubble, .info:focus + .bubble{ display:block; }
+    .bubble table{ width:100%; border-collapse:collapse; }
+    .bubble td{ padding:4px 6px; border-bottom:1px solid var(--line); font-size:12px; color:var(--muted) }
+    .bubble tr:last-child td{ border-bottom:none; }
+    .bubble td:first-child{ color:#fff; font-weight:700; width:36% }
   </style>
 </head>
 <body>
@@ -240,13 +270,41 @@
         <section class="card step active" data-step="who" aria-labelledby="h-who">
           <h3 id="h-who">1) Who & Where</h3>
           <div class="grid grid-2">
-            <div class="field"><label for="fullName">Full name</label><input id="fullName" type="text" required placeholder="Your name"></div>
-            <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" required placeholder="+27…"></div>
-            <div class="field"><label for="email">Email <span class="help">(optional)</span></label><input id="email" type="email" placeholder="you@example.com"></div>
-            <div class="field"><label for="city">City</label><input id="city" type="text" value="Cape Town"></div>
-            <div class="field"><label for="address1">Address</label><input id="address1" type="text" required placeholder="Street and number"></div>
-            <div class="field"><label for="suburb">Suburb</label><input id="suburb" type="text" required placeholder="Suburb"></div>
-            <div class="field"><label for="postal">Postal code</label><input id="postal" type="text" inputmode="numeric" pattern="[0-9]{4}" placeholder="0000"></div>
+            <div class="field" id="field-fullName">
+              <label for="fullName">Full name</label>
+              <input id="fullName" type="text" required placeholder="Your name" autocomplete="name" inputmode="text" />
+              <small class="err-msg">Only letters, spaces, and hyphens (e.g., “Jean-Pierre”).</small>
+            </div>
+            <div class="field" id="field-phone">
+              <label for="phone">Phone</label>
+              <input id="phone" type="tel" required placeholder="0712345678" inputmode="numeric" maxlength="10" />
+              <small class="err-msg">Phone must be exactly 10 digits.</small>
+            </div>
+            <div class="field" id="field-email">
+              <label for="email">Email <span class="help">(optional)</span></label>
+              <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
+              <small class="err-msg">Enter a valid email like name@example.com.</small>
+            </div>
+            <div class="field" id="field-city">
+              <label for="city">City</label>
+              <input id="city" type="text" value="Cape Town" required/>
+              <small class="err-msg">Only letters, spaces, and hyphens.</small>
+            </div>
+            <div class="field" id="field-address1">
+              <label for="address1">Address</label>
+              <input id="address1" type="text" required placeholder="Street and number">
+              <small class="err-msg">Please enter your street and number.</small>
+            </div>
+            <div class="field" id="field-suburb">
+              <label for="suburb">Suburb</label>
+              <input id="suburb" type="text" required placeholder="Suburb">
+              <small class="err-msg">Suburb is required.</small>
+            </div>
+            <div class="field" id="field-postal">
+              <label for="postal">Postal code</label>
+              <input id="postal" type="text" inputmode="numeric" maxlength="4" placeholder="0000" />
+              <small class="err-msg">Postal code must be 4 digits.</small>
+            </div>
             <div class="field">
               <label>Preferred contact</label>
               <div class="segmented" role="radiogroup" aria-label="Preferred contact">
@@ -266,7 +324,17 @@
               </div>
             </div>
             <div class="field">
-              <label>Vehicle size (affects price)</label>
+              <label class="hint">
+                Vehicle size (affects price)
+                <span class="info" tabindex="0" aria-label="Vehicle size examples">?</span>
+                <span class="bubble" role="tooltip" aria-live="polite">
+                  <table>
+                    <tr><td>Compact</td><td>i10, GTI, Starlet</td></tr>
+                    <tr><td>Standard</td><td>C63, M3, Macan</td></tr>
+                    <tr><td>Large</td><td>Range Rover, Hilux, Cayenne</td></tr>
+                  </table>
+                </span>
+              </label>
               <div class="segmented" role="radiogroup" id="sizeGroup">
                 <input type="radio" name="vsize" id="sizeCompact" value="Compact" checked><label for="sizeCompact">Compact</label>
                 <input type="radio" name="vsize" id="sizeStandard" value="Standard"><label for="sizeStandard">Standard</label>
@@ -426,11 +494,10 @@
     };
     let state = loadState() || initialState;
 
-    // --- normalize/migrate persisted state (handles old versions) ---
+    // --- normalize/migrate persisted state ---
     if (!state.vehicleSize || !["Compact","Standard","Large"].includes(state.vehicleSize)) state.vehicleSize = "Compact";
     if (!state.customer) state.customer = initialState.customer;
     if (!state.cart) state.cart = {};
-    // migrate extras
     state.extras = {
       notes: state.extras?.notes || '',
       water: (state.extras?.water ?? null),
@@ -471,7 +538,7 @@
       });
     });
 
-    // Extras (new)
+    // Extras
     const notes=f('notes'), parking=f('parking');
     const waterYes=f('waterYes'), waterNo=f('waterNo'), powerYes=f('powerYes'), powerNo=f('powerNo');
 
@@ -522,6 +589,7 @@
         b.dataset.cat=c;
         b.addEventListener('click', ()=>{
           chipsWrap.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+          b.addEventListener('blur',()=>b.classList.remove('active'));
           b.classList.add('active');
           renderServices();
         });
@@ -645,9 +713,19 @@
       recName.value=state.customer.recName||'';
       recPhone.value=state.customer.recPhone||'';
 
+      // Persist while typing
       [fullName,phone,email,address1,suburb,city,postal,recName,recPhone].forEach(el=>{
-        el.addEventListener('input', ()=>{ state.customer[el.id] = el.value; saveState(); });
+        el.addEventListener('input', ()=>{
+          // live scrubbing for some fields
+          if(el===phone){ el.value = (el.value||'').replace(/\D/g,'').slice(0,10); }
+          if(el===postal){ el.value = (el.value||'').replace(/\D/g,'').slice(0,4); }
+          state.customer[el.id] = el.value;
+          saveState();
+        });
+        // validate on blur
+        el.addEventListener('blur', ()=>validateField(el));
       });
+
       document.querySelectorAll('input[name="contact"]').forEach(r=>r.addEventListener('change', ()=>{
         if(r.checked){ state.customer.contact=r.value; saveState(); }
       }));
@@ -658,6 +736,7 @@
         }
       }));
     }
+
     function bindExtras(){
       notes.value = state.extras.notes||'';
       parking.checked = !!state.extras.parking;
@@ -730,6 +809,82 @@
       }
     }
 
+    // ====== Validation helpers ======
+    const NAME_CITY_RE = /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/; // letters with spaces/hyphen only
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function setValidity(el, valid, msgSel='.err-msg'){
+      const wrap = el.closest('.field');
+      wrap?.classList.toggle('invalid', !valid);
+      wrap?.classList.toggle('valid', valid);
+      el.setAttribute('aria-invalid', String(!valid));
+      if(!valid && wrap){
+        const m = wrap.querySelector(msgSel);
+        if(m) m.style.display = 'block';
+      }
+      return valid;
+    }
+
+    function validateField(el){
+      if(el===fullName){
+        return setValidity(el, NAME_CITY_RE.test(el.value.trim()));
+      }
+      if(el===city){
+        return setValidity(el, NAME_CITY_RE.test(el.value.trim()));
+      }
+      if(el===phone){
+        return setValidity(el, /^\d{10}$/.test(el.value));
+      }
+      if(el===email){
+        if(!el.value.trim()) { // optional
+          el.removeAttribute('aria-invalid');
+          const wrap = el.closest('.field'); wrap?.classList.remove('invalid','valid');
+          return true;
+        }
+        return setValidity(el, EMAIL_RE.test(el.value.trim()));
+      }
+      if(el===postal){
+        return setValidity(el, /^\d{4}$/.test(el.value));
+      }
+      if(el===address1){
+        return setValidity(el, el.value.trim().length>3);
+      }
+      if(el===suburb){
+        return setValidity(el, el.value.trim().length>1);
+      }
+      return true;
+    }
+
+    // Validate the whole "Who" step
+    function validateWho(){
+      const fields = [fullName, phone, email, address1, suburb, city, postal];
+      let ok = true;
+      fields.forEach(el=>{
+        if(!validateField(el)) ok = false;
+      });
+      // required-only check: email is optional, but if invalid it's already marked
+      if(!fullName.value.trim()) ok=false;
+      if(!phone.value.match(/^\d{10}$/)) ok=false;
+      if(!address1.value.trim()) ok=false;
+      if(!suburb.value.trim()) ok=false;
+      if(!city.value.trim()) ok=false;
+      if(!postal.value.match(/^\d{4}$/)) ok=false;
+      if(!ok){
+        const firstBad = document.querySelector('.field.invalid input, .field.invalid select, .field.invalid textarea');
+        if(firstBad){ firstBad.focus(); shake(firstBad); }
+      }
+      return ok;
+    }
+
+    function validateSchedule(){
+      if(!hasCart()){
+        flash(durationAlert,'Add at least one service.'); return false;
+      }
+      if(!dateEl.value){ shake(dateEl); return false; }
+      if(!timeEl.value){ shake(timeEl); return false; }
+      return true;
+    }
+
     // ====== Navigation ======
     function stepIndex(key){ return ['who','services','extras','schedule','review'].indexOf(key); }
     function goTo(key, pushHash=true){
@@ -747,6 +902,7 @@
         const next = order[idx+1];
         if(next==='extras' && !hasCart()) { flash(durationAlert, 'Please add at least one service.'); return; }
         if(next==='schedule' && !hasCart()) { flash(durationAlert, 'Please add at least one service.'); return; }
+        if(state.step==='who' && !validateWho()) return;
         if(next==='review' && !validateSchedule()) return;
         goTo(next);
       }
@@ -782,26 +938,6 @@
       return null;
     }
 
-    // ====== Validation ======
-    function validateWho(){
-      const req = [fullName, phone, address1, suburb];
-      let ok = true;
-      req.forEach(el=>{
-        if(!el.value.trim()){
-          ok=false; shake(el); el.focus();
-        }
-      });
-      return ok;
-    }
-    function validateSchedule(){
-      if(!hasCart()){
-        flash(durationAlert,'Add at least one service.'); return false;
-      }
-      if(!dateEl.value){ shake(dateEl); return false; }
-      if(!timeEl.value){ shake(timeEl); return false; }
-      return true;
-    }
-
     // ====== Review & WhatsApp ======
     function renderSummary(){
       const cust = state.customer;
@@ -832,20 +968,12 @@
           <td>${fmtCurrency(it.total)}</td>
         </tr>`).join('');
 
-      const extrasBits = [
-        state.extras.water ? `Water: ${escapeHTML(state.extras.water)}` : 'Water: Not specified',
-        state.extras.power ? `Electricity: ${escapeHTML(state.extras.power)}` : 'Electricity: Not specified',
-        state.extras.parking ? 'Parking: On-site available' : 'Parking: Not specified',
-        state.extras.notes ? `Notes: ${escapeHTML(state.extras.notes)}` : ''
-      ].filter(Boolean);
-
       const scheduleStr = `${state.schedule.date} at ${state.schedule.time} (${computeDurationHours().toFixed(1)} hrs est)`;
 
       summary.innerHTML = `
         ${custHtml}
         <div style="height:10px"></div>
         <div class="pill">Scheduled: ${scheduleStr}</div>
-        <div class="help" style="margin-top:6px">${extrasBits.join(' • ')}</div>
         <div style="height:10px"></div>
         <div class="card" style="padding:0">
           <table aria-label="Order summary">
@@ -863,6 +991,8 @@
 
     confirmBtn.addEventListener('click', ()=>{
       if(!terms.checked){ termsErr.style.display='block'; setTimeout(()=>termsErr.style.display='none', 2500); return; }
+      // safety: validate again before sending
+      if(!validateWho()){ goTo('who'); return; }
       const msg = buildWhatsAppMessage();
       const url = `https://wa.me/${encodeURIComponent(WHATSAPP_NUMBER_E164.replace(/\D/g,''))}?text=${encodeURIComponent(msg)}`;
       window.open(url, '_blank', 'noopener');
