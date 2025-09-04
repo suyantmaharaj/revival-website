@@ -68,7 +68,7 @@
 
     /* Services */
     .chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px }
-    .chip {padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#0f0f13;color:var(--muted);cursor:pointer;font-size:13px;}
+    .chip {padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#0f0f13;color:#var(--muted);cursor:pointer;font-size:13px;}
     .chip.active{ background:#151518; color:#fff; border-color:var(--accent) }
 
     .svc-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px }
@@ -86,9 +86,9 @@
     }
     .svc-body{ padding:12px; display:grid; gap:8px }
     .svc-title{ font-weight:700 }
-    .svc-desc{ color:var(--muted); font-size:13px }
+    .svc-desc{ color:#var(--muted); font-size:13px }
     .svc-meta{ display:flex; justify-content:space-between; align-items:center; font-weight:700 }
-    .svc-meta small{ font-weight:500; color:var(--muted) }
+    .svc-meta small{ font-weight:500; color:#var(--muted) }
     .svc-actions{ margin-top:8px }
     .btn-mini{ padding:8px 10px; border-radius:10px; background:var(--accent); color:#0b0b0c; border:none; cursor:pointer }
 
@@ -107,16 +107,16 @@
     .line{ display:grid; grid-template-columns:1fr auto; gap:6px; align-items:center; border-bottom:1px dashed #27272f; padding-bottom:8px }
     .line h4{ margin:0; font-size:14px }
     .qty{ display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:#0f0f13 }
-    .qty button{background:#0f0f13; border:none; padding:6px 10px; cursor:pointer; color:var(--text);}
-    .qty input{width:66px; padding:6px 0; border:none; text-align:center; background:#0f0f13; color:var(--text);}
-    .line small{ color:var(--muted); }
+    .qty button{background:#0f0f13; border:none; padding:6px 10px; cursor:pointer; color:#var(--text);}
+    .qty input{width:66px; padding:6px 0; border:none; text-align:center; background:#0f0f13; color:#var(--text);}
+    .line small{ color:#var(--muted); }
 
     .totals{ margin-top:12px; border-top:1px solid var(--line); padding-top:10px; display:grid; gap:6px }
     .totals .row{ display:flex; justify-content:space-between; align-items:center }
     .remove{ color:#f87171; font-size:12px; background:transparent; border:none; cursor:pointer }
 
     /* Mobile cart sheet */
-    .cart-toggle {display:none;border:1px solid var(--line);background:#0f0f13;border-radius:999px;padding:8px 12px;box-shadow:var(--shadow);color:var(--text);}
+    .cart-toggle {display:none;border:1px solid var(--line);background:#0f0f13;border-radius:999px;padding:8px 12px;box-shadow:var(--shadow);color:#var(--text);}
 
     @media (max-width:960px){
       aside.cart{ position:fixed; left:0; right:0; bottom:0; top:auto; transform:translateY(calc(100% - 56px));
@@ -130,7 +130,7 @@
 
     /* Buttons */
     .btn{ display:inline-block; padding:14px 22px; border-radius:12px; background:var(--accent); color:#0b0b0c; border:none; cursor:pointer; font-weight:800 }
-    .btn.secondary {background:transparent;color:var(--text);border:1px solid var(--line);}
+    .btn.secondary {background:transparent;color:#var(--text);border:1px solid var(--line);}
 
     .btn.ghost{ background:transparent; border:1px dashed var(--line); color:#0b0b0c }
     .btn.block{ width:100% }
@@ -146,8 +146,8 @@
     .err{ border-left-color:#ef4444; background:#1a0d0d; color:#ffb3b3 }
 
     .nav-inline{ margin-top:16px; display:flex; justify-content:space-between; gap:10px }
-    .help{ color:var(--muted); font-size:12px }
-    .pill { display:inline-block; padding:8px 14px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase;}
+    .help{ color:#var(--muted); font-size:12px }
+    .pill { display:inline-block; padding:8px 14px;border:1px solid var(--line);border-radius:999px;color:#var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase;}
 
     /* ---- FIX: service card sizing & responsive grid ---- */
     .svc-grid{
@@ -227,7 +227,7 @@
     <div class="container hero-inner reveal visible" style="text-align:center">
       <span class="pill kicker">Cape Town • Mobile & Studio</span>
       <h2 style="margin:10px 0 8px">Book Your Detailing</h2>
-      <p style="max-width:860px;margin:0 auto;color:var(--muted)">Choose services, pick a time, and confirm on WhatsApp.</p>
+      <p style="max-width:860px;margin:0 auto;color:#var(--muted)">Choose services, pick a time, and confirm on WhatsApp.</p>
     </div>
   </section>
 
@@ -414,7 +414,7 @@
         </div>
         <div id="cartItems" class="cart-items" role="list"></div>
         <div class="totals">
-          <div class="row"><span>Subtotal</span><strong id="subTotal">R 0.00</strong></div>
+          <!-- Subtotal removed -->
           <div class="row" style="font-size:18px"><span>Total</span><strong id="grandTotal">R 0.00</strong></div>
         </div>
         <p class="help" style="margin-top:8px">Please note these are estimated prices in ZAR. Final confirmation via WhatsApp.</p>
@@ -511,7 +511,6 @@
 
     const cartEl = document.getElementById('cart');
     const cartItemsEl = document.getElementById('cartItems');
-    const subTotalEl = document.getElementById('subTotal');
     const grandTotalEl = document.getElementById('grandTotal');
     const cartToggle = document.getElementById('cartToggle');
     const cartCount = document.getElementById('cartCount');
@@ -688,8 +687,7 @@
         });
       }
       // Totals (no VAT)
-      const {subtotal, total} = computeTotals();
-      subTotalEl.textContent = fmtCurrency(subtotal);
+      const { total } = computeTotals();
       grandTotalEl.textContent = fmtCurrency(total);
       cartCount.textContent = items.length;
 
@@ -852,7 +850,7 @@
         const required = isEmailRequired();
         const val = el.value.trim();
         if(!val){
-          return setValidity(el, !required); // valid only if not required
+          return setValidity(el, !required);
         }
         return setValidity(el, EMAIL_RE.test(val));
       }
@@ -973,7 +971,7 @@
           </div>
         </div>`;
 
-      let rows = items.map(it=>`
+      const rows = items.map(it=>`
         <tr>
           <td>${escapeHTML(it.name)}</td>
           <td>${it.unit}</td>
@@ -994,7 +992,7 @@
             <thead><tr><th>Service</th><th>Unit</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
             <tbody>${rows || '<tr><td colspan="5">No services selected.</td></tr>'}</tbody>
             <tfoot>
-              <tr><td colspan="4">Subtotal</td><td>${fmtCurrency(totals.subtotal)}</td></tr>
+              <!-- Subtotal row removed -->
               <tr><td colspan="4">Grand Total</td><td>${fmtCurrency(totals.total)}</td></tr>
             </tfoot>
           </table>
@@ -1046,7 +1044,7 @@
         `Access: Water=${state.extras.water ?? 'n/a'}, Electricity=${state.extras.power ?? 'n/a'}${state.extras.parking ? ', Parking=On-site' : ''}`,
         `Services:`,
         ...items.map(x=>'• '+x),
-        `Subtotal: ${fmtCurrency(totals.subtotal)}`,
+        // Subtotal removed
         `Total: ${fmtCurrency(totals.total)}`,
         state.extras.notes ? `Notes: ${truncate(state.extras.notes, 180)}` : null
       ].filter(Boolean);
@@ -1056,7 +1054,8 @@
         msg = msg.replace(/\nNotes:[\s\S]*/,'');
         if(msg.length>1000){
           const count = Object.keys(state.cart).length;
-          msg = msg.replace(/Services:[\s\S]*?Subtotal:/, `Services: ${count} item(s)\nSubtotal:`)
+          // shorten list between "Services:" and "Total:"
+          msg = msg.replace(/Services:[\s\S]*?Total:/, `Services: ${count} item(s)\nTotal:`);
         }
         msg = msg.slice(0,1000);
       }
