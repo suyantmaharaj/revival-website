@@ -66,7 +66,7 @@
 
     /* Services */
     .chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px }
-    .chip{ padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:#0f0f13; color:var(--muted); cursor:pointer; font-size:13px }
+    .chip{ padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:#0f0f13; color:#var(--muted); cursor:pointer; font-size:13px }
     .chip.active{ background:#151518; color:#fff; border-color:var(--accent) }
 
     .svc-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px }
@@ -127,7 +127,7 @@
     /* Buttons */
     .btn{ display:inline-block; padding:14px 22px; border-radius:12px; background:var(--accent); color:#0b0b0c; border:none; cursor:pointer; font-weight:800 }
     .btn.secondary{ background:transparent; color:var(--text); border:1px solid var(--line) }
-    .btn.ghost{ background:transparent; border:1px dashed var(--line); color:var(--text) }
+    .btn.ghost{ background:transparent; border:1px dashed var(--line); color:#0b0b0c }
     .btn.block{ width:100% }
 
     /* Tables */
@@ -438,22 +438,36 @@
 
     const VEHICLE_SIZES = ["Compact","Standard","Large"];
 
-    // Services (size-based where applicable)
+    // Services (size-based where applicable) — with your image paths
     const SERVICES = [
       { id:'washwax', name:'Wash & Wax', cat:'Exterior', desc:'Gentle wash, decon & premium wax.', unit:'item',
-        prices: { Compact:400, Standard:450, Large:500 } },
+        prices:{ Compact:400, Standard:450, Large:500 },
+        img:'../assets/car1.jpg'
+      },
       { id:'interior', name:'Interior Detail', cat:'Interior', desc:'Deep clean & fresh finish.', unit:'item',
-        prices: { Compact:250, Standard:300, Large:350 } },
+        prices:{ Compact:250, Standard:300, Large:350 },
+        img:'../assets/Interior.png'
+      },
       { id:'engine', name:'Engine Bay Detail', cat:'Add-ons', desc:'Degrease & dress engine bay.', unit:'item',
-        prices: { Compact:200, Standard:225, Large:250 } },
+        prices:{ Compact:200, Standard:225, Large:250 },
+        img:'../assets/EngineBay.png'
+      },
       { id:'window', name:'Window Polish', cat:'Add-ons', desc:'Polish & restore clarity.', unit:'item',
-        prices: { Compact:325, Standard:350, Large:375 } },
+        prices:{ Compact:325, Standard:350, Large:375 },
+        img:'../assets/car2.jpg'
+      },
       { id:'polish1', name:'1-Step Polish', cat:'Exterior', desc:'Gloss enhancement; reduces swirls.', unit:'item',
-        prices: { Compact:1850, Standard:2000, Large:2175 } },
+        prices:{ Compact:1850, Standard:2000, Large:2175 },
+        img:'../assets/car3.jpg'
+      },
       { id:'polish2', name:'2-Step Polish', cat:'Exterior', desc:'Cut & refine for deeper correction.', unit:'item',
-        prices: { Compact:2750, Standard:3000, Large:3250 } },
+        prices:{ Compact:2750, Standard:3000, Large:3250 },
+        img:'../assets/GolfBonnet.png'
+      },
       { id:'headlight', name:'Headlight Restoration', cat:'Add-ons', desc:'Sand, polish & seal (pair).', unit:'pair',
-        prices: { Any:400 } },
+        prices:{ Any:400 },
+        img:'../assets/Audi Headlight.jpg'
+      },
     ];
     const CATS = ['All','Interior','Exterior','Add-ons'];
 
@@ -580,33 +594,39 @@
     }
     function unitLabel(svc){ return (svc.unit==='pair') ? 'per pair' : 'per vehicle'; }
 
+    // ====== UPDATED: renderServices with <img> support ======
     function renderServices(){
       const active = chipsWrap.querySelector('.chip.active')?.dataset.cat || 'All';
       const inCart = state.cart;
       svcGrid.innerHTML='';
-      SERVICES.filter(s=>active==='All'||s.cat===active).forEach(s=>{
-        const price = priceForSize(s);
-        const card = document.createElement('div');
-        card.className='svc-card'+(inCart[s.id]?' selected':'');
-        card.innerHTML = `
-          <span class="badge">Selected</span>
-          <div class="svc-media" role="img" aria-label="${s.name} image"></div>
-          <div class="svc-body">
-            <div class="svc-title">${s.name}</div>
-            <div class="svc-desc">${s.desc}</div>
-            <div class="svc-meta">
-              <div>R ${price.toFixed(0)} <small>${unitLabel(s)}</small></div>
-              <button class="btn-mini add">${inCart[s.id]?'Added':'Add'}</button>
+      SERVICES
+        .filter(s=>active==='All'||s.cat===active)
+        .forEach(s=>{
+          const price = priceForSize(s);
+          const card = document.createElement('div');
+          card.className='svc-card'+(inCart[s.id]?' selected':'');
+          card.innerHTML = `
+            <span class="badge">Selected</span>
+            <div class="svc-media">
+              <img src="${s.img || '/assets/services/placeholder.jpg'}" alt="${s.name}">
             </div>
-          </div>`;
-        card.querySelector('.add').addEventListener('click', (e)=>{
-          e.stopPropagation();
-          toggleService(s);
-        });
-        card.addEventListener('click', ()=>toggleService(s));
-        svcGrid.appendChild(card);
+            <div class="svc-body">
+              <div class="svc-title">${s.name}</div>
+              <div class="svc-desc">${s.desc}</div>
+              <div class="svc-meta">
+                <div>R ${price.toFixed(0)} <small>${unitLabel(s)}</small></div>
+                <button class="btn-mini add">${inCart[s.id]?'Added':'Add'}</button>
+              </div>
+            </div>`;
+          card.querySelector('.add').addEventListener('click', (e)=>{
+            e.stopPropagation();
+            toggleService(s);
+          });
+          card.addEventListener('click', ()=>toggleService(s));
+          svcGrid.appendChild(card);
       });
     }
+
     function toggleService(svc){
       if(state.cart[svc.id]){
         delete state.cart[svc.id];
