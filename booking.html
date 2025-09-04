@@ -108,7 +108,7 @@
     .line h4{ margin:0; font-size:14px }
     .qty{ display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:#0f0f13 }
     .qty button{background:#0f0f13; border:none; padding:6px 10px; cursor:pointer; color:var(--text);}
-    .qty input{width:66px; padding:6px 0; border:none; text-align:center; background:#0f0f13; color:var(--text);}
+    .qty input{width:66px; padding:6px 0; border:none; text-align:center; background:#0f0f13; color:#0f0f13; color:var(--text);}
     .line small{ color:var(--muted); }
 
     .totals{ margin-top:12px; border-top:1px solid var(--line); padding-top:10px; display:grid; gap:6px }
@@ -474,6 +474,17 @@
       },
     ];
     const CATS = ['All','Interior','Exterior','Add-ons'];
+
+    // === NEW: Per-service estimated hours (use max of any range) ===
+    const SERVICE_HOURS = {
+      washwax: 2.0,   // Wash & Wax = 2 hours
+      interior: 1.5,  // Interior = 1.5 hours
+      engine: 0.5,    // Engine Bay = 0.5 hours
+      headlight: 0.5, // Headlight Restoration = 0.5 hours
+      polish1: 3.0,   // One Step = 2–3 hours → use 3
+      polish2: 4.0,   // Two Step = 3–4 hours → use 4
+      window: 2.0     // Window Polish = 1–2 hours → use 2
+    };
 
     // ====== State ======
     const initialState = {
@@ -1070,17 +1081,20 @@
     function lineTotal(it, svc){ return Number(it.qty||0) * priceForSize(svc); }
     function hasCart(){ return Object.keys(state.cart).length>0; }
 
+    // ====== UPDATED DURATION (only change requested) ======
     function computeDurationHours(){
       const items = Object.values(state.cart);
       if(!items.length) return 0;
-      // Each selected line ~0.5 hr; polishing ~1.0 hr per qty.
+
       let hrs = 0;
       items.forEach(it=>{
-        const s = SERVICES.find(x=>x.id===it.id);
-        const weight = (s.id==='polish1' || s.id==='polish2') ? 1.0 : 0.5;
-        hrs += weight * Number(it.qty||0);
+        const svc = SERVICES.find(x=>x.id===it.id);
+        const perUnit = SERVICE_HOURS[svc.id] ?? 0.5; // fallback to previous default
+        hrs += perUnit * Number(it.qty || 0);
       });
-      return Math.max(0.5, Math.round(hrs*2)/2);
+
+      // round to nearest 0.5 and enforce minimum 0.5 like before
+      return Math.max(0.5, Math.round(hrs * 2) / 2);
     }
 
     // ====== Storage ======
