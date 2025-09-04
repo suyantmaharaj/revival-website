@@ -365,9 +365,11 @@
                 <input type="radio" name="power" id="powerNo" value="No"><label for="powerNo">No</label>
               </div>
             </div>
-            <div class="field"><label class="help"><input id="parking" type="checkbox"> On-site parking available</label></div>
           </div>
-          <div class="field" style="margin-top:8px"><label for="notes">Notes</label><textarea id="notes" rows="4" placeholder="Special requests, gate access, pets, etc."></textarea></div>
+          <div class="field" style="margin-top:8px">
+            <label for="notes">Notes</label>
+            <textarea id="notes" rows="4" placeholder="Special requests, gate access, pets, etc."></textarea>
+          </div>
           <div class="nav-inline">
             <button class="btn secondary" data-prev>← Back</button>
             <button class="btn" data-next>Next: Schedule →</button>
@@ -414,7 +416,6 @@
         </div>
         <div id="cartItems" class="cart-items" role="list"></div>
         <div class="totals">
-          <!-- Subtotal removed -->
           <div class="row" style="font-size:18px"><span>Total</span><strong id="grandTotal">R 0.00</strong></div>
         </div>
         <p class="help" style="margin-top:8px">Please note these are estimated prices in ZAR. Final confirmation via WhatsApp.</p>
@@ -483,7 +484,7 @@
         for:'Myself', recName:'', recPhone:''
       },
       cart: {}, // {id: {id, qty}}
-      extras: { notes:'', water:null, power:null, parking:false },
+      extras: { notes:'', water:null, power:null },
       schedule: { date:'', time:'' }
     };
     let state = loadState() || initialState;
@@ -495,8 +496,7 @@
     state.extras = {
       notes: state.extras?.notes || '',
       water: (state.extras?.water ?? null),
-      power: (state.extras?.power ?? null),
-      parking: !!state.extras?.parking
+      power: (state.extras?.power ?? null)
     };
     if (!state.schedule) state.schedule = initialState.schedule;
     saveState();
@@ -532,7 +532,7 @@
     });
 
     // Extras
-    const notes=f('notes'), parking=f('parking');
+    const notes=f('notes');
     const waterYes=f('waterYes'), waterNo=f('waterNo'), powerYes=f('powerYes'), powerNo=f('powerNo');
 
     // Schedule
@@ -750,7 +750,6 @@
 
     function bindExtras(){
       notes.value = state.extras.notes||'';
-      parking.checked = !!state.extras.parking;
 
       // restore radios
       if(state.extras.water==='Yes') waterYes.checked = true;
@@ -760,7 +759,6 @@
       else if(state.extras.power==='No') powerNo.checked = true;
 
       notes.addEventListener('input', ()=>{ state.extras.notes=notes.value; saveState(); });
-      parking.addEventListener('change', ()=>{ state.extras.parking = parking.checked; saveState(); });
 
       [waterYes,waterNo].forEach(r=>r.addEventListener('change', ()=>{
         if(r.checked){ state.extras.water = r.value; saveState(); }
@@ -992,7 +990,6 @@
             <thead><tr><th>Service</th><th>Unit</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
             <tbody>${rows || '<tr><td colspan="5">No services selected.</td></tr>'}</tbody>
             <tfoot>
-              <!-- Subtotal row removed -->
               <tr><td colspan="4">Grand Total</td><td>${fmtCurrency(totals.total)}</td></tr>
             </tfoot>
           </table>
@@ -1041,10 +1038,9 @@
         `Vehicle size: ${size}`,
         `Contact via: ${cust.contact}`,
         `Schedule: ${scheduleStr}`,
-        `Access: Water=${state.extras.water ?? 'n/a'}, Electricity=${state.extras.power ?? 'n/a'}${state.extras.parking ? ', Parking=On-site' : ''}`,
+        `Access: Water=${state.extras.water ?? 'n/a'}, Electricity=${state.extras.power ?? 'n/a'}`,
         `Services:`,
         ...items.map(x=>'• '+x),
-        // Subtotal removed
         `Total: ${fmtCurrency(totals.total)}`,
         state.extras.notes ? `Notes: ${truncate(state.extras.notes, 180)}` : null
       ].filter(Boolean);
@@ -1054,7 +1050,6 @@
         msg = msg.replace(/\nNotes:[\s\S]*/,'');
         if(msg.length>1000){
           const count = Object.keys(state.cart).length;
-          // shorten list between "Services:" and "Total:"
           msg = msg.replace(/Services:[\s\S]*?Total:/, `Services: ${count} item(s)\nTotal:`);
         }
         msg = msg.slice(0,1000);
