@@ -44,9 +44,9 @@
     .field label{ color:var(--muted); font-weight:600; font-size:14px }
     input[type="text"],input[type="email"],input[type="tel"],input[type="date"],input[type="number"],select,textarea{
       width:100%; padding:12px; border:1px solid var(--line); border-radius:10px;
-  background:#0f0f13;
-color:var(--text);
-outline:none;
+      background:#0f0f13;
+      color:var(--text);
+      outline:none;
     }
     input:focus,select:focus,textarea:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(199,167,104,.25) }
 
@@ -116,7 +116,7 @@ outline:none;
     .remove{ color:#f87171; font-size:12px; background:transparent; border:none; cursor:pointer }
 
     /* Mobile cart sheet */
-   .cart-toggle {display:none;border:1px solid var(--line);background:#0f0f13;border-radius:999px;padding:8px 12px;box-shadow:var(--shadow);color:var(--text);}
+    .cart-toggle {display:none;border:1px solid var(--line);background:#0f0f13;border-radius:999px;padding:8px 12px;box-shadow:var(--shadow);color:var(--text);}
 
     @media (max-width:960px){
       aside.cart{ position:fixed; left:0; right:0; bottom:0; top:auto; transform:translateY(calc(100% - 56px));
@@ -232,8 +232,6 @@ outline:none;
   </section>
 
   <main class="booking-wrap">
-    
-
     <!-- Progress -->
     <section class="progress" aria-label="Booking progress" style="margin:24px 0 16px">
       <div class="progress-rail"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
@@ -600,7 +598,7 @@ outline:none;
     }
     function unitLabel(svc){ return (svc.unit==='pair') ? 'per pair' : 'per vehicle'; }
 
-    // ====== UPDATED: renderServices with <img> support ======
+    // ====== renderServices with <img> support ======
     function renderServices(){
       const active = chipsWrap.querySelector('.chip.active')?.dataset.cat || 'All';
       const inCart = state.cart;
@@ -730,8 +728,8 @@ outline:none;
         if(r.checked){
           state.customer.contact=r.value;
           saveState();
-          updateEmailRequiredUI(); // NEW
-          validateField(email);    // re-validate email on change
+          updateEmailRequiredUI();
+          validateField(email);
         }
       }));
 
@@ -854,10 +852,8 @@ outline:none;
         const required = isEmailRequired();
         const val = el.value.trim();
         if(!val){
-          // empty email
           return setValidity(el, !required); // valid only if not required
         }
-        // has a value → must be valid format
         return setValidity(el, EMAIL_RE.test(val));
       }
       if(el===postal){
@@ -884,7 +880,6 @@ outline:none;
       if(!suburb.value.trim()) ok=false;
       if(!city.value.trim()) ok=false;
       if(!postal.value.match(/^\d{4}$/)) ok=false;
-      // extra guard: if contact is Email, enforce email present and valid
       if(isEmailRequired()){
         if(!email.value.trim() || !EMAIL_RE.test(email.value.trim())) ok=false;
       }
@@ -1007,12 +1002,26 @@ outline:none;
       `;
     }
 
+    // === CLEAR STATE on confirm ===
     confirmBtn.addEventListener('click', ()=>{
-      if(!terms.checked){ termsErr.style.display='block'; setTimeout(()=>termsErr.style.display='none', 2500); return; }
-      if(!validateWho()){ goTo('who'); return; }
+      if(!terms.checked){ 
+        termsErr.style.display='block'; 
+        setTimeout(()=>termsErr.style.display='none', 2500); 
+        return; 
+      }
+      if(!validateWho()){ 
+        goTo('who'); 
+        return; 
+      }
       const msg = buildWhatsAppMessage();
       const url = `https://wa.me/${encodeURIComponent(WHATSAPP_NUMBER_E164.replace(/\D/g,''))}?text=${encodeURIComponent(msg)}`;
+
+      // Open WhatsApp and immediately clear the saved booking so the next visit is fresh
       window.open(url, '_blank', 'noopener');
+      clearBookingState();
+
+      // Optional quick toast
+      flash(durationAlert, 'Booking sent! Starting a fresh form.');
     });
 
     function buildWhatsAppMessage(){
@@ -1083,6 +1092,27 @@ outline:none;
     // ====== Storage ======
     function saveState(){ localStorage.setItem('revival_booking', JSON.stringify(state)); }
     function loadState(){ try{ const raw=localStorage.getItem('revival_booking'); return raw?JSON.parse(raw):null }catch(e){ return null } }
+
+    // === NEW: reset + clear state helpers ===
+    function resetToInitialState(){
+      state = JSON.parse(JSON.stringify(initialState));
+      saveState();
+      bindWho();
+      bindExtras();
+      renderServices();
+      renderCart();
+      updateProgress();
+      goTo('who', false);
+    }
+
+    function clearBookingState(){
+      localStorage.removeItem('revival_booking');
+      resetToInitialState();
+      // Remove hash so refresh doesn't jump to a step
+      if (location.hash) {
+        history.replaceState(null, '', location.pathname + location.search);
+      }
+    }
 
     // ====== Small utils ======
     function fmtCurrency(n){
