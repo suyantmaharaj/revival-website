@@ -290,3 +290,12 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted)}
 .hint .bubble td{ padding:4px 6px; border-bottom:1px solid var(--line); font-size:12px; color:var(--muted); }
 .hint .bubble tr:last-child td{ border-bottom:none; }
 .hint .bubble td:first-child{ color:#fff; font-weight:700; width:36%; }
+
+/* Make "Clear" button text white */
+#clearCart {
+  color: #fff !important;
+}
+#clearCart:hover,
+#clearCart:focus {
+  color: #fff !important;
+}
