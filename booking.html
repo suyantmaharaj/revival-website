@@ -44,7 +44,7 @@
     .field label{ color:var(--muted); font-weight:600; font-size:14px }
     input[type="text"],input[type="email"],input[type="tel"],input[type="date"],input[type="number"],select,textarea{
       width:100%; padding:12px; border:1px solid var(--line); border-radius:10px;
-      background:#0f0f13; color:var(--text); outline:none
+      background:#0f0f13; color:#var(--text); outline:none
     }
     input:focus,select:focus,textarea:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(199,167,104,.25) }
 
@@ -105,15 +105,15 @@
     .line{ display:grid; grid-template-columns:1fr auto; gap:6px; align-items:center; border-bottom:1px dashed #27272f; padding-bottom:8px }
     .line h4{ margin:0; font-size:14px }
     .qty{ display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:#0f0f13 }
-    .qty button{ background:#0f0f13; border:none; padding:6px 10px; cursor:pointer; color:var(--text) }
-    .qty input{ width:66px; padding:6px 0; border:none; text-align:center; background:#0f0f13; color:var(--text) }
-    .line small{ color:var(--muted) }
+    .qty button{ background:#0f0f13; border:none; padding:6px 10px; cursor:pointer; color:#var(--text) }
+    .qty input{ width:66px; padding:6px 0; border:none; text-align:center; background:#0f0f13; color:#var(--text) }
+    .line small{ color:#var(--muted) }
     .totals{ margin-top:12px; border-top:1px solid var(--line); padding-top:10px; display:grid; gap:6px }
     .totals .row{ display:flex; justify-content:space-between; align-items:center }
     .remove{ color:#f87171; font-size:12px; background:transparent; border:none; cursor:pointer }
 
     /* Mobile cart sheet */
-    .cart-toggle{ display:none; border:1px solid var(--line); background:#0f0f13; border-radius:999px; padding:8px 12px; box-shadow:var(--shadow); color:var(--text) }
+    .cart-toggle{ display:none; border:1px solid var(--line); background:#0f0f13; border-radius:999px; padding:8px 12px; box-shadow:var(--shadow); color:#var(--text) }
     @media (max-width:960px){
       aside.cart{ position:fixed; left:0; right:0; bottom:0; top:auto; transform:translateY(calc(100% - 56px));
         border-top-left-radius:14px; border-top-right-radius:14px; padding:12px 16px; z-index:30; }
@@ -126,7 +126,7 @@
 
     /* Buttons */
     .btn{ display:inline-block; padding:14px 22px; border-radius:12px; background:var(--accent); color:#0b0b0c; border:none; cursor:pointer; font-weight:800 }
-    .btn.secondary{ background:transparent; color:var(--text); border:1px solid var(--line) }
+    .btn.secondary{ background:transparent; color:#var(--text); border:1px solid var(--line) }
     .btn.ghost{ background:transparent; border:1px dashed var(--line); color:#0b0b0c }
     .btn.block{ width:100% }
 
@@ -142,7 +142,7 @@
 
     .nav-inline{ margin-top:16px; display:flex; justify-content:space-between; gap:10px }
     .help{ color:var(--muted); font-size:12px }
-    .pill{ display:inline-block; padding:8px 14px; border:1px solid var(--line); border-radius:999px; color:var(--muted); font-size:12px; letter-spacing:.08em; text-transform:uppercase }
+    .pill{ display:inline-block; padding:8px 14px; border:1px solid var(--line); border-radius:999px; color:#var(--muted); font-size:12px; letter-spacing:.08em; text-transform:uppercase }
 
     /* ---- FIX: service card sizing & responsive grid ---- */
     .svc-grid{
@@ -259,7 +259,7 @@
               <small class="err-msg">Phone must be exactly 10 digits.</small>
             </div>
             <div class="field" id="field-email">
-              <label for="email">Email <span class="help">(optional)</span></label>
+              <label for="email">Email <span id="emailNote" class="help">(optional)</span></label>
               <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
               <small class="err-msg">Enter a valid email like name@example.com.</small>
             </div>
@@ -517,6 +517,7 @@
     // Who fields
     const f = (id)=>document.getElementById(id);
     const fullName=f('fullName'), phone=f('phone'), email=f('email'), address1=f('address1'), suburb=f('suburb'), city=f('city'), postal=f('postal');
+    const emailNote = document.getElementById('emailNote');
     const recipientWrap = f('recipient'), recName=f('recName'), recPhone=f('recPhone');
 
     // Vehicle size radios
@@ -719,15 +720,31 @@
         el.addEventListener('blur', ()=>validateField(el));
       });
 
+      // Preferred contact: toggle email requirement dynamically
       document.querySelectorAll('input[name="contact"]').forEach(r=>r.addEventListener('change', ()=>{
-        if(r.checked){ state.customer.contact=r.value; saveState(); }
-      }));
-      document.querySelectorAll('input[name="for"]').forEach(r=>r.addEventListener('change', ()=>{
         if(r.checked){
-          state.customer.for=r.value; recipientWrap.style.display = r.value==='Someone else'?'grid':'none';
+          state.customer.contact=r.value;
           saveState();
+          updateEmailRequiredUI(); // NEW
+          validateField(email);    // re-validate email on change
         }
       }));
+
+      // initialize email required state on load
+      updateEmailRequiredUI();
+    }
+
+    function updateEmailRequiredUI(){
+      const required = isEmailRequired();
+      email.toggleAttribute('required', required);
+      email.setAttribute('aria-required', String(required));
+      if (emailNote){
+        emailNote.textContent = required ? '(required)' : '(optional)';
+      }
+    }
+
+    function isEmailRequired(){
+      return (state.customer?.contact === 'Email');
     }
 
     function bindExtras(){
@@ -829,12 +846,14 @@
         return setValidity(el, /^\d{10}$/.test(el.value));
       }
       if(el===email){
-        if(!el.value.trim()) {
-          el.removeAttribute('aria-invalid');
-          const wrap = el.closest('.field'); wrap?.classList.remove('invalid','valid');
-          return true;
+        const required = isEmailRequired();
+        const val = el.value.trim();
+        if(!val){
+          // empty email
+          return setValidity(el, !required); // valid only if not required
         }
-        return setValidity(el, EMAIL_RE.test(el.value.trim()));
+        // has a value → must be valid format
+        return setValidity(el, EMAIL_RE.test(val));
       }
       if(el===postal){
         return setValidity(el, /^\d{4}$/.test(el.value));
@@ -860,6 +879,10 @@
       if(!suburb.value.trim()) ok=false;
       if(!city.value.trim()) ok=false;
       if(!postal.value.match(/^\d{4}$/)) ok=false;
+      // extra guard: if contact is Email, enforce email present and valid
+      if(isEmailRequired()){
+        if(!email.value.trim() || !EMAIL_RE.test(email.value.trim())) ok=false;
+      }
       if(!ok){
         const firstBad = document.querySelector('.field.invalid input, .field.invalid select, .field.invalid textarea');
         if(firstBad){ firstBad.focus(); shake(firstBad); }
