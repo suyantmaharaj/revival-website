@@ -86,7 +86,7 @@
     .svc-title{ font-weight:700 }
     .svc-desc{ color:var(--muted); font-size:13px }
     .svc-meta{ display:flex; justify-content:space-between; align-items:center; font-weight:700 }
-    .svc-meta small{ font-weight:500; color:var(--muted) }
+    .svc-meta small{ color:var(--muted); font-weight:500 }
     .svc-actions{ margin-top:8px }
     .btn-mini{ padding:8px 10px; border-radius:10px; background:var(--accent); color:#0b0b0c; border:none; cursor:pointer }
 
@@ -196,6 +196,27 @@
 
     /* === Clear Cart visibility: hidden by default, toggled via JS on Services step === */
     #clearCart{ display:none; }
+
+    /* Tooltip CSS (if not already in global) */
+    .hint{ display:inline-flex; align-items:center; gap:8px; position:relative; }
+    .hint .info{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:18px; height:18px; border-radius:999px;
+      border:1px solid var(--line); background:#0f0f13; color:var(--muted);
+      font-size:12px; cursor:default; position:relative; line-height:1;
+    }
+    .hint .bubble{
+      position:absolute; left:0; top:26px; z-index:20;
+      display:none; min-width:260px; max-width:320px;
+      background:#121214; color:var(--text);
+      border:1px solid var(--line); border-radius:10px; padding:10px; box-shadow:var(--shadow);
+    }
+    .hint:hover .bubble,
+    .hint .info:focus + .bubble { display:block; }
+    .hint .bubble table{ width:100%; border-collapse:collapse; }
+    .hint .bubble td{ padding:4px 6px; border-bottom:1px solid var(--line); font-size:12px; color:var(--muted); }
+    .hint .bubble tr:last-child td{ border-bottom:none; }
+    .hint .bubble td:first-child{ color:#fff; font-weight:700; width:36%; }
   </style>
 </head>
 <body>
@@ -227,8 +248,6 @@
   </section>
 
   <main class="booking-wrap">
-    
-
     <!-- Progress -->
     <section class="progress" aria-label="Booking progress" style="margin:24px 0 16px">
       <div class="progress-rail"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
@@ -259,7 +278,7 @@
               <small class="err-msg">Phone must be exactly 10 digits.</small>
             </div>
             <div class="field" id="field-email">
-              <label for="email">Email <span class="help">(optional)</span></label>
+              <label for="email">Email <span class="help">(required if contact preference is Email)</span></label>
               <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
               <small class="err-msg">Enter a valid email like name@example.com.</small>
             </div>
@@ -411,7 +430,7 @@
         </div>
         <div id="cartItems" class="cart-items" role="list"></div>
         <div class="totals">
-          <div class="row"><span>Subtotal</span><strong id="subTotal">R 0.00</strong></div>
+          <!-- Subtotal row removed as requested -->
           <div class="row" style="font-size:18px"><span>Total</span><strong id="grandTotal">R 0.00</strong></div>
         </div>
         <p class="help" style="margin-top:8px">Please note these are estimated prices in ZAR. Final confirmation via WhatsApp.</p>
@@ -494,7 +513,6 @@
 
     const cartEl = document.getElementById('cart');
     const cartItemsEl = document.getElementById('cartItems');
-    const subTotalEl = document.getElementById('subTotal');
     const grandTotalEl = document.getElementById('grandTotal');
     const cartToggle = document.getElementById('cartToggle');
     const cartCount = document.getElementById('cartCount');
@@ -626,7 +644,7 @@
           const svc = SERVICES.find(s=>s.id===it.id);
           const line = document.createElement('div');
           line.className='line';
-          const step = 1; // integer qty for all size-based items
+          const step = 1;
           line.innerHTML=`
             <div>
               <h4>${svc.name}</h4>
@@ -663,17 +681,20 @@
           cartItemsEl.appendChild(line);
         });
       }
-      // Totals (no VAT)
-      const {subtotal, total} = computeTotals();
-      subTotalEl.textContent = fmtCurrency(subtotal);
+      // Totals (no subtotal row in the cart UI)
+      const { total } = computeTotals();
       grandTotalEl.textContent = fmtCurrency(total);
       cartCount.textContent = items.length;
 
-      // Duration view (size does not affect duration)
       updateDurationView();
     }
 
     // ====== Form bind/persist ======
+    const NAME_CITY_RE = /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/;
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function isEmailRequired(){ return state.customer.contact === 'Email'; }
+
     function bindWho(){
       fullName.value=state.customer.fullName||'';
       phone.value=state.customer.phone||'';
@@ -699,15 +720,91 @@
         el.addEventListener('blur', ()=>validateField(el));
       });
 
+      // Contact preference (force email when Email selected)
       document.querySelectorAll('input[name="contact"]').forEach(r=>r.addEventListener('change', ()=>{
-        if(r.checked){ state.customer.contact=r.value; saveState(); }
+        if(r.checked){
+          state.customer.contact=r.value; saveState();
+          validateField(email);
+          if(isEmailRequired() && !EMAIL_RE.test((email.value||'').trim())){
+            email.focus();
+          }
+        }
       }));
+
       document.querySelectorAll('input[name="for"]').forEach(r=>r.addEventListener('change', ()=>{
         if(r.checked){
           state.customer.for=r.value; recipientWrap.style.display = r.value==='Someone else'?'grid':'none';
           saveState();
         }
       }));
+    }
+
+    function setValidity(el, valid, msgSel='.err-msg'){
+      const wrap = el.closest('.field');
+      wrap?.classList.toggle('invalid', !valid);
+      wrap?.classList.toggle('valid', valid);
+      el.setAttribute('aria-invalid', String(!valid));
+      if(!valid && wrap){
+        const m = wrap.querySelector(msgSel);
+        if(m) m.style.display = 'block';
+      }
+      return valid;
+    }
+
+    function validateField(el){
+      if(el===fullName){
+        return setValidity(el, NAME_CITY_RE.test(el.value.trim()));
+      }
+      if(el===city){
+        return setValidity(el, NAME_CITY_RE.test(el.value.trim()));
+      }
+      if(el===phone){
+        return setValidity(el, /^\d{10}$/.test(el.value));
+      }
+      if(el===email){
+        const v = el.value.trim();
+        if(isEmailRequired()){
+          return setValidity(el, EMAIL_RE.test(v));
+        } else {
+          if(!v){ // optional when not required
+            el.removeAttribute('aria-invalid');
+            const wrap = el.closest('.field'); wrap?.classList.remove('invalid','valid');
+            return true;
+          }
+          return setValidity(el, EMAIL_RE.test(v));
+        }
+      }
+      if(el===postal){
+        return setValidity(el, /^\d{4}$/.test(el.value));
+      }
+      if(el===address1){
+        return setValidity(el, el.value.trim().length>3);
+      }
+      if(el===suburb){
+        return setValidity(el, el.value.trim().length>1);
+      }
+      return true;
+    }
+
+    function validateWho(){
+      const fields = [fullName, phone, email, address1, suburb, city, postal];
+      let ok = true;
+      fields.forEach(el=>{
+        if(!validateField(el)) ok = false;
+      });
+      if(!fullName.value.trim() || !NAME_CITY_RE.test(fullName.value.trim())) ok=false;
+      if(!phone.value.match(/^\d{10}$/)) ok=false;
+      if(!address1.value.trim()) ok=false;
+      if(!suburb.value.trim()) ok=false;
+      if(!city.value.trim() || !NAME_CITY_RE.test(city.value.trim())) ok=false;
+      if(!postal.value.match(/^\d{4}$/)) ok=false;
+      if(isEmailRequired() && !EMAIL_RE.test((email.value||'').trim())) ok=false;
+
+      if(!ok){
+        const firstBad = document.querySelector('.field.invalid input, .field.invalid select, .field.invalid textarea');
+        if(firstBad){ firstBad.focus(); shake(firstBad); }
+      }
+      return ok;
     }
 
     function bindExtras(){
@@ -782,80 +879,6 @@
       }
     }
 
-    // ====== Validation helpers ======
-    const NAME_CITY_RE = /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/;
-    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    function setValidity(el, valid, msgSel='.err-msg'){
-      const wrap = el.closest('.field');
-      wrap?.classList.toggle('invalid', !valid);
-      wrap?.classList.toggle('valid', valid);
-      el.setAttribute('aria-invalid', String(!valid));
-      if(!valid && wrap){
-        const m = wrap.querySelector(msgSel);
-        if(m) m.style.display = 'block';
-      }
-      return valid;
-    }
-
-    function validateField(el){
-      if(el===fullName){
-        return setValidity(el, NAME_CITY_RE.test(el.value.trim()));
-      }
-      if(el===city){
-        return setValidity(el, NAME_CITY_RE.test(el.value.trim()));
-      }
-      if(el===phone){
-        return setValidity(el, /^\d{10}$/.test(el.value));
-      }
-      if(el===email){
-        if(!el.value.trim()) {
-          el.removeAttribute('aria-invalid');
-          const wrap = el.closest('.field'); wrap?.classList.remove('invalid','valid');
-          return true;
-        }
-        return setValidity(el, EMAIL_RE.test(el.value.trim()));
-      }
-      if(el===postal){
-        return setValidity(el, /^\d{4}$/.test(el.value));
-      }
-      if(el===address1){
-        return setValidity(el, el.value.trim().length>3);
-      }
-      if(el===suburb){
-        return setValidity(el, el.value.trim().length>1);
-      }
-      return true;
-    }
-
-    function validateWho(){
-      const fields = [fullName, phone, email, address1, suburb, city, postal];
-      let ok = true;
-      fields.forEach(el=>{
-        if(!validateField(el)) ok = false;
-      });
-      if(!fullName.value.trim()) ok=false;
-      if(!phone.value.match(/^\d{10}$/)) ok=false;
-      if(!address1.value.trim()) ok=false;
-      if(!suburb.value.trim()) ok=false;
-      if(!city.value.trim()) ok=false;
-      if(!postal.value.match(/^\d{4}$/)) ok=false;
-      if(!ok){
-        const firstBad = document.querySelector('.field.invalid input, .field.invalid select, .field.invalid textarea');
-        if(firstBad){ firstBad.focus(); shake(firstBad); }
-      }
-      return ok;
-    }
-
-    function validateSchedule(){
-      if(!hasCart()){
-        flash(durationAlert,'Add at least one service.'); return false;
-      }
-      if(!dateEl.value){ shake(dateEl); return false; }
-      if(!timeEl.value){ shake(timeEl); return false; }
-      return true;
-    }
-
     // ====== Navigation ======
     function stepIndex(key){ return ['who','services','extras','schedule','review'].indexOf(key); }
     function goTo(key, pushHash=true){
@@ -871,9 +894,9 @@
       const idx = order.indexOf(state.step);
       if(idx<order.length-1){
         const next = order[idx+1];
+        if(state.step==='who' && !validateWho()) return;
         if(next==='extras' && !hasCart()) { flash(durationAlert, 'Please add at least one service.'); return; }
         if(next==='schedule' && !hasCart()) { flash(durationAlert, 'Please add at least one service.'); return; }
-        if(state.step==='who' && !validateWho()) return;
         if(next==='review' && !validateSchedule()) return;
         goTo(next);
       }
@@ -1074,6 +1097,22 @@
         }
       });
       obs.observe(sec, {attributes:true, attributeFilter:['class']});
+    });
+
+    // Tap-to-toggle tooltip for touch devices
+    document.querySelectorAll('.hint .info').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const bubble = btn.nextElementSibling;
+        const open = bubble?.style.display === 'block';
+        document.querySelectorAll('.hint .bubble').forEach(b=>b.style.display='none');
+        if(bubble) bubble.style.display = open ? 'none' : 'block';
+      });
+    });
+    document.addEventListener('click', (e)=>{
+      if(!e.target.closest('.hint')) {
+        document.querySelectorAll('.hint .bubble').forEach(b=>b.style.display='none');
+      }
     });
 
   })();
