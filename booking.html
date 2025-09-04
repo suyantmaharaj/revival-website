@@ -381,8 +381,7 @@
                 <input type="radio" name="power" id="powerNo" value="No"><label for="powerNo">No</label>
               </div>
             </div>
-            <div class="field"><label class="help"><input id="parking" type="checkbox"> On-site parking available</label></div>
-          </div>
+
           <div class="field" style="margin-top:8px"><label for="notes">Notes</label><textarea id="notes" rows="4" placeholder="Special requests, gate access, pets, etc."></textarea></div>
           <div class="nav-inline">
             <button class="btn secondary" data-prev>← Back</button>
@@ -687,6 +686,8 @@
       cartCount.textContent = items.length;
 
       updateDurationView();
+
+      
     }
 
     // ====== Form bind/persist ======
@@ -878,6 +879,25 @@
         rangeHelp.textContent = '';
       }
     }
+
+    function validateSchedule(){
+  if(!hasCart()){
+    flash(durationAlert,'Please add at least one service.');
+    return false;
+  }
+  if(!dateEl.value){
+    shake(dateEl);
+    flash(durationAlert,'Please choose a date.');
+    return false;
+  }
+  if(!timeEl.value){
+    shake(timeEl);
+    flash(durationAlert,'Please choose a start time.');
+    return false;
+  }
+  return true;
+}
+
 
     // ====== Navigation ======
     function stepIndex(key){ return ['who','services','extras','schedule','review'].indexOf(key); }
