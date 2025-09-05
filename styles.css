@@ -299,3 +299,29 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted)}
 #clearCart:focus {
   color: #fff !important;
 }
+
+/* Booking: keep checkboxes tiny, inline */
+.booking-wrap input[type="checkbox"]{
+  width:auto !important;
+  display:inline-block !important;
+  vertical-align:middle;
+  margin:0;           /* let the label handle spacing */
+  appearance:auto;    /* reset any odd UA styles */
+}
+
+/* Inline “I accept…” row */
+.booking-wrap label.terms{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;             /* space between box and text */
+  margin-top:10px;
+  max-width:100%;
+  cursor:pointer;
+}
+
+.booking-wrap label.terms span{
+  display:inline;                 /* no block/float weirdness */
+  white-space:normal;
+  position:static !important;
+  float:none !important;
+}
