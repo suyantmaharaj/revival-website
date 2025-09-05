@@ -201,8 +201,6 @@
 
     /* === Clear Cart visibility: hidden by default, toggled via JS on Services step === */
     #clearCart{ display:none; color:#fff !important; } /* ensure white text */
-
-    /* Keep Clear button white on hover/focus too */
     #clearCart:hover,
     #clearCart:focus { color:#fff !important; }
   </style>
@@ -385,9 +383,24 @@
           <h3 id="h-schedule">4) Schedule</h3>
           <div class="alert" id="durationAlert" style="display:none"></div>
           <div class="grid grid-3">
-            <div class="field"><label for="date">Date</label><input id="date" type="date" required><small class="help">We’ll confirm availability after you submit.</small></div>
-            <div class="field"><label for="time">Start time</label><select id="time"></select></div>
-            <div class="field"><label>Estimated duration</label><div class="pill" id="durationLabel">—</div><small class="help">Items = 0.5 hr each. Size doesn't change duration.</small></div>
+            <div class="field">
+              <label for="date">Date</label>
+              <input id="date" type="date" required>
+            </div>
+            <div class="field">
+              <label class="hint" for="time">
+                Start time
+                <span class="info" tabindex="0" aria-label="Outside hours info">?</span>
+                <span class="bubble" role="tooltip" aria-live="polite">
+                  If you'd like us to come outside our hours (06:00–18:00), please mention it in the Notes on the previous step.
+                </span>
+              </label>
+              <select id="time"></select>
+            </div>
+            <div class="field">
+              <label>Estimated duration</label>
+              <div class="pill" id="durationLabel">—</div>
+            </div>
           </div>
           <p class="help" id="rangeHelp" style="margin-top:6px"></p>
           <div class="nav-inline">
@@ -446,7 +459,7 @@
 
     const VEHICLE_SIZES = ["Compact","Standard","Large"];
 
-    // Services (size-based where applicable) — with your image paths
+    // Services (size-based where applicable)
     const SERVICES = [
       { id:'washwax', name:'Wash & Wax', cat:'Exterior', desc:'Gentle wash, decon & premium wax.', unit:'item',
         prices:{ Compact:400, Standard:450, Large:500 },
@@ -479,15 +492,15 @@
     ];
     const CATS = ['All','Interior','Exterior','Add-ons'];
 
-    // Per-service estimated hours (using max where a range was given)
+    // Per-service estimated hours
     const SERVICE_HOURS = {
-      washwax: 2.0,   // Wash & Wax = 2 hours
-      interior: 1.5,  // Interior = 1.5 hours
-      engine: 0.5,    // Engine Bay = 0.5 hours
-      headlight: 0.5, // Headlight Restoration = 0.5 hours
-      polish1: 3.0,   // One Step = 2–3 hours → use 3
-      polish2: 4.0,   // Two Step = 3–4 hours → use 4
-      window: 2.0     // Window Polish = 1–2 hours → use 2
+      washwax: 2.0,
+      interior: 1.5,
+      engine: 0.5,
+      headlight: 0.5,
+      polish1: 3.0,
+      polish2: 4.0,
+      window: 2.0
     };
 
     // ====== State ======
@@ -498,7 +511,7 @@
         fullName:'', phone:'', email:'', address1:'', suburb:'', city: CITY, postal:'', contact:'WhatsApp',
         for:'Myself', recName:'', recPhone:''
       },
-      cart: {}, // {id: {id, qty}}
+      cart: {},
       extras: { notes:'', water:null, power:null },
       schedule: { date:'', time:'' }
     };
@@ -664,7 +677,7 @@
           const svc = SERVICES.find(s=>s.id===it.id);
           const line = document.createElement('div');
           line.className='line';
-          const step = 1; // integer qty for all size-based items
+          const step = 1;
           line.innerHTML=`
             <div>
               <h4>${svc.name}</h4>
@@ -701,12 +714,9 @@
           cartItemsEl.appendChild(line);
         });
       }
-      // Totals (no VAT)
       const { total } = computeTotals();
       grandTotalEl.textContent = fmtCurrency(total);
       cartCount.textContent = items.length;
-
-      // Duration view (size does not affect duration)
       updateDurationView();
     }
 
@@ -725,7 +735,6 @@
       recName.value=state.customer.recName||'';
       recPhone.value=state.customer.recPhone||'';
 
-      // Persist while typing
       [fullName,phone,email,address1,suburb,city,postal,recName,recPhone].forEach(el=>{
         el.addEventListener('input', ()=>{
           if(el===phone){ el.value = (el.value||'').replace(/\D/g,'').slice(0,10); }
@@ -736,7 +745,6 @@
         el.addEventListener('blur', ()=>validateField(el));
       });
 
-      // Preferred contact: toggle email requirement dynamically
       document.querySelectorAll('input[name="contact"]').forEach(r=>r.addEventListener('change', ()=>{
         if(r.checked){
           state.customer.contact=r.value;
@@ -746,7 +754,6 @@
         }
       }));
 
-      // initialize email required state on load
       updateEmailRequiredUI();
     }
 
@@ -765,8 +772,6 @@
 
     function bindExtras(){
       notes.value = state.extras.notes||'';
-
-      // restore radios
       if(state.extras.water==='Yes') waterYes.checked = true;
       else if(state.extras.water==='No') waterNo.checked = true;
 
@@ -774,7 +779,6 @@
       else if(state.extras.power==='No') powerNo.checked = true;
 
       notes.addEventListener('input', ()=>{ state.extras.notes=notes.value; saveState(); });
-
       [waterYes,waterNo].forEach(r=>r.addEventListener('change', ()=>{
         if(r.checked){ state.extras.water = r.value; saveState(); }
       }));
@@ -787,9 +791,9 @@
     function buildTimeOptions(){
       timeEl.innerHTML='';
       const times=[];
-      for(let h=8;h<=18;h++){
+      for(let h=6;h<=18;h++){        // updated: 06:00 start
         for(let m=0;m<60;m+=30){
-          if(h===18 && m>0) continue;
+          if(h===18 && m>0) continue; // allow 18:00 but not later
           times.push(`${pad(h)}:${pad(m)}`);
         }
       }
@@ -850,41 +854,25 @@
     }
 
     function validateField(el){
-      if(el===fullName){
-        return setValidity(el, NAME_CITY_RE.test(el.value.trim()));
-      }
-      if(el===city){
-        return setValidity(el, NAME_CITY_RE.test(el.value.trim()));
-      }
-      if(el===phone){
-        return setValidity(el, /^\d{10}$/.test(el.value));
-      }
+      if(el===fullName){ return setValidity(el, NAME_CITY_RE.test(el.value.trim())); }
+      if(el===city){ return setValidity(el, NAME_CITY_RE.test(el.value.trim())); }
+      if(el===phone){ return setValidity(el, /^\d{10}$/.test(el.value)); }
       if(el===email){
         const required = isEmailRequired();
         const val = el.value.trim();
-        if(!val){
-          return setValidity(el, !required);
-        }
+        if(!val){ return setValidity(el, !required); }
         return setValidity(el, EMAIL_RE.test(val));
       }
-      if(el===postal){
-        return setValidity(el, /^\d{4}$/.test(el.value));
-      }
-      if(el===address1){
-        return setValidity(el, el.value.trim().length>3);
-      }
-      if(el===suburb){
-        return setValidity(el, el.value.trim().length>1);
-      }
+      if(el===postal){ return setValidity(el, /^\d{4}$/.test(el.value)); }
+      if(el===address1){ return setValidity(el, el.value.trim().length>3); }
+      if(el===suburb){ return setValidity(el, el.value.trim().length>1); }
       return true;
     }
 
     function validateWho(){
       const fields = [fullName, phone, email, address1, suburb, city, postal];
       let ok = true;
-      fields.forEach(el=>{
-        if(!validateField(el)) ok = false;
-      });
+      fields.forEach(el=>{ if(!validateField(el)) ok = false; });
       if(!fullName.value.trim()) ok=false;
       if(!phone.value.match(/^\d{10}$/)) ok=false;
       if(!address1.value.trim()) ok=false;
@@ -945,7 +933,6 @@
         el.classList.toggle('active', i===idx);
       });
 
-      // Show "Clear Cart" ONLY on Services step
       const clearBtn = document.getElementById('clearCart');
       if (state.step === 'services') {
         clearBtn.style.display = 'inline-block';
@@ -1026,11 +1013,8 @@
       const msg = buildWhatsAppMessage();
       const url = `https://wa.me/${encodeURIComponent(WHATSAPP_NUMBER_E164.replace(/\D/g,''))}?text=${encodeURIComponent(msg)}`;
 
-      // Open WhatsApp and immediately clear the saved booking so the next visit is fresh
       window.open(url, '_blank', 'noopener');
       clearBookingState();
-
-      // Optional quick toast
       flash(durationAlert, 'Booking sent! Starting a fresh form.');
     });
 
@@ -1079,7 +1063,7 @@
         const s = SERVICES.find(x=>x.id===it.id);
         return acc + (priceForSize(s) * Number(it.qty||0));
       },0);
-      const total = subtotal; // no VAT
+      const total = subtotal;
       return {subtotal, total};
     }
     function lineTotal(it, svc){ return Number(it.qty||0) * priceForSize(svc); }
@@ -1089,14 +1073,12 @@
     function computeDurationHours(){
       const items = Object.values(state.cart);
       if(!items.length) return 0;
-
       let hrs = 0;
       items.forEach(it=>{
         const s = SERVICES.find(x=>x.id===it.id);
-        const perUnit = SERVICE_HOURS[s.id] ?? 0.5; // fallback to 0.5 hr per item
+        const perUnit = SERVICE_HOURS[s.id] ?? 0.5;
         hrs += perUnit * Number(it.qty || 0);
       });
-
       return Math.max(0.5, Math.round(hrs * 2) / 2);
     }
 
