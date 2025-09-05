@@ -81,10 +81,8 @@
     }
     .chip label:active{transform:scale(0.98)}
 
-    /* YOUR tooltip block styling (kept as-is structurally) */
-    .hint{
-      display:flex; align-items:center; gap:8px; position:relative; font-weight:600;
-    }
+    /* Tooltip block (kept structure / text) */
+    .hint{display:flex; align-items:center; gap:8px; position:relative; font-weight:600;}
     .hint .info{
       display:inline-flex; align-items:center; justify-content:center;
       width:18px; height:18px; border-radius:50%;
@@ -99,7 +97,6 @@
     }
     .hint:has(.info:hover) .bubble,
     .hint:has(.info:focus) .bubble{ opacity:1; pointer-events:auto; }
-
     .hint .bubble table{border-collapse:collapse; width:auto}
     .hint .bubble td{padding:4px 8px; font-size:12px; color:#fff}
     .hint .bubble tr td:first-child{font-weight:700; color:#fff}
@@ -160,8 +157,21 @@
           </div>
           <div class="field">
             <label for="phone">Your Phone</label>
-            <input id="phone" name="phone" inputmode="tel" placeholder="+27…" required>
+            <!-- phone no longer hard-required; validated conditionally -->
+            <input id="phone" name="phone" inputmode="tel" placeholder="+27…">
             <div class="error" id="err-phone">Please enter a valid phone number.</div>
+          </div>
+        </div>
+
+        <div class="inline">
+          <div class="field">
+            <label for="email">Your Email</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com">
+            <div class="error" id="err-email">Please enter a valid email address.</div>
+          </div>
+          <div class="field">
+            <label for="suburb">Suburb / Location</label>
+            <input id="suburb" name="suburb" placeholder="e.g., Claremont, Cape Town">
           </div>
         </div>
 
@@ -201,12 +211,12 @@
           <div class="field">
             <label>Preferred Contact</label>
             <div class="segmented" role="radiogroup" aria-label="Preferred contact method">
-              <input type="radio" id="cm-call" name="contactMethod" value="Call" required>
-              <label for="cm-call">Call</label>
-              <input type="radio" id="cm-whatsapp" name="contactMethod" value="WhatsApp">
+              <input type="radio" id="cm-whatsapp" name="contactMethod" value="WhatsApp" required>
               <label for="cm-whatsapp">WhatsApp</label>
-              <input type="radio" id="cm-sms" name="contactMethod" value="SMS/Text">
-              <label for="cm-sms">Text</label>
+              <input type="radio" id="cm-phone" name="contactMethod" value="Phone">
+              <label for="cm-phone">Phone</label>
+              <input type="radio" id="cm-email" name="contactMethod" value="Email">
+              <label for="cm-email">Email</label>
             </div>
             <div class="error" id="err-contact">Please choose how we should contact you.</div>
           </div>
@@ -215,11 +225,6 @@
             <input id="date" name="date" type="date">
             <div class="help">Optional</div>
           </div>
-        </div>
-
-        <div class="field">
-          <label for="suburb">Suburb / Location</label>
-          <input id="suburb" name="suburb" placeholder="e.g., Claremont, Cape Town">
         </div>
 
         <div class="field">
@@ -314,7 +319,7 @@
   }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-  // Min selectable date = today (no text changes)
+  // Min selectable date = today
   (function setMinDate(){
     const d = document.getElementById('date');
     if (!d) return;
@@ -326,7 +331,24 @@
   // Utils
   function show(id, on){ const el = document.getElementById(id); if(!el) return; el.style.display = on ? 'block' : 'none'; }
   function validatePhone(v){ return /^\+?\d[\d\s()-]{6,}$/.test(v); }
+  function validateEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
   function getCheckedServices(){ return [...document.querySelectorAll('#services input[type="checkbox"]:checked')].map(i=>i.value); }
+
+  // Dynamic hint: show which field is required based on contact method
+  document.querySelectorAll('input[name="contactMethod"]').forEach(r=>{
+    r.addEventListener('change', ()=>{
+      const method = document.querySelector('input[name="contactMethod"]:checked')?.value;
+      const phone = document.getElementById('phone');
+      const email = document.getElementById('email');
+      if(method === 'Email'){
+        phone.removeAttribute('required');
+        email.setAttribute('required','required');
+      }else{
+        email.removeAttribute('required');
+        phone.setAttribute('required','required');
+      }
+    });
+  });
 
   // WhatsApp submission
   document.getElementById('waForm').addEventListener('submit', function(e) {
@@ -338,8 +360,8 @@
     // Gather
     const name = document.getElementById('name').value.trim();
     const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
     const vehicle = document.getElementById('vehicle').value.trim();
-    // Respect your chosen name="vsize"
     const sizeEl = document.querySelector('input[name="vsize"]:checked') || document.querySelector('input[name="size"]:checked');
     const contactMethodEl = document.querySelector('input[name="contactMethod"]:checked');
     const date = document.getElementById('date').value;
@@ -349,16 +371,24 @@
     const services = getCheckedServices();
 
     // Reset errors
-    ['err-name','err-phone','err-vehicle','err-size','err-services','err-contact','err-consent']
+    ['err-name','err-phone','err-email','err-vehicle','err-size','err-services','err-contact','err-consent']
       .forEach(id=>show(id,false));
 
-    // Validate (no text changes to messages)
+    // Validate
     let ok = true;
     if(!name){ show('err-name', true); ok = false; }
-    if(!validatePhone(phone)){ show('err-phone', true); ok = false; }
+    if(!contactMethodEl){ show('err-contact', true); ok = false; }
+
+    // Conditional validation
+    const method = contactMethodEl ? contactMethodEl.value : null;
+    if(method === 'Email'){
+      if(!validateEmail(email)){ show('err-email', true); ok = false; }
+    }else if(method === 'WhatsApp' || method === 'Phone'){
+      if(!validatePhone(phone)){ show('err-phone', true); ok = false; }
+    }
+
     if(!vehicle){ show('err-vehicle', true); ok = false; }
     if(!sizeEl){ show('err-size', true); ok = false; }
-    if(!contactMethodEl){ show('err-contact', true); ok = false; }
     if(services.length === 0){ show('err-services', true); ok = false; }
     if(!consent){ show('err-consent', true); ok = false; }
 
@@ -369,8 +399,9 @@
     const msgLines = [
       "New enquiry:",
       "Name: " + name,
-      "Phone: " + phone,
-      "Preferred contact: " + (contactMethodEl ? contactMethodEl.value : ""),
+      phone ? ("Phone: " + phone) : null,
+      email ? ("Email: " + email) : null,
+      "Preferred contact: " + (method || ""),
       "Vehicle: " + vehicle,
       "Size: " + (sizeEl ? sizeEl.value : ""),
       "Services: " + services.join(", "),
