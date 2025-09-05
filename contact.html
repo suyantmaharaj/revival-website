@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Contact & Booking | Revival Automotive</title>
+  <title>Contact | Revival Automotive</title>
 
   <!-- SEO -->
-  <meta name="description" content="Book a premium car detail in Cape Town. Fast WhatsApp confirmations. Provide your vehicle, service, date, and access to water/electricity.">
+  <meta name="description" content="Want us to call you? Fill in the form and we’ll reach out to confirm your car detail. Choose multiple services, pick a date, and send to WhatsApp in one tap.">
   <meta name="robots" content="index,follow">
   <meta name="theme-color" content="#0b0b0c">
   <link rel="canonical" href="https://revivalautomotive.co.za/contact.html">
@@ -19,15 +19,15 @@
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" sizes="180x180">
 
   <!-- Open Graph / Social -->
-  <meta property="og:title" content="Contact & Booking | Revival Automotive">
-  <meta property="og:description" content="Book your car detailing appointment with Revival Automotive in Cape Town. Quick WhatsApp booking with details on service, date, and site access.">
+  <meta property="og:title" content="Contact | Revival Automotive">
+  <meta property="og:description" content="Want us to call you? Fill in the form, select your services, and send straight to WhatsApp.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://revivalautomotive.co.za/contact.html">
   <meta property="og:image" content="https://revivalautomotive.co.za/assets/logo_revival.jpg">
   <meta property="og:image:alt" content="Revival Automotive logo">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Contact & Booking | Revival Automotive">
-  <meta name="twitter:description" content="Book via WhatsApp. Share your vehicle, service, preferred date, and confirm access to electricity/water.">
+  <meta name="twitter:title" content="Contact | Revival Automotive">
+  <meta name="twitter:description" content="Book via WhatsApp. Share your vehicle, pick multiple services, and preferred date.">
   <meta name="twitter:image" content="https://revivalautomotive.co.za/assets/logo_revival.jpg">
 
   <!-- Fonts -->
@@ -35,11 +35,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Site styles (root-absolute) -->
+  <!-- Site styles -->
   <link href="/styles.css" rel="stylesheet">
 
-  <!-- Keep nav spacing consistent with the site -->
+  <!-- Page styles -->
   <style>
+    /* Header: match site rhythm */
     header .nav { padding: 10px 0; }
     header .brand a { display:inline-flex; align-items:center; }
     header .brand img { height:42px; width:auto; border-radius:8px; border:1px solid var(--line); background:#111 }
@@ -48,15 +49,73 @@
     header .links a:hover { color: var(--text); }
     header .links .btn { display:none !important; }
 
-    /* ------- Contact form enhancements ------- */
-    .form-note{color:var(--muted);font-size:14px;margin-top:6px}
+    /* Layout + fields */
+    .field{margin-bottom:14px}
+    .inline{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    @media (max-width: 780px){ .inline{grid-template-columns:1fr} }
+    input, select, textarea{width:100%}
+
+    .help{font-size:12px;color:var(--muted);margin-top:6px}
+    .error{color:#ff6b6b;font-size:13px;margin-top:6px;display:none}
+
+    /* Segmented controls */
     .segmented{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:rgba(255,255,255,.02)}
     .segmented input{display:none}
     .segmented label{padding:10px 16px;cursor:pointer;color:var(--muted);user-select:none}
     .segmented label + label{border-left:1px solid var(--line)}
     .segmented input:checked + label{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#0b0b0c;font-weight:700}
-    .help{font-size:12px;color:var(--muted);margin-top:6px}
-    .card .body h3{margin-top:0}
+
+    /* Multi-select chips */
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{position:relative}
+    .chip input{display:none}
+    .chip label{
+      display:inline-flex;align-items:center;
+      padding:9px 14px;border:1px solid var(--line);border-radius:999px;
+      color:var(--muted);cursor:pointer;background:rgba(255,255,255,.02);
+      transition:transform .02s ease-in-out;
+    }
+    .chip input:checked + label{
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      color:#0b0b0c;font-weight:700;border-color:transparent;
+    }
+    .chip label:active{transform:scale(0.98)}
+
+    /* YOUR tooltip block styling (kept as-is structurally) */
+    .hint{
+      display:flex; align-items:center; gap:8px; position:relative; font-weight:600;
+    }
+    .hint .info{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:18px; height:18px; border-radius:50%;
+      border:1px solid var(--line); background:rgba(255,255,255,.02);
+      color:var(--muted); font-size:12px; cursor:pointer; outline:none;
+    }
+    .hint .bubble{
+      position:absolute; left:0; top:calc(100% + 8px);
+      background:#0b0b0c; color:#fff; border:1px solid var(--line);
+      border-radius:10px; padding:10px 12px; box-shadow:0 6px 18px rgba(0,0,0,.35);
+      opacity:0; pointer-events:none; transition:opacity .12s ease-out; z-index:10;
+    }
+    .hint:has(.info:hover) .bubble,
+    .hint:has(.info:focus) .bubble{ opacity:1; pointer-events:auto; }
+
+    .hint .bubble table{border-collapse:collapse; width:auto}
+    .hint .bubble td{padding:4px 8px; font-size:12px; color:#fff}
+    .hint .bubble tr td:first-child{font-weight:700; color:#fff}
+
+    /* Consent row alignment */
+    .consent-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+    .consent-row input[type="checkbox"]{margin:0;inline-size:16px;block-size:16px}
+    .consent-row label{margin:0;cursor:pointer}
+
+    /* Details look */
+    details{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.02)}
+    details+details{margin-top:10px}
+    summary{cursor:pointer;color:var(--text);font-weight:600}
+
+    .form-note{color:var(--muted);font-size:14px;margin-top:6px}
+    .muted{color:var(--muted)}
   </style>
 </head>
 <body>
@@ -77,109 +136,153 @@
 </header>
 
 <section class="hero">
-  <div class="bg" style="--img:url('/assets/')"></div>
+  <div class="bg" style="--img:url('/assets/KiaFoam.jpg')"></div>
   <div class="container hero-inner reveal">
-    <span class="pill kicker">Bookings</span>
-    <h2>WhatsApp to Book</h2>
-    <p>Fast confirmations. Share your vehicle, service, size, and preferred date.</p>
+    <span class="pill kicker">Contact</span>
+    <h2>Want us to call you?</h2>
+    <p>Fill in the form below. We’ll review your request and get back to you via your preferred contact method.</p>
   </div>
 </section>
 
 <section class="section">
   <div class="container two-col reveal">
+    <!-- FORM -->
     <div>
       <form id="waForm" novalidate>
+        <!-- Honeypot -->
+        <input type="text" id="company" name="company" style="position:absolute;left:-5000px;opacity:0" tabindex="-1" autocomplete="off" aria-hidden="true">
+
         <div class="inline">
-          <div>
+          <div class="field">
             <label for="name">Your Name</label>
             <input id="name" name="name" placeholder="Name" required>
+            <div class="error" id="err-name">Please enter your name.</div>
           </div>
-          <div>
+          <div class="field">
             <label for="phone">Your Phone</label>
-            <input id="phone" name="phone" placeholder="+27…" required>
+            <input id="phone" name="phone" inputmode="tel" placeholder="+27…" required>
+            <div class="error" id="err-phone">Please enter a valid phone number.</div>
           </div>
         </div>
 
         <div class="inline">
-          <div>
+          <div class="field">
             <label for="vehicle">Vehicle</label>
             <input id="vehicle" name="vehicle" placeholder="e.g., BMW X2 M35i" required>
+            <div class="error" id="err-vehicle">Please enter your vehicle.</div>
           </div>
-          <div>
-            <label>Vehicle Size</label>
-            <div class="segmented" role="radiogroup" aria-label="Vehicle size">
-              <input type="radio" id="size-compact" name="size" value="Compact" required>
-              <label for="size-compact">Compact</label>
-              <input type="radio" id="size-standard" name="size" value="Standard">
-              <label for="size-standard">Standard</label>
-              <input type="radio" id="size-large" name="size" value="Large">
-              <label for="size-large">Large</label>
+
+          <!-- YOUR SIZE BLOCK (unchanged text/structure) -->
+          <div class="field">
+            <label class="hint">
+              Vehicle Size
+              <span class="info" tabindex="0" aria-label="Vehicle size examples">?</span>
+              <span class="bubble" role="tooltip" aria-live="polite">
+                <table>
+                  <tr><td>Compact</td><td>i10, GTI, Starlet</td></tr>
+                  <tr><td>Standard</td><td>C63, M3, Macan</td></tr>
+                  <tr><td>Large</td><td>Range Rover, Hilux, X5</td></tr>
+                </table>
+              </span>
+            </label>
+            <div class="segmented" role="radiogroup" id="sizeGroup">
+              <input type="radio" name="vsize" id="sizeCompact" value="Compact" checked>
+              <label for="sizeCompact">Compact</label>
+              <input type="radio" name="vsize" id="sizeStandard" value="Standard">
+              <label for="sizeStandard">Standard</label>
+              <input type="radio" name="vsize" id="sizeLarge" value="Large">
+              <label for="sizeLarge">Large</label>
             </div>
-            <div class="help">Pick the closest size. Unsure? Choose Standard.</div>
+            <div class="error" id="err-size">Please select a vehicle size.</div>
           </div>
         </div>
 
         <div class="inline">
-          <div>
-            <label for="service">Service</label>
-            <select id="service" name="service" required>
-              <option value="">Select</option>
-              <option>Wash & Wax</option>
-              <option>Interior Detail</option>
-              <option>Headlight Restoration</option>
-              <option>Engine Bay Detail</option>
-              <option>1-Step Polish</option>
-              <option>2-Step Polish</option>
-              <option>Window Polish</option>
-              <option>Ceramic Coating</option>
-            </select>
+          <div class="field">
+            <label>Preferred Contact</label>
+            <div class="segmented" role="radiogroup" aria-label="Preferred contact method">
+              <input type="radio" id="cm-call" name="contactMethod" value="Call" required>
+              <label for="cm-call">Call</label>
+              <input type="radio" id="cm-whatsapp" name="contactMethod" value="WhatsApp">
+              <label for="cm-whatsapp">WhatsApp</label>
+              <input type="radio" id="cm-sms" name="contactMethod" value="SMS/Text">
+              <label for="cm-sms">Text</label>
+            </div>
+            <div class="error" id="err-contact">Please choose how we should contact you.</div>
           </div>
-          <div>
+          <div class="field">
             <label for="date">Preferred Date</label>
-            <input id="date" name="date" type="date" required>
+            <input id="date" name="date" type="date">
+            <div class="help">Optional</div>
           </div>
         </div>
 
-        <!-- Electricity access -->
-        <div>
-          <label>Do you have access to electricity?</label>
-          <div class="segmented" role="radiogroup" aria-label="Electricity access">
-            <input type="radio" id="electricity-yes" name="electricity" value="Yes" required>
-            <label for="electricity-yes">Yes</label>
-            <input type="radio" id="electricity-no" name="electricity" value="No">
-            <label for="electricity-no">No</label>
-          </div>
+        <div class="field">
+          <label for="suburb">Suburb / Location</label>
+          <input id="suburb" name="suburb" placeholder="e.g., Claremont, Cape Town">
         </div>
 
-        <!-- Water access -->
-        <div style="margin-top:12px">
-          <label>Do you have access to water?</label>
-          <div class="segmented" role="radiogroup" aria-label="Water access">
-            <input type="radio" id="water-yes" name="water" value="Yes" required>
-            <label for="water-yes">Yes</label>
-            <input type="radio" id="water-no" name="water" value="No">
-            <label for="water-no">No</label>
+        <div class="field">
+          <label>Services (select one or more)</label>
+          <div class="chips" id="services">
+            <div class="chip"><input type="checkbox" id="svc-washwax" value="Wash & Wax"><label for="svc-washwax">Wash & Wax</label></div>
+            <div class="chip"><input type="checkbox" id="svc-interior" value="Interior Detail"><label for="svc-interior">Interior Detail</label></div>
+            <div class="chip"><input type="checkbox" id="svc-1step" value="1-Step Polish"><label for="svc-1step">1-Step Polish</label></div>
+            <div class="chip"><input type="checkbox" id="svc-2step" value="2-Step Polish"><label for="svc-2step">2-Step Polish</label></div>
+            <div class="chip"><input type="checkbox" id="svc-headlight" value="Headlight Restoration"><label for="svc-headlight">Headlight Restoration</label></div>
+            <div class="chip"><input type="checkbox" id="svc-engine" value="Engine Bay Detail"><label for="svc-engine">Engine Bay Detail</label></div>
+            <div class="chip"><input type="checkbox" id="svc-window" value="Window Polish"><label for="svc-window">Window Polish</label></div>
+            <div class="chip"><input type="checkbox" id="svc-ceramic" value="Ceramic Coating"><label for="svc-ceramic">Ceramic Coating</label></div>
           </div>
+          <div class="error" id="err-services">Please select at least one service.</div>
         </div>
 
-        <div style="margin-top:12px">
+        <div class="field">
           <label for="notes">Notes</label>
-          <textarea id="notes" name="notes" rows="4" placeholder="Location, special requests, add-ons…"></textarea>
+          <textarea id="notes" name="notes" rows="4" placeholder="Anything else we should know? Access, parking, colour, concerns…"></textarea>
         </div>
 
-        <div style="margin-top:12px">
-          <button class="btn" type="submit">Send Booking via WhatsApp</button>
+        <div class="field consent-row">
+          <input id="consent" type="checkbox" required>
+          <label for="consent" class="muted">I consent to being contacted about my enquiry.</label>
         </div>
-        <div class="form-note">We confirm availability and final pricing on WhatsApp.</div>
+        <div class="error" id="err-consent">Please tick the consent box.</div>
+
+        <div style="margin-top:12px">
+          <button class="btn" type="submit">Send Enquiry via WhatsApp</button>
+        </div>
+        <div class="form-note">We’ll confirm availability and final pricing on WhatsApp or by phone.</div>
       </form>
     </div>
 
+    <!-- SIDEBAR -->
     <aside class="card" style="overflow:hidden">
       <div class="media" style="height:220px;background-image:url('/assets/KiaFoam.jpg')"></div>
       <div class="body">
         <h3>Contact</h3>
-        <p style="margin:0 0 8px">WhatsApp: <a href="https://wa.me/27624952909" target="_blank" rel="noopener">Tap to open</a></p>
-        <p style="color:var(--muted);margin:0">Cape Town • Mobile & Studio • By appointment only</p>
+        <p style="margin:0 0 6px">WhatsApp: <a href="https://wa.me/27624952909" target="_blank" rel="noopener">Tap to open</a></p>
+        <p style="margin:0 0 6px">Email: <a href="mailto:revivaldetailingcpt@gmail.com">revivaldetailingcpt@gmail.com</a></p>
+        <p class="muted" style="margin:0 0 8px">Cape Town • Mobile & Studio • By appointment only</p>
+
+        <details>
+          <summary>Service Area</summary>
+          <div class="muted" style="margin-top:8px">
+            Greater Cape Town. Travel fees may apply outside core zones.
+          </div>
+        </details>
+        <details>
+          <summary>How bookings work</summary>
+          <div class="muted" style="margin-top:8px">
+            Send your details → We confirm date/time and final price → You approve → We lock it in.
+          </div>
+        </details>
+        <details>
+          <summary>Payments</summary>
+          <div class="muted" style="margin-top:8px">
+            EFT or Cash On-site. Invoice available on request.
+          </div>
+        </details>
+        <p class="muted" style="margin-top:10px">Your information is used only to arrange your booking. We don’t share it.</p>
       </div>
     </aside>
   </div>
@@ -202,6 +305,7 @@
 </footer>
 
 <script>
+  // Footer year
   document.getElementById('y').textContent = new Date().getFullYear();
 
   // Reveal on scroll
@@ -210,45 +314,77 @@
   }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
+  // Min selectable date = today (no text changes)
+  (function setMinDate(){
+    const d = document.getElementById('date');
+    if (!d) return;
+    const today = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    d.min = today.getFullYear() + '-' + pad(today.getMonth()+1) + '-' + pad(today.getDate());
+  })();
+
+  // Utils
+  function show(id, on){ const el = document.getElementById(id); if(!el) return; el.style.display = on ? 'block' : 'none'; }
+  function validatePhone(v){ return /^\+?\d[\d\s()-]{6,}$/.test(v); }
+  function getCheckedServices(){ return [...document.querySelectorAll('#services input[type="checkbox"]:checked')].map(i=>i.value); }
+
   // WhatsApp submission
   document.getElementById('waForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    const sizeEl = document.querySelector('input[name="size"]:checked');
-    const elecEl = document.querySelector('input[name="electricity"]:checked');
-    const waterEl = document.querySelector('input[name="water"]:checked');
-    if (!sizeEl || !elecEl || !waterEl) {
-      alert('Please complete all required fields.');
-      return;
-    }
-    function esc(s){ return encodeURIComponent(s || ""); }
-    const name    = document.getElementById('name').value.trim();
-    const phone   = document.getElementById('phone').value.trim();
+
+    // Honeypot
+    if (document.getElementById('company').value.trim() !== '') return;
+
+    // Gather
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
     const vehicle = document.getElementById('vehicle').value.trim();
-    const size    = sizeEl.value;
-    const service = document.getElementById('service').value;
-    const date    = document.getElementById('date').value;
-    const electricity = elecEl.value;
-    const water = waterEl.value;
-    const notes   = document.getElementById('notes').value.trim();
+    // Respect your chosen name="vsize"
+    const sizeEl = document.querySelector('input[name="vsize"]:checked') || document.querySelector('input[name="size"]:checked');
+    const contactMethodEl = document.querySelector('input[name="contactMethod"]:checked');
+    const date = document.getElementById('date').value;
+    const suburb = document.getElementById('suburb').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+    const consent = document.getElementById('consent').checked;
+    const services = getCheckedServices();
 
-    const msg = 
-      "Booking request:%0A"
-      + "Name: " + esc(name) + "%0A"
-      + "Phone: " + esc(phone) + "%0A"
-      + "Vehicle: " + esc(vehicle) + "%0A"
-      + "Size: " + esc(size) + "%0A"
-      + "Service: " + esc(service) + "%0A"
-      + "Preferred date: " + esc(date) + "%0A"
-      + "Electricity access: " + esc(electricity) + "%0A"
-      + "Water access: " + esc(water) + "%0A"
-      + "Notes: " + esc(notes);
+    // Reset errors
+    ['err-name','err-phone','err-vehicle','err-size','err-services','err-contact','err-consent']
+      .forEach(id=>show(id,false));
 
-    const wa = "https://wa.me/27624952909?text=" + msg;
+    // Validate (no text changes to messages)
+    let ok = true;
+    if(!name){ show('err-name', true); ok = false; }
+    if(!validatePhone(phone)){ show('err-phone', true); ok = false; }
+    if(!vehicle){ show('err-vehicle', true); ok = false; }
+    if(!sizeEl){ show('err-size', true); ok = false; }
+    if(!contactMethodEl){ show('err-contact', true); ok = false; }
+    if(services.length === 0){ show('err-services', true); ok = false; }
+    if(!consent){ show('err-consent', true); ok = false; }
+
+    if(!ok) return;
+
+    function esc(s){ return encodeURIComponent(s || ""); }
+
+    const msgLines = [
+      "New enquiry:",
+      "Name: " + name,
+      "Phone: " + phone,
+      "Preferred contact: " + (contactMethodEl ? contactMethodEl.value : ""),
+      "Vehicle: " + vehicle,
+      "Size: " + (sizeEl ? sizeEl.value : ""),
+      "Services: " + services.join(", "),
+      date ? ("Preferred date: " + date) : null,
+      suburb ? ("Suburb/Location: " + suburb) : null,
+      notes ? ("Notes: " + notes) : null
+    ].filter(Boolean);
+
+    const wa = "https://wa.me/27624952909?text=" + esc(msgLines.join("\n"));
     window.open(wa, "_blank");
   });
 </script>
 
-<!-- Floating gold WhatsApp button with icon -->
+<!-- Floating WhatsApp button -->
 <div class="floating-cta">
   <a href="https://wa.me/27624952909" aria-label="Book Now" target="_blank" rel="noopener">
     <img src="/assets/whatsapp-white-icon.png" alt="WhatsApp" style="width:28px;height:28px;display:block;margin:auto;">

@@ -325,3 +325,31 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted)}
   position:static !important;
   float:none !important;
 }
+
+/* Tooltip */
+.label-row{display:flex;align-items:center;gap:8px}
+.tooltip{position:relative;display:inline-flex;align-items:center}
+.tooltip .tip{
+  position:absolute;left:50%;transform:translateX(-50%);
+  bottom:130%;min-width:220px;max-width:280px;
+  background:#0b0b0c;color:#fff;font-size:12px;line-height:1.35;
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);opacity:0;pointer-events:none;
+  transition:opacity .12s ease-out;z-index:10;
+}
+.tooltip:hover .tip,
+.tooltip:focus-within .tip{opacity:1}
+.tooltip .icon{
+  width:18px;height:18px;border-radius:50%;
+  border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--muted);background:rgba(255,255,255,.02);
+}
+@media (hover:none){
+  /* tap-friendly: show tooltip when the icon is focused */
+  .tooltip .tip{bottom:140%}
+}
+
+/* Consent row alignment */
+.consent-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.consent-row input[type="checkbox"]{margin:0;inline-size:16px;block-size:16px}
+.consent-row label{margin:0;cursor:pointer}
