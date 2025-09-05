@@ -412,10 +412,14 @@
         <section class="card step" data-step="review" aria-labelledby="h-review">
           <h3 id="h-review">5) Review & Confirm</h3>
           <div id="summary"></div>
-          <label class="help" style="display:flex;gap:8px;align-items:center;margin-top:10px">
-            <input type="checkbox" id="terms"> I accept the booking terms and agree to be contacted by Revival Automotive.
-          </label>
-          <div id="termsErr" class="err alert" style="display:none;margin-top:8px">Please accept the terms to continue.</div>
+          <label class="terms" style="margin-top:10px">
+        <input type="checkbox" id="terms">
+       <span>I accept the booking terms and agree to be contacted by Revival Automotive.</span>
+        </label>
+       <div id="termsErr" class="err alert" style="display:none;margin-top:8px">
+  Please accept the terms to continue.
+        </div>
+
           <div class="nav-inline">
             <button class="btn secondary" data-prev>← Back</button>
             <button class="btn" id="confirmBtn">Confirm Booking on WhatsApp</button>
@@ -989,20 +993,37 @@
       const scheduleStr = `${state.schedule.date} at ${state.schedule.time} (${computeDurationHours().toFixed(1)} hrs est)`;
 
       summary.innerHTML = `
-        ${custHtml}
-        <div style="height:10px"></div>
-        <div class="pill">Scheduled: ${scheduleStr}</div>
-        <div style="height:10px"></div>
-        <div class="card" style="padding:0">
-          <table aria-label="Order summary">
-            <thead><tr><th>Service</th><th>Unit</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
-            <tbody>${rows || '<tr><td colspan="5">No services selected.</td></tr>'}</tbody>
-            <tfoot>
-              <tr><td colspan="4">Grand Total</td><td>${fmtCurrency(totals.total)}</td></tr>
-            </tfoot>
-          </table>
-        </div>
-      `;
+  ${custHtml}
+  <div style="height:10px"></div>
+  <div class="pill">Scheduled: ${scheduleStr}</div>
+  <div style="height:10px"></div>
+  <div class="card" style="padding:0">
+    <table aria-label="Order summary">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Qty</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${items.length ? items.map(it => `
+          <tr>
+            <td>${escapeHTML(it.name)}</td>
+            <td>${it.qty}</td>
+            <td>${fmtCurrency(it.unitPrice)}</td>
+            <td>${fmtCurrency(it.total)}</td>
+          </tr>
+        `).join('') : '<tr><td colspan="4">No services selected.</td></tr>'}
+      </tbody>
+      <tfoot>
+        <tr><td colspan="3">Grand Total</td><td>${fmtCurrency(totals.total)}</td></tr>
+      </tfoot>
+    </table>
+  </div>
+`;
+
     }
 
     // === CLEAR STATE on confirm ===
