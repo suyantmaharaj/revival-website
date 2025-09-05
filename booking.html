@@ -200,7 +200,11 @@
     }
 
     /* === Clear Cart visibility: hidden by default, toggled via JS on Services step === */
-    #clearCart{ display:none; }
+    #clearCart{ display:none; color:#fff !important; } /* ensure white text */
+
+    /* Keep Clear button white on hover/focus too */
+    #clearCart:hover,
+    #clearCart:focus { color:#fff !important; }
   </style>
 </head>
 <body>
@@ -238,7 +242,7 @@
       <div class="progress-steps" id="progressSteps">
         <span data-step-label="who">Who & Where</span>
         <span data-step-label="services">Services</span>
-        <span data-step-label="extras">Extras</span>
+        <span data-step-label="extras">Access</span><!-- renamed from Extras -->
         <span data-step-label="schedule">Schedule</span>
         <span data-step-label="review">Review</span>
       </div>
@@ -343,7 +347,7 @@
           <div class="svc-grid" id="svcGrid" aria-live="polite"></div>
           <div class="nav-inline">
             <button class="btn secondary" data-prev>← Back</button>
-            <button class="btn" data-next>Next: Extras →</button>
+            <button class="btn" data-next>Next: Access →</button> <!-- renamed button label -->
           </div>
         </section>
 
@@ -475,7 +479,7 @@
     ];
     const CATS = ['All','Interior','Exterior','Add-ons'];
 
-    // === NEW: Per-service estimated hours (use max of any range) ===
+    // Per-service estimated hours (using max where a range was given)
     const SERVICE_HOURS = {
       washwax: 2.0,   // Wash & Wax = 2 hours
       interior: 1.5,  // Interior = 1.5 hours
@@ -1081,19 +1085,18 @@
     function lineTotal(it, svc){ return Number(it.qty||0) * priceForSize(svc); }
     function hasCart(){ return Object.keys(state.cart).length>0; }
 
-    // ====== UPDATED DURATION (only change requested) ======
+    // ====== UPDATED DURATION ======
     function computeDurationHours(){
       const items = Object.values(state.cart);
       if(!items.length) return 0;
 
       let hrs = 0;
       items.forEach(it=>{
-        const svc = SERVICES.find(x=>x.id===it.id);
-        const perUnit = SERVICE_HOURS[svc.id] ?? 0.5; // fallback to previous default
+        const s = SERVICES.find(x=>x.id===it.id);
+        const perUnit = SERVICE_HOURS[s.id] ?? 0.5; // fallback to 0.5 hr per item
         hrs += perUnit * Number(it.qty || 0);
       });
 
-      // round to nearest 0.5 and enforce minimum 0.5 like before
       return Math.max(0.5, Math.round(hrs * 2) / 2);
     }
 
@@ -1101,7 +1104,7 @@
     function saveState(){ localStorage.setItem('revival_booking', JSON.stringify(state)); }
     function loadState(){ try{ const raw=localStorage.getItem('revival_booking'); return raw?JSON.parse(raw):null }catch(e){ return null } }
 
-    // === NEW: reset + clear state helpers ===
+    // Reset + clear state helpers
     function resetToInitialState(){
       state = JSON.parse(JSON.stringify(initialState));
       saveState();
@@ -1116,7 +1119,6 @@
     function clearBookingState(){
       localStorage.removeItem('revival_booking');
       resetToInitialState();
-      // Remove hash so refresh doesn't jump to a step
       if (location.hash) {
         history.replaceState(null, '', location.pathname + location.search);
       }
