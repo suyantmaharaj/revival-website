@@ -113,7 +113,6 @@
 
     .totals{ margin-top:12px; border-top:1px solid var(--line); padding-top:10px; display:grid; gap:6px }
     .totals .row{ display:flex; justify-content:space-between; align-items:center }
-    .remove{ color:#f87171; font-size:12px; background:transparent; border:none; cursor:pointer }
 
     /* Mobile cart sheet */
     .cart-toggle {display:none;border:1px solid var(--line);background:#0f0f13;border-radius:999px;padding:8px 12px;box-shadow:var(--shadow);color:var(--text);}
@@ -200,7 +199,7 @@
     }
 
     /* === Clear Cart visibility: hidden by default, toggled via JS on Services step === */
-    #clearCart{ display:none; color:#fff !important; } /* ensure white text */
+    #clearCart{ display:none; color:#fff !important; }
     #clearCart:hover,
     #clearCart:focus { color:#fff !important; }
   </style>
@@ -240,7 +239,7 @@
       <div class="progress-steps" id="progressSteps">
         <span data-step-label="who">Who & Where</span>
         <span data-step-label="services">Services</span>
-        <span data-step-label="extras">Access</span><!-- renamed from Extras -->
+        <span data-step-label="extras">Access</span>
         <span data-step-label="schedule">Schedule</span>
         <span data-step-label="review">Review</span>
       </div>
@@ -345,7 +344,7 @@
           <div class="svc-grid" id="svcGrid" aria-live="polite"></div>
           <div class="nav-inline">
             <button class="btn secondary" data-prev>← Back</button>
-            <button class="btn" data-next>Next: Access →</button> <!-- renamed button label -->
+            <button class="btn" data-next>Next: Access →</button>
           </div>
         </section>
 
@@ -683,7 +682,6 @@
               <h4>${svc.name}</h4>
               <small>${svc.unit==='pair'?'Pair':'Qty'} • ${unitLabel(svc)}</small>
               <div class="help">Line: ${fmtCurrency(lineTotal(it, svc))}</div>
-              <button class="remove" aria-label="Remove ${svc.name}">Remove</button>
             </div>
             <div>
               <div class="qty" role="group" aria-label="Quantity">
@@ -695,7 +693,6 @@
           const [dec, inp, inc] = line.querySelectorAll('.qty *');
           dec.addEventListener('click', ()=>{
             it.qty = Math.max(Number(inp.step), (Number(it.qty) - Number(inp.step)));
-            if(it.qty<=0){ delete state.cart[it.id]; }
             saveState(); renderCart();
           });
           inc.addEventListener('click', ()=>{
@@ -704,12 +701,9 @@
           });
           inp.addEventListener('change', ()=>{
             let v = Number(inp.value);
-            if(isNaN(v) || v<=0) v = Number(inp.step);
+            if(isNaN(v) || v < Number(inp.step)) v = Number(inp.step);
             it.qty = v;
             saveState(); renderCart();
-          });
-          line.querySelector('.remove').addEventListener('click', ()=>{
-            delete state.cart[it.id]; saveState(); renderCart(); renderServices();
           });
           cartItemsEl.appendChild(line);
         });
@@ -731,7 +725,8 @@
       postal.value=state.customer.postal||'';
       document.querySelectorAll('input[name="contact"]').forEach(r=>r.checked=(r.value===state.customer.contact));
       document.querySelectorAll('input[name="for"]').forEach(r=>r.checked=(r.value===state.customer.for));
-      (state.customer.for==='Someone else') && (recipientWrap.style.display='grid');
+      // initial recipient visibility
+      recipientWrap.style.display = (state.customer.for === 'Someone else') ? 'grid' : 'none';
       recName.value=state.customer.recName||'';
       recPhone.value=state.customer.recPhone||'';
 
@@ -745,12 +740,23 @@
         el.addEventListener('blur', ()=>validateField(el));
       });
 
+      // preferred contact
       document.querySelectorAll('input[name="contact"]').forEach(r=>r.addEventListener('change', ()=>{
         if(r.checked){
           state.customer.contact=r.value;
           saveState();
           updateEmailRequiredUI();
           validateField(email);
+        }
+      }));
+
+      // SHOW/HIDE recipient fields when switching "Myself" / "Someone else"
+      document.querySelectorAll('input[name="for"]').forEach(r=>r.addEventListener('change', ()=>{
+        if(r.checked){
+          state.customer.for = r.value;
+          saveState();
+          const isOther = (r.value === 'Someone else');
+          recipientWrap.style.display = isOther ? 'grid' : 'none';
         }
       }));
 
@@ -791,9 +797,9 @@
     function buildTimeOptions(){
       timeEl.innerHTML='';
       const times=[];
-      for(let h=6;h<=18;h++){        // updated: 06:00 start
+      for(let h=6;h<=18;h++){
         for(let m=0;m<60;m+=30){
-          if(h===18 && m>0) continue; // allow 18:00 but not later
+          if(h===18 && m>0) continue;
           times.push(`${pad(h)}:${pad(m)}`);
         }
       }
