@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <script defer src="/scripts.js"></script>
 
   <meta name="theme-color" content="#0b0b0c" />
   <meta name="description" content="Simple multi-step booking for Revival Automotive (Cape Town). Choose services, pick a time, and confirm via WhatsApp." />
@@ -210,17 +211,25 @@
   <header>
     <div class="container nav">
       <div class="brand">
-        <a href="/index.html"><img src="/assets/logo_revival.jpg" alt="Revival Automotive logo"></a>
+        <a href="/index.html" aria-label="Go to Home"><img src="/assets/logo_revival.jpg" alt="Revival Automotive logo"></a>
       </div>
-      <nav class="links">
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" data-nav-toggle>
+        <span class="sr-only">Toggle navigation</span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="links" id="primary-nav" data-nav-menu>
         <a href="/index.html">Home</a>
         <a href="/services.html">Services</a>
         <a href="/coating.html">Ceramic Coating</a>
         <a href="/gallery.html">Gallery</a>
         <a href="/contact.html">Contact</a>
+        <a href="/booking.html" aria-current="page" class="btn outline">Book WhatsApp</a>
       </nav>
     </div>
   </header>
+  <div class="nav-overlay" data-nav-overlay></div>
 
   <!-- ====== Page Heading ====== -->
   <section class="hero" style="min-height:36vh; display:grid; place-items:center; border-bottom:1px solid var(--line);">

@@ -37,35 +37,33 @@
 
   <!-- Styles -->
   <link href="styles.css" rel="stylesheet">
+  <script defer src="/scripts.js"></script>
 
-  <!-- Page header tweaks -->
-  <style>
-    header .nav { padding: 10px 0; }
-    header .brand { gap: 0; }
-    header .brand a { display:inline-flex; align-items:center; }
-    header .brand img { height:42px; width:auto; border-radius:8px; border:1px solid var(--line); background:#111 }
-    header .links { display:flex; align-items:center; gap:22px; }
-    header .links a { color: var(--muted); }
-    header .links a:hover { color: var(--text); }
-    header .links .btn { display:none !important; }
-  </style>
 </head>
 <body>
 
  <header>
   <div class="container nav">
     <div class="brand">
-      <a href="index.html"><img src="assets/logo_revival.jpg" alt="Revival Automotive logo"></a>
+      <a href="/index.html" aria-label="Go to Home"><img src="/assets/logo_revival.jpg" alt="Revival Automotive logo"></a>
     </div>
-    <nav class="links">
-      <a href="index.html">Home</a>
-      <a href="services.html" style="color:#fff">Services</a>
-      <a href="coating.html">Ceramic Coating</a>
-      <a href="gallery.html">Gallery</a>
-      <a href="contact.html">Contact</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" data-nav-toggle>
+      <span class="sr-only">Toggle navigation</span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav class="links" id="primary-nav" data-nav-menu>
+      <a href="/index.html">Home</a>
+      <a href="/services.html" aria-current="page">Services</a>
+      <a href="/coating.html">Ceramic Coating</a>
+      <a href="/gallery.html">Gallery</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/booking.html" class="btn outline">Book WhatsApp</a>
     </nav>
   </div>
 </header>
+<div class="nav-overlay" data-nav-overlay></div>
 
 
 <section class="hero"><div class="bg" style="--img:url('assets/BMWBadge.JPG')"></div>  <div class="overlay"></div>
