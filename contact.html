@@ -65,11 +65,12 @@
       display:inline-flex;align-items:center;
       padding:9px 14px;border:1px solid var(--line);border-radius:999px;
       color:var(--muted);cursor:pointer;background:rgba(255,255,255,.02);
-      transition:transform .02s ease-in-out;
+      transition:transform .02s ease-in-out, box-shadow .25s ease;
     }
     .chip input:checked + label{
       background:linear-gradient(135deg,var(--accent),var(--accent-2));
       color:#0b0b0c;font-weight:700;border-color:transparent;
+      box-shadow:0 12px 20px rgba(0,0,0,.35);
     }
     .chip label:active{transform:scale(0.98)}
 
@@ -105,6 +106,217 @@
 
     .form-note{color:var(--muted);font-size:14px;margin-top:6px}
     .muted{color:var(--muted)}
+
+    /* Contact ways */
+    .contact-overview{padding:80px 0;border-top:1px solid var(--line);background:radial-gradient(circle at top, rgba(199,167,104,.08), transparent 55%)}
+    .contact-section-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;margin-bottom:32px;align-items:flex-end}
+    .contact-section-head h3{margin:6px 0 8px;font-size:30px;font-family:"Playfair Display",serif}
+    .contact-section-head p{max-width:540px;color:var(--muted)}
+    .contact-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:18px;
+    }
+    .contact-tile{
+      position:relative;
+      padding:24px;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(165deg, rgba(16,16,22,.95), rgba(16,16,22,.7));
+      box-shadow:0 25px 55px rgba(0,0,0,.55);
+      overflow:hidden;
+    }
+    .contact-tile::after{
+      content:"";
+      position:absolute;
+      inset:-40% auto auto -30%;
+      width:160px;
+      height:160px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(199,167,104,.3), transparent 70%);
+      opacity:.4;
+      pointer-events:none;
+      animation:orbit 20s linear infinite;
+    }
+    .contact-tile__icon{
+      width:46px;height:46px;border-radius:16px;
+      display:grid;place-items:center;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      margin-bottom:16px;
+      color:var(--accent);
+    }
+    .contact-tile__icon svg{
+      width:20px;height:20px;
+      stroke:currentColor;
+      stroke-width:1.6;
+      fill:none;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+    .contact-tile h4{margin:0 0 6px;font-size:20px}
+    .contact-tile p{margin:0 0 14px;color:var(--muted)}
+    .contact-link{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-size:11px;
+      color:var(--accent);
+    }
+    .contact-tile__meta{display:flex;flex-wrap:wrap;gap:8px;font-size:13px;color:var(--muted)}
+    .contact-process{
+      margin-top:40px;
+      padding:26px;
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(9,9,12,.7);
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:16px;
+    }
+    .contact-process__step{
+      position:relative;
+      padding-left:50px;
+      min-height:58px;
+    }
+    .step-number{
+      position:absolute;
+      left:0;
+      top:0;
+      width:38px;
+      height:38px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      display:grid;
+      place-items:center;
+      font-weight:600;
+      color:var(--accent);
+      background:rgba(255,255,255,.03);
+    }
+    .contact-process__step strong{display:block;margin-bottom:4px}
+    .contact-process__step span{color:var(--muted);font-size:13px}
+
+    /* Commitment / info blocks */
+    .contact-commitments{
+      border-top:1px solid var(--line);
+      padding:80px 0;
+      background:linear-gradient(180deg, rgba(11,11,12,.95), rgba(11,11,12,.8));
+    }
+    .contact-commitments h3{
+      margin:0 0 20px;
+      font-size:32px;
+      font-family:"Playfair Display",serif;
+    }
+    .commitment-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:18px;
+    }
+    .commitment{
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(14,14,18,.8);
+      padding:22px;
+      box-shadow:0 25px 55px rgba(0,0,0,.5);
+    }
+    .commitment span{
+      display:block;
+      font-size:12px;
+      letter-spacing:.25em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .commitment strong{
+      display:block;
+      font-size:28px;
+      margin:12px 0 8px;
+      font-family:"Playfair Display",serif;
+    }
+    .commitment p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .contact-cta-panel{
+      margin-top:32px;
+      padding:26px;
+      border-radius:26px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(135deg, rgba(199,167,104,.08), rgba(11,11,13,.9));
+      display:flex;
+      flex-wrap:wrap;
+      gap:20px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .contact-cta-panel__text{
+      max-width:560px;
+    }
+    .contact-cta-panel__actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    /* FAQ */
+    .contact-faq{
+      padding:80px 0 60px;
+      border-top:1px solid var(--line);
+    }
+    .contact-faq h3{
+      margin:0 0 16px;
+      font-size:30px;
+      font-family:"Playfair Display",serif;
+    }
+    .faq-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+      gap:18px;
+    }
+    .faq-card{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(13,13,16,.85);
+      padding:20px 22px;
+      box-shadow:0 20px 45px rgba(0,0,0,.4);
+    }
+    .faq-card h4{
+      margin:0 0 10px;
+      font-size:18px;
+    }
+    .faq-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    /* Motion helper */
+    [data-animate]{opacity:0;transform:translateY(16px)}
+    [data-animate].visible{
+      animation:fadeUp .75s ease forwards;
+      animation-delay:var(--delay,0s);
+    }
+    @keyframes fadeUp{
+      to{opacity:1;transform:none}
+    }
+    @keyframes orbit{
+      0%{transform:translate3d(-15px,-10px,0)}
+      50%{transform:translate3d(18px,12px,0)}
+      100%{transform:translate3d(-15px,-10px,0)}
+    }
+
+    @media (max-width: 900px){
+      .contact-section-head{flex-direction:column;align-items:flex-start;text-align:left}
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .contact-tile::after{
+        animation:none;
+      }
+      [data-animate]{opacity:1;transform:none;animation:none}
+    }
   </style>
 </head>
 <body>
@@ -133,163 +345,166 @@
 <div class="nav-overlay" data-nav-overlay></div>
 
 <section class="hero">
-  <div class="bg" style="--img:url('/assets/')"></div>
+  <div class="bg" style="--img:url('/assets/RAV4_Back.JPG')"></div>
   <div class="container hero-inner reveal">
     <span class="pill kicker">Contact</span>
-    <h2>Want us to call you?</h2>
-    <p>Fill in the form below. We’ll review your request and get back to you via your preferred contact method.</p>
+    <h2>Let’s plan your next detail.</h2>
+    <p>Share your vehicle info, select the services you require, and we’ll respond with availability and prep instructions.</p>
+    <div class="hero-cta">
+      <a class="btn" href="https://wa.me/27624952909" target="_blank" rel="noopener">Chat on WhatsApp</a>
+      <a class="btn outline" href="mailto:revivaldetailingcpt@gmail.com">Email us</a>
+    </div>
   </div>
 </section>
 
-<section class="section">
-  <div class="container two-col reveal">
-    <!-- FORM -->
-    <div>
-      <form id="waForm" novalidate>
-        <!-- Honeypot -->
-        <input type="text" id="company" name="company" style="position:absolute;left:-5000px;opacity:0" tabindex="-1" autocomplete="off" aria-hidden="true">
-
-        <div class="inline">
-          <div class="field">
-            <label for="name">Your Name</label>
-            <input id="name" name="name" placeholder="Name" required>
-            <div class="error" id="err-name">Please enter your name.</div>
-          </div>
-          <div class="field">
-            <label for="phone">Your Phone</label>
-            <!-- phone no longer hard-required; validated conditionally -->
-            <input id="phone" name="phone" inputmode="tel" placeholder="+27…">
-            <div class="error" id="err-phone">Please enter a valid phone number.</div>
-          </div>
-        </div>
-
-        <div class="inline">
-          <div class="field">
-            <label for="email">Your Email</label>
-            <input id="email" name="email" type="email" placeholder="you@example.com">
-            <div class="error" id="err-email">Please enter a valid email address.</div>
-          </div>
-          <div class="field">
-            <label for="suburb">Suburb / Location</label>
-            <input id="suburb" name="suburb" placeholder="e.g., Claremont, Cape Town">
-          </div>
-        </div>
-
-        <div class="inline">
-          <div class="field">
-            <label for="vehicle">Vehicle</label>
-            <input id="vehicle" name="vehicle" placeholder="e.g., BMW X2 M35i" required>
-            <div class="error" id="err-vehicle">Please enter your vehicle.</div>
-          </div>
-
-          <!-- YOUR SIZE BLOCK (unchanged text/structure) -->
-          <div class="field">
-            <label class="hint">
-              Vehicle Size
-              <span class="info" tabindex="0" aria-label="Vehicle size examples">?</span>
-              <span class="bubble" role="tooltip" aria-live="polite">
-                <table>
-                  <tr><td>Compact</td><td>i10, GTI, Starlet</td></tr>
-                  <tr><td>Standard</td><td>C63, M3, Macan</td></tr>
-                  <tr><td>Large</td><td>Range Rover, Hilux, X5</td></tr>
-                </table>
-              </span>
-            </label>
-            <div class="segmented" role="radiogroup" id="sizeGroup">
-              <input type="radio" name="vsize" id="sizeCompact" value="Compact" checked>
-              <label for="sizeCompact">Compact</label>
-              <input type="radio" name="vsize" id="sizeStandard" value="Standard">
-              <label for="sizeStandard">Standard</label>
-              <input type="radio" name="vsize" id="sizeLarge" value="Large">
-              <label for="sizeLarge">Large</label>
-            </div>
-            <div class="error" id="err-size">Please select a vehicle size.</div>
-          </div>
-        </div>
-
-        <div class="inline">
-          <div class="field">
-            <label>Preferred Contact</label>
-            <div class="segmented" role="radiogroup" aria-label="Preferred contact method">
-              <input type="radio" id="cm-whatsapp" name="contactMethod" value="WhatsApp" required>
-              <label for="cm-whatsapp">WhatsApp</label>
-              <input type="radio" id="cm-phone" name="contactMethod" value="Phone">
-              <label for="cm-phone">Phone</label>
-              <input type="radio" id="cm-email" name="contactMethod" value="Email">
-              <label for="cm-email">Email</label>
-            </div>
-            <div class="error" id="err-contact">Please choose how we should contact you.</div>
-          </div>
-          <div class="field">
-            <label for="date">Preferred Date</label>
-            <input id="date" name="date" type="date">
-            <div class="help">Optional</div>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>Services (select one or more)</label>
-          <div class="chips" id="services">
-            <div class="chip"><input type="checkbox" id="svc-washwax" value="Wash & Wax"><label for="svc-washwax">Wash & Wax</label></div>
-            <div class="chip"><input type="checkbox" id="svc-interior" value="Interior Detail"><label for="svc-interior">Interior Detail</label></div>
-            <div class="chip"><input type="checkbox" id="svc-1step" value="1-Step Polish"><label for="svc-1step">1-Step Polish</label></div>
-            <div class="chip"><input type="checkbox" id="svc-2step" value="2-Step Polish"><label for="svc-2step">2-Step Polish</label></div>
-            <div class="chip"><input type="checkbox" id="svc-headlight" value="Headlight Restoration"><label for="svc-headlight">Headlight Restoration</label></div>
-            <div class="chip"><input type="checkbox" id="svc-engine" value="Engine Bay Detail"><label for="svc-engine">Engine Bay Detail</label></div>
-            <div class="chip"><input type="checkbox" id="svc-window" value="Window Polish"><label for="svc-window">Window Polish</label></div>
-            <div class="chip"><input type="checkbox" id="svc-ceramic" value="Ceramic Coating"><label for="svc-ceramic">Ceramic Coating</label></div>
-          </div>
-          <div class="error" id="err-services">Please select at least one service.</div>
-        </div>
-
-        <div class="field">
-          <label for="notes">Notes</label>
-          <textarea id="notes" name="notes" rows="4" placeholder="Anything else we should know? Access, parking, colour, concerns…"></textarea>
-        </div>
-
-        <div class="field consent-row">
-          <input id="consent" type="checkbox" required>
-          <label for="consent" class="muted">I consent to being contacted about my enquiry.</label>
-        </div>
-        <div class="error" id="err-consent">Please tick the consent box.</div>
-
-        <div style="margin-top:12px">
-          <button class="btn" type="submit">Send Enquiry via WhatsApp</button>
-        </div>
-        <div class="form-note">We’ll confirm availability and final pricing on WhatsApp or by phone.</div>
-      </form>
+<section class="contact-overview">
+  <div class="container">
+    <div class="contact-section-head reveal">
+      <div>
+        <span class="pill kicker">Ways to reach us</span>
+        <h3>Choose the channel that suits you best.</h3>
+        <p>Need a quote, availability, or advice? Reach the Revival concierge on the platform you already use. Every request is reviewed by a senior detailer before we respond.</p>
+      </div>
+      <div>
+        <p class="muted" style="margin:0">Prefer to talk? Call or WhatsApp +27 62 495 2909 and we’ll walk you through options in real time.</p>
+      </div>
     </div>
 
-    <!-- SIDEBAR -->
-    <aside class="card" style="overflow:hidden">
-      <div class="media" style="height:220px;background-image:url('/assets/KiaFoam.jpg')"></div>
-      <div class="body">
-        <h3>Contact</h3>
-        <p style="margin:0 0 6px">WhatsApp: <a href="https://wa.me/27624952909" target="_blank" rel="noopener">Tap to open</a></p>
-        <p style="margin:0 0 6px">Email: <a href="mailto:revivaldetailingcpt@gmail.com">revivaldetailingcpt@gmail.com</a></p>
-        <p class="muted" style="margin:0 0 8px">Cape Town • Mobile & Studio • By appointment only</p>
+    <div class="contact-grid">
+      <article class="contact-tile" data-animate style="--delay:.05s">
+        <div class="contact-tile__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 5h16v9H7l-3 3z"></path>
+            <path d="M8 9h8"></path>
+            <path d="M8 12h5"></path>
+          </svg>
+        </div>
+        <h4>WhatsApp Concierge</h4>
+        <p>Share photos, paint concerns, or availability and receive tailored recommendations quickly.</p>
+        <div class="contact-tile__meta">
+          <span>+27 62 495 2909</span>
+          <span>7 days · 07:00 – 19:00</span>
+        </div>
+        <a class="contact-link" href="https://wa.me/27624952909" target="_blank" rel="noopener">
+          Open chat →
+        </a>
+      </article>
+      <article class="contact-tile" data-animate style="--delay:.15s">
+        <div class="contact-tile__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect>
+            <path d="M3 7.5 12 13l9-5.5"></path>
+          </svg>
+        </div>
+        <h4>Email our studio</h4>
+        <p>Ideal if you need a written proposal or want to attach service histories for reference.</p>
+        <div class="contact-tile__meta">
+          <span>revivaldetailingcpt@gmail.com</span>
+          <span>Replies within 24h</span>
+        </div>
+        <a class="contact-link" href="mailto:revivaldetailingcpt@gmail.com">
+          Send an email →
+        </a>
+      </article>
+      <article class="contact-tile" data-animate style="--delay:.25s">
+        <div class="contact-tile__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 22s7-6.2 7-12A7 7 0 1 0 5 10c0 5.8 7 12 7 12z"></path>
+            <circle cx="12" cy="10" r="2.5"></circle>
+          </svg>
+        </div>
+        <h4>Studio & mobile</h4>
+        <p>We operate from Cape Town with mobile service across Southern suburbs, Atlantic seaboard, and beyond on request.</p>
+        <div class="contact-tile__meta">
+          <span>Studio by appointment</span>
+          <span>Travel fees outside core zones</span>
+        </div>
+        <a class="contact-link" href="/services.html">
+          View services →
+        </a>
+      </article>
+    </div>
 
-        <details>
-          <summary>Service Area</summary>
-          <div class="muted" style="margin-top:8px">
-            Greater Cape Town. Travel fees may apply outside core zones.
-          </div>
-        </details>
-        <details>
-          <summary>How bookings work</summary>
-          <div class="muted" style="margin-top:8px">
-            Send your details → We confirm date/time and final price → You approve → We lock it in.
-          </div>
-        </details>
-        <details>
-          <summary>Payments</summary>
-          <div class="muted" style="margin-top:8px">
-            EFT or Cash On-site. Invoice available on request.
-          </div>
-        </details>
-        <p class="muted" style="margin-top:10px">Your information is used only to arrange your booking. We don’t share it.</p>
+    <div class="contact-process" data-animate style="--delay:.35s">
+      <div class="contact-process__step">
+        <span class="step-number">1</span>
+        <strong>Share your vehicle</strong>
+        <span>Tell us about make, colour, and concerns.</span>
       </div>
-    </aside>
+      <div class="contact-process__step">
+        <span class="step-number">2</span>
+        <strong>Review your curated plan</strong>
+        <span>We’ll reply with service pairings, durations, and prep.</span>
+      </div>
+      <div class="contact-process__step">
+        <span class="step-number">3</span>
+        <strong>Confirm & lock it in</strong>
+        <span>Approve via WhatsApp or email and we schedule your slot.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact-commitments">
+  <div class="container reveal">
+    <h3>What to expect when you reach out.</h3>
+    <div class="commitment-grid">
+      <div class="commitment" data-animate style="--delay:.05s">
+        <span>Response time</span>
+        <strong>Within 2 hours</strong>
+        <p>Concierge replies daily between 24/7 with tailored next steps.</p>
+      </div>
+      <div class="commitment" data-animate style="--delay:.15s">
+        <span>Availability</span>
+        <strong>2–7 days</strong>
+        <p>Flexible schedule for mobile jobs and reserved studio bays for correction work.</p>
+      </div>
+      <div class="commitment" data-animate style="--delay:.25s">
+        <span>Coverage</span>
+        <strong>Cape Town</strong>
+        <p>Southern suburbs, Atlantic seaboard, Northern suburbs, and travel on request.</p>
+      </div>
+      <div class="commitment" data-animate style="--delay:.35s">
+        <span>Aftercare</span>
+        <strong>Follow-up</strong>
+        <p>We check in after each service to assist with maintenance or additional needs.</p>
+      </div>
+    </div>
+
+    <div class="contact-cta-panel reveal">
+      <div class="contact-cta-panel__text">
+        <h4 style="margin:0 0 8px;font-size:22px;font-family:'Playfair Display',serif;">Ready to brief us?</h4>
+        <p class="muted" style="margin:0">Send a quick introduction on WhatsApp or email along with photos if possible. We’ll review paint condition, interior priorities, and send through the most suitable service combination.</p>
+      </div>
+      <div class="contact-cta-panel__actions">
+        <a class="btn" href="https://wa.me/27624952909" target="_blank" rel="noopener">WhatsApp Revival</a>
+        <a class="btn outline" href="mailto:revivaldetailingcpt@gmail.com">Email the studio</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact-faq">
+  <div class="container reveal">
+    <h3>Frequently asked questions</h3>
+    <div class="faq-grid">
+      <article class="faq-card">
+        <h4>What info helps you quote faster?</h4>
+        <p>Share the vehicle make/model, colour, known defects, preferred timeframe, and whether you’d like mobile or studio service. Photos of the paintwork or cabin always help.</p>
+      </article>
+      <article class="faq-card">
+        <h4>Can you visit my location?</h4>
+        <p>Yes. We’re mobile across greater Cape Town with a self-contained setup. Secure water/electricity access speeds things up, but we can make arrangements if not available.</p>
+      </article>
+      <article class="faq-card">
+        <h4>How do I secure a booking?</h4>
+        <p>Once we send your tailored plan, simply approve on WhatsApp or email. A deposit may apply for multi-day paint correction or coating work.</p>
+      </article>
+      <article class="faq-card">
+        <h4>What payment options are available?</h4>
+        <p>EFT and on-site card facilities are preferred. Cash is accepted for mobile visits. Tax invoices are supplied on request.</p>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -310,109 +525,11 @@
 </footer>
 
 <script>
-  // Footer year
   document.getElementById('y').textContent = new Date().getFullYear();
-
-  // Reveal on scroll
   const io = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-
-  // Min selectable date = today
-  (function setMinDate(){
-    const d = document.getElementById('date');
-    if (!d) return;
-    const today = new Date();
-    const pad = n => String(n).padStart(2,'0');
-    d.min = today.getFullYear() + '-' + pad(today.getMonth()+1) + '-' + pad(today.getDate());
-  })();
-
-  // Utils
-  function show(id, on){ const el = document.getElementById(id); if(!el) return; el.style.display = on ? 'block' : 'none'; }
-  function validatePhone(v){ return /^\+?\d[\d\s()-]{6,}$/.test(v); }
-  function validateEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-  function getCheckedServices(){ return [...document.querySelectorAll('#services input[type="checkbox"]:checked')].map(i=>i.value); }
-
-  // Dynamic hint: show which field is required based on contact method
-  document.querySelectorAll('input[name="contactMethod"]').forEach(r=>{
-    r.addEventListener('change', ()=>{
-      const method = document.querySelector('input[name="contactMethod"]:checked')?.value;
-      const phone = document.getElementById('phone');
-      const email = document.getElementById('email');
-      if(method === 'Email'){
-        phone.removeAttribute('required');
-        email.setAttribute('required','required');
-      }else{
-        email.removeAttribute('required');
-        phone.setAttribute('required','required');
-      }
-    });
-  });
-
-  // WhatsApp submission
-  document.getElementById('waForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    // Honeypot
-    if (document.getElementById('company').value.trim() !== '') return;
-
-    // Gather
-    const name = document.getElementById('name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const vehicle = document.getElementById('vehicle').value.trim();
-    const sizeEl = document.querySelector('input[name="vsize"]:checked') || document.querySelector('input[name="size"]:checked');
-    const contactMethodEl = document.querySelector('input[name="contactMethod"]:checked');
-    const date = document.getElementById('date').value;
-    const suburb = document.getElementById('suburb').value.trim();
-    const notes = document.getElementById('notes').value.trim();
-    const consent = document.getElementById('consent').checked;
-    const services = getCheckedServices();
-
-    // Reset errors
-    ['err-name','err-phone','err-email','err-vehicle','err-size','err-services','err-contact','err-consent']
-      .forEach(id=>show(id,false));
-
-    // Validate
-    let ok = true;
-    if(!name){ show('err-name', true); ok = false; }
-    if(!contactMethodEl){ show('err-contact', true); ok = false; }
-
-    // Conditional validation
-    const method = contactMethodEl ? contactMethodEl.value : null;
-    if(method === 'Email'){
-      if(!validateEmail(email)){ show('err-email', true); ok = false; }
-    }else if(method === 'WhatsApp' || method === 'Phone'){
-      if(!validatePhone(phone)){ show('err-phone', true); ok = false; }
-    }
-
-    if(!vehicle){ show('err-vehicle', true); ok = false; }
-    if(!sizeEl){ show('err-size', true); ok = false; }
-    if(services.length === 0){ show('err-services', true); ok = false; }
-    if(!consent){ show('err-consent', true); ok = false; }
-
-    if(!ok) return;
-
-    function esc(s){ return encodeURIComponent(s || ""); }
-
-    const msgLines = [
-      "New enquiry:",
-      "Name: " + name,
-      phone ? ("Phone: " + phone) : null,
-      email ? ("Email: " + email) : null,
-      "Preferred contact: " + (method || ""),
-      "Vehicle: " + vehicle,
-      "Size: " + (sizeEl ? sizeEl.value : ""),
-      "Services: " + services.join(", "),
-      date ? ("Preferred date: " + date) : null,
-      suburb ? ("Suburb/Location: " + suburb) : null,
-      notes ? ("Notes: " + notes) : null
-    ].filter(Boolean);
-
-    const wa = "https://wa.me/27624952909?text=" + esc(msgLines.join("\n"));
-    window.open(wa, "_blank");
-  });
+  document.querySelectorAll('.reveal,[data-animate]').forEach(el=>io.observe(el));
 </script>
 
 <!-- Floating WhatsApp button -->
