@@ -54,16 +54,18 @@ header::after{
   padding:18px 30px;
   border-radius:40px;
   border:1px solid rgba(255,255,255,.05);
-  background:linear-gradient(135deg, rgba(15,15,20,.95), rgba(6,6,9,.9));
+  background:linear-gradient(120deg, rgba(199,167,104,.32), rgba(15,15,20,.94) 44%, rgba(6,6,9,.92));
   box-shadow:0 18px 45px rgba(0,0,0,.55);
   isolation:isolate;
+  overflow:hidden;
 }
 .nav::after{
   content:"";
   position:absolute;
   inset:0;
-  background:radial-gradient(circle at 14% 50%, rgba(199,167,104,.22), transparent 55%);
-  opacity:.8;
+  background:linear-gradient(95deg, rgba(199,167,104,.38), transparent 24%);
+  opacity:.65;
+  border-radius:inherit;
   pointer-events:none;
 }
 .nav > *{position:relative;z-index:1}
@@ -101,8 +103,8 @@ header::after{
   position:relative;
   padding-bottom:8px;
   text-transform:uppercase;
-  letter-spacing:.22em;
-  font-size:11px;
+  letter-spacing:.2em;
+  font-size:12px;
   color:#c5c5cf;
 }
 .links a:not(.btn)::after{
@@ -131,8 +133,22 @@ header::after{
   transform:scaleX(1);
 }
 .links .btn{
-  border-color:rgba(199,167,104,.6);
-  box-shadow:none;
+  padding:10px 26px;
+  margin-left:10px;
+  border-radius:999px;
+  border:1px solid rgba(199,167,104,.85);
+  background:linear-gradient(120deg, rgba(250,226,182,.95), rgba(199,167,104,.95), rgba(140,112,54,.95));
+  color:#0b0804;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  font-size:11px;
+  font-weight:700;
+  box-shadow:0 14px 30px rgba(0,0,0,.45);
+}
+.links .btn:hover,
+.links .btn:focus-visible{
+  color:#0b0804;
+  filter:brightness(1.05);
 }
 
 .nav-toggle{
