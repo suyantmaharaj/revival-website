@@ -139,8 +139,44 @@ body.nav-open .nav-overlay{opacity:1;pointer-events:auto}
 .trust .card strong{display:block;color:var(--text);margin-bottom:4px}
 
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.card{background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-.card .media{height:180px;border-bottom:1px solid var(--line);background:#0e0e10 center/cover;}
+.card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  background:var(--bg-elev);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  transition:transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+  will-change:transform;
+  overflow:hidden;
+}
+.card::after{
+  content:"";
+  position:absolute;
+  inset:12px;
+  border-radius:calc(var(--radius) - 6px);
+  border:2px solid transparent;
+  transition:border-color .35s ease, box-shadow .35s ease, inset .35s ease;
+  pointer-events:none;
+}
+.card .media{
+  position:relative;
+  height:180px;
+  border-bottom:1px solid var(--line);
+  background:#0e0e10 center/cover;
+  overflow:hidden;
+}
+.card:hover{
+  transform:translateY(-10px) scale(1.01);
+  border-color:rgba(199,167,104,.4);
+  box-shadow:0 20px 40px rgba(0,0,0,.6);
+}
+.card:hover::after{
+  border-color:rgba(199,167,104,.7);
+  box-shadow:0 0 35px rgba(199,167,104,.55);
+  inset:8px;
+}
 .card .body{padding:20px}
 .card h3{font-family:"Playfair Display",serif;margin:0 0 8px;font-size:24px}
 .card p{margin:0 0 16px;color:var(--muted)}
