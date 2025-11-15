@@ -91,26 +91,6 @@
   <!-- Styles -->
   <link href="/styles.css" rel="stylesheet">
   <script defer src="/scripts.js"></script>
-
-  <style>
-    /* HERO slideshow */
-    .hero { position:relative; min-height:78vh; display:grid; place-items:center; border-bottom:1px solid var(--line); overflow:hidden; color:#fff; }
-    .hero .slides { position:absolute; inset:0; z-index:0; }
-    .hero .slide {
-      position:absolute; inset:0;
-      background:center/cover no-repeat;
-      opacity:0;
-      transition:opacity 500ms ease-in-out; /* smooth but fast */
-      filter:brightness(.6);
-    }
-    .hero .slide.active { opacity:1; }
-    .hero::after {
-      content:""; position:absolute; inset:0;
-      background:linear-gradient(to top, rgba(11,11,12,.75), rgba(11,11,12,.15));
-      z-index:1;
-    }
-    .hero .hero-inner { position:relative; z-index:2; text-align:center; padding:80px 0; }
-  </style>
 </head>
 
 <body>
@@ -140,7 +120,7 @@
 </header>
 <div class="nav-overlay" data-nav-overlay></div>
 
-<section class="hero" id="hero">
+<section class="hero" id="hero" data-hero-slideshow="3200">
   <div class="slides" aria-hidden="true">
     <div class="slide active" style="background-image:url('/assets/RSQ8Front.JPG')"></div>
     <div class="slide" style="background-image:url('/assets/Interior.png')"></div>
@@ -296,7 +276,7 @@
 <footer>
   <div class="container" style="display:flex;flex-direction:column;gap:10px">
     <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
-      <div>© <span id="y"></span> Revival Automotive. All rights reserved.</div>
+      <div>© <span data-year></span> Revival Automotive. All rights reserved.</div>
       <div>Website by <span style="color:var(--accent)">Rithm</span></div>
     </div>
     <div style="width:100%;color:var(--muted)">
@@ -308,39 +288,6 @@
     </div>
   </div>
 </footer>
-
-<script>
-  // Footer year
-  document.getElementById('y').textContent = new Date().getFullYear();
-
-  // Reveal on scroll
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
-  },{threshold:0.15});
-  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-
-  // HERO slideshow
-  (function(){
-    const slides = document.querySelectorAll('.hero .slide');
-    if(!slides.length) return;
-
-    let i = 0, timer = null;
-    const DURATION = 2750; // 2.75 seconds per slide
-
-    function next() {
-      slides[i].classList.remove('active');
-      i = (i + 1) % slides.length;
-      slides[i].classList.add('active');
-    }
-
-    function start(){ if(!timer) timer = setInterval(next, DURATION); }
-    function stop(){ clearInterval(timer); timer = null; }
-
-    start();
-    document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else start(); });
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) stop();
-  })();
-</script>
 
 <div class="floating-cta">
   <a class="floating-cta__btn" href="https://wa.me/27624952909" aria-label="Chat on WhatsApp" target="_blank" rel="noopener">

@@ -163,7 +163,7 @@
   <footer>
     <div class="container" style="display:flex;flex-direction:column;gap:10px">
       <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <div>© <span id="y"></span> Revival Automotive. All rights reserved.</div>
+        <div>© <span data-year></span> Revival Automotive. All rights reserved.</div>
         <div>Website by <span style="color:var(--accent)">Rithm</span></div>
       </div>
       <div style="width:100%;color:var(--muted)">
@@ -175,7 +175,6 @@
       </div>
     </div>
   </footer>
-  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
 <div class="floating-cta">
   <a class="floating-cta__btn" href="https://wa.me/27624952909" aria-label="Chat on WhatsApp" target="_blank" rel="noopener">
     <span class="floating-cta__pulse" aria-hidden="true"></span>
@@ -185,13 +184,6 @@
     <span class="floating-cta__label">WhatsApp</span>
   </a>
 </div>
-  <script>
-    // Reveal on scroll
-    const io = new IntersectionObserver(function(entries) {
-      entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.15 });
-    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
-  </script>
 
 </body>
 </html>
