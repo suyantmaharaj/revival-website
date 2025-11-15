@@ -97,10 +97,6 @@
   <div class="container nav">
     <div class="brand">
       <a href="/index.html" aria-label="Go to Home"><img src="/assets/logo_revival.jpg" alt="Revival Automotive logo"></a>
-      <div class="brand-text">
-        <span class="brand-name">Revival Automotive</span>
-        <span class="brand-tagline">Detailing Atelier • Cape Town</span>
-      </div>
     </div>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" data-nav-toggle>
       <span class="sr-only">Toggle navigation</span>
@@ -118,6 +114,7 @@
     </nav>
   </div>
 </header>
+
 <div class="nav-overlay" data-nav-overlay></div>
 
  <section class="hero" style="background-image:url('../assets/polish.jpg')">
@@ -270,11 +267,12 @@
         <div>
           <p class="muted">Need more defect removal? Upgrade to our 2-step correction or add-on panel spot corrections during the same appointment.</p>
         </div>
-        <a class="btn" href="/booking.html">Schedule correction</a>
+        <a class="btn" href="/booking.html">Book correction</a>
       </div>
     </div>
   </section>
-  <footer class="site-footer">
+
+<footer class="site-footer">
     <div class="container">
       <div class="footer-meta">
         <div class="footer-brand">
@@ -291,6 +289,8 @@
       </div>
     </div>
   </footer>
+
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
 <div class="floating-cta">
   <a class="floating-cta__btn" href="https://wa.me/27624952909" aria-label="Chat on WhatsApp" target="_blank" rel="noopener">
     <span class="floating-cta__pulse" aria-hidden="true"></span>
