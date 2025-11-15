@@ -297,18 +297,19 @@
       </aside>
     </div>
   </section>
-
-  <footer>
-    <div class="container" style="display:flex;flex-direction:column;gap:10px">
-      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <div>© <span data-year></span> Revival Automotive. All rights reserved.</div>
-        <div>Website by <span style="color:var(--accent)">Rithm</span></div>
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-meta">
+        <div class="footer-brand">
+          <p class="footer-copy">© <span data-year></span> Revival Automotive. All rights reserved.</p>
+        </div>
+        <div class="footer-madeby">Website by <span>Rithm</span></div>
       </div>
-      <div style="width:100%;color:var(--muted)">
-        <a href="https://instagram.com/revivalcpt" target="_blank" rel="noopener">Instagram</a> ·
-        <a href="https://facebook.com/revivalauto" target="_blank" rel="noopener">Facebook</a> ·
-        <a href="https://www.youtube.com/@revivalauto" target="_blank" rel="noopener">YouTube</a> ·
-        <a href="https://www.tiktok.com/@revivalautomotive" target="_blank" rel="noopener">TikTok</a> ·
+      <div class="footer-links" aria-label="Social links">
+        <a href="https://instagram.com/therevivalauto" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://facebook.com/revivalauto" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://www.youtube.com/@revivalauto" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://www.tiktok.com/@revivalautomotive" target="_blank" rel="noopener">TikTok</a>
         <a href="https://www.linkedin.com/company/revivalautomotive" target="_blank" rel="noopener">LinkedIn</a>
       </div>
     </div>
@@ -321,7 +322,13 @@
     </span>
     <span class="floating-cta__label">WhatsApp</span>
   </a>
-</div>
+</div>  <script>
+    // Reveal on scroll
+    const io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  </script>
 
 </body>
 </html>

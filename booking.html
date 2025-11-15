@@ -527,11 +527,21 @@
 
     <button class="cart-toggle" id="cartToggle" aria-expanded="false">Cart • <span id="cartCount">0</span> items</button>
   </main>
-
-  <footer>
-    <div class="container" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
-      <div>&copy; <span id="yr"></span> Revival Automotive</div>
-      <div class="help">Cape Town • Mobile & Studio</div>
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-meta">
+        <div class="footer-brand">
+          <p class="footer-copy">© <span data-year></span> Revival Automotive. All rights reserved.</p>
+        </div>
+        <div class="footer-madeby">Website by <span>Rithm</span></div>
+      </div>
+      <div class="footer-links" aria-label="Social links">
+        <a href="https://instagram.com/therevivalauto" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://facebook.com/revivalauto" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://www.youtube.com/@revivalauto" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://www.tiktok.com/@revivalautomotive" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://www.linkedin.com/company/revivalautomotive" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
     </div>
   </footer>
 
@@ -678,7 +688,6 @@
     gotoFromHashOrState();
     renderCart();
     updateProgress();
-    document.getElementById('yr').textContent = new Date().getFullYear();
 
     // Persist on hash navigation
     window.addEventListener('hashchange', ()=>{
