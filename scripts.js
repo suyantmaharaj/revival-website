@@ -17,6 +17,7 @@
     initReveal();
     initHeroSlideshow();
     initHeroTilt();
+    initInventoryEmptyState();
     stampYear();
   });
 
@@ -60,6 +61,21 @@
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") close(true);
+    });
+  }
+
+  function initInventoryEmptyState(){
+    document.querySelectorAll(".inventory-grid").forEach((grid) => {
+      if (grid.dataset.forceEmpty === "true"){
+        grid.removeAttribute("data-has-cars");
+        return;
+      }
+      const cards = grid.querySelectorAll(".inventory-card");
+      if (cards.length){
+        grid.setAttribute("data-has-cars", "true");
+      } else {
+        grid.removeAttribute("data-has-cars");
+      }
     });
   }
 

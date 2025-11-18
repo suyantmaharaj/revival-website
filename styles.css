@@ -1193,6 +1193,31 @@ label{font-size:14px;color:var(--muted)}
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:22px;
 }
+.inventory-empty{
+  grid-column:1 / -1;
+  padding:32px;
+  border-radius:24px;
+  border:1px dashed rgba(255,255,255,.25);
+  background:rgba(12,12,16,.75);
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+  justify-content:center;
+  color:var(--muted);
+}
+.inventory-empty p{
+  margin:0;
+  font-size:22px;
+  color:#fff;
+  font-family:"Playfair Display",serif;
+}
+.inventory-empty span{
+  font-size:14px;
+  max-width:440px;
+  line-height:1.5;
+}
 .inventory-card{
   border-radius:24px;
   border:1px solid rgba(255,255,255,.06);
@@ -1342,6 +1367,7 @@ label{font-size:14px;color:var(--muted)}
   flex-wrap:wrap;
   gap:16px;
 }
+.inventory-grid[data-has-cars] .inventory-empty{display:none}
 
 @media (max-width: 900px){
   .showroom-feature{
