@@ -103,7 +103,22 @@
     </button>
     <nav class="links" id="primary-nav" data-nav-menu>
       <a href="/index.html">Home</a>
-      <a href="/services.html">Services</a>
+      <div class="nav-dropdown" data-nav-dropdown data-open="false">
+        <div class="nav-dropdown__trigger">
+          <a href="/services.html" class="nav-dropdown__link">Services</a>
+          <button type="button" class="nav-dropdown__toggle" data-nav-dropdown-toggle aria-haspopup="true" aria-expanded="false" aria-label="Toggle services menu"></button>
+        </div>
+        <div class="nav-dropdown__menu" data-nav-dropdown-menu>
+          <a href="/services.html">All Services</a>
+          <a href="/services/wash-wax.html">Wash &amp; Wax</a>
+          <a href="/services/interior.html">Interior Detail</a>
+          <a href="/services/engine.html">Engine Bay Detail</a>
+          <a href="/services/headlights.html">Headlight Restoration</a>
+          <a href="/services/polish-1step.html">1-Step Polish</a>
+          <a href="/services/polish-2step.html">2-Step Polish</a>
+          <a href="/services/window-polish.html">Window Polish</a>
+        </div>
+      </div>
       <a href="/coating.html" aria-current="page">Ceramic Coating</a>
       <a href="/gallery.html">Gallery</a>
       <a href="/contact.html">Contact</a>

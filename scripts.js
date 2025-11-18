@@ -28,6 +28,7 @@
     const overlay = document.querySelector("[data-nav-overlay]");
     const body = document.body;
     const MEDIA_BREAKPOINT = "(min-width: 821px)";
+    const dropdownManager = initNavDropdowns(menu, MEDIA_BREAKPOINT);
 
     const open = () => {
       body.classList.add("nav-open");
@@ -37,6 +38,7 @@
       if (!body.classList.contains("nav-open")) return;
       body.classList.remove("nav-open");
       toggle.setAttribute("aria-expanded", "false");
+      dropdownManager?.closeAll();
       if (focusBack) toggle.focus();
     };
 
@@ -59,6 +61,57 @@
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") close(true);
     });
+  }
+
+  function initNavDropdowns(menu, breakpointQuery){
+    const dropdowns = Array.from(menu.querySelectorAll("[data-nav-dropdown]"));
+    if (!dropdowns.length) return null;
+
+    const closeAll = () => {
+      dropdowns.forEach((dropdown) => {
+        dropdown.setAttribute("data-open", "false");
+        const toggle = dropdown.querySelector("[data-nav-dropdown-toggle]");
+        toggle?.setAttribute("aria-expanded", "false");
+      });
+    };
+
+    dropdowns.forEach((dropdown) => {
+      const toggle = dropdown.querySelector("[data-nav-dropdown-toggle]");
+      if (!toggle) return;
+
+      const setExpanded = (value) => {
+        toggle.setAttribute("aria-expanded", String(value));
+      };
+
+      toggle.addEventListener("click", (event) => {
+        if (window.matchMedia(breakpointQuery).matches) return;
+        event.preventDefault();
+        const isOpen = dropdown.getAttribute("data-open") === "true";
+        dropdown.setAttribute("data-open", String(!isOpen));
+        setExpanded(!isOpen);
+      });
+
+      dropdown.addEventListener("mouseenter", () => {
+        if (!window.matchMedia(breakpointQuery).matches) return;
+        setExpanded(true);
+      });
+      dropdown.addEventListener("mouseleave", () => {
+        if (!window.matchMedia(breakpointQuery).matches) return;
+        setExpanded(false);
+      });
+      dropdown.addEventListener("focusin", () => {
+        if (!window.matchMedia(breakpointQuery).matches) return;
+        setExpanded(true);
+      });
+      dropdown.addEventListener("focusout", (event) => {
+        if (!window.matchMedia(breakpointQuery).matches) return;
+        if (!dropdown.contains(event.relatedTarget)) {
+          setExpanded(false);
+        }
+      });
+    });
+
+    return { closeAll };
   }
 
   function initReveal(){
