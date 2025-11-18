@@ -477,7 +477,7 @@ header::after{
 }
 .nav-dropdown__menu{
   position:absolute;
-  top:calc(100% + 12px);
+  top:calc(100% + 4px);
   left:0;
   min-width:220px;
   padding:12px 0;
