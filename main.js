@@ -1,4 +1,15 @@
 import { auth, db } from "./firebase-config.js";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 /**
  * Site-wide interactions:
@@ -13,6 +24,7 @@ import { auth, db } from "./firebase-config.js";
       ? fn()
       : document.addEventListener("DOMContentLoaded", fn)
   );
+  let currentUserProfile = null;
 
   ready(() => {
     initNav();
@@ -102,7 +114,7 @@ import { auth, db } from "./firebase-config.js";
           <div class="auth-modal__header">
             <p class="pill">Account</p>
             <h3 id="authModalTitle">Access Revival</h3>
-            <p class="auth-modal__intro">Sign in or create an account to manage bookings. This is a placeholder only.</p>
+            <p class="auth-modal__intro">Sign in or create an account to manage bookings.</p>
           </div>
           <div class="auth-tabs" role="tablist" aria-label="Authentication">
             <button class="auth-tab is-active" type="button" role="tab" aria-selected="true" data-auth-tab="login">Login</button>
@@ -110,7 +122,8 @@ import { auth, db } from "./firebase-config.js";
           </div>
           <div class="auth-panels">
             <div class="auth-panel is-active" role="tabpanel" data-auth-panel="login">
-              <form class="auth-form">
+              <form class="auth-form" data-auth-form="login">
+                <div class="auth-feedback" data-auth-feedback="login" role="status" aria-live="polite"></div>
                 <label>
                   <span>Email</span>
                   <input type="email" name="login-email" autocomplete="email" placeholder="you@example.com" required>
@@ -125,11 +138,16 @@ import { auth, db } from "./firebase-config.js";
                   </span>
                   <span>Continue with Google</span>
                 </button>
-                <button type="submit" class="btn">Login</button>
+                <button type="submit" class="btn" data-auth-submit="login">Login</button>
               </form>
             </div>
             <div class="auth-panel" role="tabpanel" data-auth-panel="register">
-              <form class="auth-form">
+              <form class="auth-form" data-auth-form="register">
+                <div class="auth-feedback" data-auth-feedback="register" role="status" aria-live="polite"></div>
+                <label>
+                  <span>Name</span>
+                  <input type="text" name="register-name" autocomplete="name" placeholder="Your name" required>
+                </label>
                 <label>
                   <span>Email</span>
                   <input type="email" name="register-email" autocomplete="email" placeholder="you@example.com" required>
@@ -138,13 +156,21 @@ import { auth, db } from "./firebase-config.js";
                   <span>Password</span>
                   <input type="password" name="register-password" autocomplete="new-password" placeholder="Create a password" required>
                 </label>
+                <label>
+                  <span>Phone</span>
+                  <input type="tel" name="register-phone" autocomplete="tel" placeholder="+27 62 495 2909" required>
+                </label>
+                <label>
+                  <span>Address</span>
+                  <input type="text" name="register-address" autocomplete="street-address" placeholder="Street, City" required>
+                </label>
                 <button type="button" class="auth-google">
                   <span class="auth-google__icon" aria-hidden="true">
                     <img src="/assets/Google_%22G%22_logo.svg.png" alt="">
                   </span>
                   <span>Continue with Google</span>
                 </button>
-                <button type="submit" class="btn">Create Account</button>
+                <button type="submit" class="btn" data-auth-submit="register">Create Account</button>
               </form>
             </div>
           </div>
@@ -159,6 +185,12 @@ import { auth, db } from "./firebase-config.js";
     const closers = modal.querySelectorAll("[data-auth-close]");
     const tabs = modal.querySelectorAll("[data-auth-tab]");
     const panels = modal.querySelectorAll("[data-auth-panel]");
+    const authTrigger = document.querySelector("[data-auth-open]");
+    const authTriggerLabel = authTrigger?.querySelector(".header-login__label");
+    const loginForm = modal.querySelector("[data-auth-form=\"login\"]");
+    const registerForm = modal.querySelector("[data-auth-form=\"register\"]");
+    const loginFeedback = modal.querySelector("[data-auth-feedback=\"login\"]");
+    const registerFeedback = modal.querySelector("[data-auth-feedback=\"register\"]");
     const body = document.body;
 
     const setTab = (name) => {
@@ -209,8 +241,145 @@ import { auth, db } from "./firebase-config.js";
       if (event.key === "Escape") close();
     });
 
-    modal.querySelectorAll("form").forEach((form) => {
-      form.addEventListener("submit", (event) => event.preventDefault());
+    const defaultSubmitLabels = {
+      login: "Login",
+      register: "Create Account"
+    };
+
+    const setAuthButtonLabel = (label) => {
+      if (!authTriggerLabel) return;
+      authTriggerLabel.textContent = label || "Login";
+    };
+
+    const setFeedback = (target, message, tone = "") => {
+      if (!target) return;
+      target.textContent = message;
+      target.dataset.state = tone;
+    };
+
+    const toggleSubmitting = (form, isSubmitting, type) => {
+      if (!form) return;
+      const submit = form.querySelector("[type=\"submit\"]");
+      if (!submit) return;
+      submit.disabled = isSubmitting;
+      if (isSubmitting) {
+        submit.textContent = "Please wait...";
+      } else {
+        const key = type || submit.dataset.authSubmit;
+        submit.textContent = defaultSubmitLabels[key] || submit.textContent;
+      }
+    };
+
+    const friendlyAuthError = (error) => {
+      const code = error?.code || "";
+      const messages = {
+        "auth/email-already-in-use": "That email is already registered.",
+        "auth/invalid-email": "Please enter a valid email address.",
+        "auth/invalid-credential": "Invalid login details. Please try again.",
+        "auth/wrong-password": "Incorrect password. Please try again.",
+        "auth/user-not-found": "No account found with that email.",
+        "auth/weak-password": "Password should be at least 6 characters."
+      };
+      return messages[code] || "Something went wrong. Please try again.";
+    };
+
+    const applyProfile = (profile) => {
+      currentUserProfile = profile;
+      if (profile) {
+        setAuthButtonLabel(profile.name || "My Account");
+      } else {
+        setAuthButtonLabel("Login");
+      }
+    };
+
+    const buildUserDoc = (overrides = {}) => ({
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      role: "customer",
+      createdAt: serverTimestamp(),
+      ...overrides
+    });
+
+    const fetchOrCreateUserProfile = async (user, fallbackEmail = "") => {
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        return { uid: user.uid, ...snap.data() };
+      }
+      const payload = buildUserDoc({
+        name: "",
+        email: user.email || fallbackEmail || "",
+        phone: "",
+        address: ""
+      });
+      await setDoc(ref, payload);
+      return { uid: user.uid, ...payload };
+    };
+
+    const handleRegister = async (event) => {
+      event.preventDefault();
+      if (!registerForm) return;
+      setFeedback(registerFeedback, "");
+      toggleSubmitting(registerForm, true, "register");
+      const formData = new FormData(registerForm);
+      const name = (formData.get("register-name") || "").trim();
+      const email = (formData.get("register-email") || "").trim();
+      const password = (formData.get("register-password") || "").trim();
+      const phone = (formData.get("register-phone") || "").trim();
+      const address = (formData.get("register-address") || "").trim();
+
+      try {
+        const { user } = await createUserWithEmailAndPassword(auth, email, password);
+        const payload = buildUserDoc({ name, email, phone, address });
+        await setDoc(doc(db, "users", user.uid), payload);
+        applyProfile({ uid: user.uid, ...payload });
+        setFeedback(registerFeedback, "Account created successfully.", "success");
+        close();
+      } catch (error) {
+        setFeedback(registerFeedback, friendlyAuthError(error), "error");
+      } finally {
+        toggleSubmitting(registerForm, false, "register");
+      }
+    };
+
+    const handleLogin = async (event) => {
+      event.preventDefault();
+      if (!loginForm) return;
+      setFeedback(loginFeedback, "");
+      toggleSubmitting(loginForm, true, "login");
+      const formData = new FormData(loginForm);
+      const email = (formData.get("login-email") || "").trim();
+      const password = (formData.get("login-password") || "").trim();
+
+      try {
+        const { user } = await signInWithEmailAndPassword(auth, email, password);
+        const profile = await fetchOrCreateUserProfile(user, email);
+        applyProfile(profile);
+        setFeedback(loginFeedback, "Welcome back!", "success");
+        close();
+      } catch (error) {
+        setFeedback(loginFeedback, friendlyAuthError(error), "error");
+      } finally {
+        toggleSubmitting(loginForm, false, "login");
+      }
+    };
+
+    loginForm?.addEventListener("submit", handleLogin);
+    registerForm?.addEventListener("submit", handleRegister);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        applyProfile(null);
+        return;
+      }
+      try {
+        const profile = await fetchOrCreateUserProfile(user);
+        applyProfile(profile);
+      } catch (error) {
+        setFeedback(loginFeedback, "Could not load your account. Please try again.", "error");
+      }
     });
 
     dialog?.addEventListener("click", (event) => event.stopPropagation());
