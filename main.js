@@ -176,6 +176,25 @@ import {
               </form>
             </div>
           </div>
+          <div class="auth-profile" data-auth-profile hidden>
+            <h4>Complete your profile</h4>
+            <p class="auth-profile__intro">Add a few details so we can personalise your experience.</p>
+            <form class="auth-form auth-profile__form" data-auth-profile-form>
+              <label>
+                <span>Name</span>
+                <input type="text" name="profile-name" autocomplete="name" placeholder="Your name">
+              </label>
+              <label>
+                <span>Phone</span>
+                <input type="tel" name="profile-phone" autocomplete="tel" placeholder="+27 62 495 2909">
+              </label>
+              <label>
+                <span>Address</span>
+                <input type="text" name="profile-address" autocomplete="street-address" placeholder="Street, City">
+              </label>
+              <button type="button" class="btn" data-auth-profile-save>Save profile</button>
+            </form>
+          </div>
         </div>
       `;
       document.body.appendChild(modal);
@@ -185,6 +204,8 @@ import {
     const dialog = modal.querySelector(".auth-modal__dialog");
     const overlay = modal.querySelector(".auth-modal__overlay");
     const closers = modal.querySelectorAll("[data-auth-close]");
+    const authTabs = modal.querySelector(".auth-tabs");
+    const panelsWrap = modal.querySelector(".auth-panels");
     const tabs = modal.querySelectorAll("[data-auth-tab]");
     const panels = modal.querySelectorAll("[data-auth-panel]");
     const authTrigger = document.querySelector("[data-auth-open]");
@@ -194,6 +215,7 @@ import {
     const loginFeedback = modal.querySelector("[data-auth-feedback=\"login\"]");
     const registerFeedback = modal.querySelector("[data-auth-feedback=\"register\"]");
     const googleButtons = modal.querySelectorAll("[data-auth-google]");
+    const completeProfileSection = modal.querySelector("[data-auth-profile]");
     const body = document.body;
 
     const setTab = (name) => {
@@ -215,7 +237,20 @@ import {
       tab.addEventListener("click", () => setTab(tab.dataset.authTab));
     });
 
+    const resetProfileStep = () => {
+      authTabs?.removeAttribute("hidden");
+      panelsWrap?.removeAttribute("hidden");
+      if (completeProfileSection) {
+        completeProfileSection.classList.remove("is-active");
+        completeProfileSection.hidden = true;
+        const profileForm = completeProfileSection.querySelector("[data-auth-profile-form]");
+        profileForm?.reset?.();
+      }
+    };
+
     const open = () => {
+      resetProfileStep();
+      setTab("login");
       modal.setAttribute("data-open", "true");
       modal.setAttribute("aria-hidden", "false");
       body.classList.add("modal-open");
@@ -223,6 +258,7 @@ import {
     };
     const close = () => {
       if (modal.getAttribute("data-open") !== "true") return;
+      resetProfileStep();
       modal.setAttribute("data-open", "false");
       modal.setAttribute("aria-hidden", "true");
       body.classList.remove("modal-open");
@@ -273,6 +309,21 @@ import {
       }
     };
 
+    const showCompleteProfileForm = (initialValues = {}) => {
+      if (!completeProfileSection) return;
+      const { name = "", phone = "", address = "" } = initialValues;
+      const nameInput = completeProfileSection.querySelector("[name=\"profile-name\"]");
+      const phoneInput = completeProfileSection.querySelector("[name=\"profile-phone\"]");
+      const addressInput = completeProfileSection.querySelector("[name=\"profile-address\"]");
+      if (nameInput) nameInput.value = name;
+      if (phoneInput) phoneInput.value = phone;
+      if (addressInput) addressInput.value = address;
+      authTabs?.setAttribute("hidden", "true");
+      panelsWrap?.setAttribute("hidden", "true");
+      completeProfileSection.hidden = false;
+      completeProfileSection.classList.add("is-active");
+    };
+
     const friendlyAuthError = (error) => {
       const code = error?.code || "";
       const messages = {
@@ -305,17 +356,17 @@ import {
       ...overrides
     });
 
-    const fetchOrCreateUserProfile = async (user, fallbackEmail = "") => {
+    const fetchOrCreateUserProfile = async (user, fallbackEmail = "", overrides = {}) => {
       const ref = doc(db, "users", user.uid);
       const snap = await getDoc(ref);
       if (snap.exists()) {
         return { uid: user.uid, ...snap.data() };
       }
       const payload = buildUserDoc({
-        name: "",
+        name: overrides.name ?? "",
         email: user.email || fallbackEmail || "",
-        phone: "",
-        address: ""
+        phone: overrides.phone ?? "",
+        address: overrides.address ?? ""
       });
       await setDoc(ref, payload);
       return { uid: user.uid, ...payload };
@@ -381,11 +432,18 @@ import {
         const provider = new GoogleAuthProvider();
         const { user } = await signInWithPopup(auth, provider);
         if (user) {
+          const profile = await fetchOrCreateUserProfile(
+            user,
+            "",
+            { name: user.displayName || "" }
+          );
+          applyProfile(profile);
           console.log("Google sign-in success:", user.uid, user.email);
           setFeedback(feedback, "Signed in with Google.", "success");
           close();
         }
       } catch (error) {
+        console.error("Google sign-in error:", error);
         setFeedback(feedback, friendlyAuthError(error), "error");
       }
     };
