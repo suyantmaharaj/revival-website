@@ -1,4 +1,5 @@
 import { auth, db } from "./firebase-config.js";
+import { sendWelcomeEmail } from "./mail.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -384,7 +385,7 @@ import {
       const ref = doc(db, "users", user.uid);
       const snap = await getDoc(ref);
       if (snap.exists()) {
-        return { uid: user.uid, ...snap.data() };
+        return { profile: { uid: user.uid, ...snap.data() }, wasCreated: false };
       }
       const payload = buildUserDoc({
         name: overrides.name ?? "",
@@ -393,7 +394,7 @@ import {
         address: overrides.address ?? ""
       });
       await setDoc(ref, payload);
-      return { uid: user.uid, ...payload };
+      return { profile: { uid: user.uid, ...payload }, wasCreated: true };
     };
 
     const handleRegister = async (event) => {
@@ -413,6 +414,7 @@ import {
         const payload = buildUserDoc({ name, email, phone, address });
         await setDoc(doc(db, "users", user.uid), payload);
         applyProfile({ uid: user.uid, ...payload });
+        await sendWelcomeEmail(email, name);
         setFeedback(registerFeedback, "Account created successfully.", "success");
         close();
       } catch (error) {
@@ -433,7 +435,7 @@ import {
 
       try {
         const { user } = await signInWithEmailAndPassword(auth, email, password);
-        const profile = await fetchOrCreateUserProfile(user, email);
+        const { profile } = await fetchOrCreateUserProfile(user, email);
         applyProfile(profile);
         setFeedback(loginFeedback, "Welcome back!", "success");
         close();
@@ -457,13 +459,16 @@ import {
         const provider = new GoogleAuthProvider();
         const { user } = await signInWithPopup(auth, provider);
         if (user) {
-          const profile = await fetchOrCreateUserProfile(
+          const { profile, wasCreated } = await fetchOrCreateUserProfile(
             user,
             "",
             { name: user.displayName || "" }
           );
           if (isProfileComplete(profile)) {
             applyProfile(profile);
+            if (wasCreated) {
+              await sendWelcomeEmail(profile.email || "", profile.name || "");
+            }
             console.log("Google sign-in success:", user.uid, user.email);
             setFeedback(feedback, "Signed in with Google.", "success");
             close();
@@ -539,7 +544,7 @@ import {
         return;
       }
       try {
-        const profile = await fetchOrCreateUserProfile(user);
+        const { profile } = await fetchOrCreateUserProfile(user);
         applyProfile(profile);
       } catch (error) {
         setFeedback(loginFeedback, "Could not load your account. Please try again.", "error");
