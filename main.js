@@ -2,7 +2,9 @@ import { auth, db } from "./firebase-config.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  onAuthStateChanged
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 import {
   doc,
@@ -132,7 +134,7 @@ import {
                   <span>Password</span>
                   <input type="password" name="login-password" autocomplete="current-password" placeholder="••••••••" required>
                 </label>
-                <button type="button" class="auth-google">
+                <button type="button" class="auth-google" data-auth-google="login">
                   <span class="auth-google__icon" aria-hidden="true">
                     <img src="/assets/Google_%22G%22_logo.svg.png" alt="">
                   </span>
@@ -164,7 +166,7 @@ import {
                   <span>Address</span>
                   <input type="text" name="register-address" autocomplete="street-address" placeholder="Street, City" required>
                 </label>
-                <button type="button" class="auth-google">
+                <button type="button" class="auth-google" data-auth-google="register">
                   <span class="auth-google__icon" aria-hidden="true">
                     <img src="/assets/Google_%22G%22_logo.svg.png" alt="">
                   </span>
@@ -191,6 +193,7 @@ import {
     const registerForm = modal.querySelector("[data-auth-form=\"register\"]");
     const loginFeedback = modal.querySelector("[data-auth-feedback=\"login\"]");
     const registerFeedback = modal.querySelector("[data-auth-feedback=\"register\"]");
+    const googleButtons = modal.querySelectorAll("[data-auth-google]");
     const body = document.body;
 
     const setTab = (name) => {
@@ -368,6 +371,28 @@ import {
 
     loginForm?.addEventListener("submit", handleLogin);
     registerForm?.addEventListener("submit", handleRegister);
+
+    const handleGoogleSignIn = async (event) => {
+      event.preventDefault();
+      const source = event.currentTarget?.dataset.authGoogle || "login";
+      const feedback = source === "register" ? registerFeedback : loginFeedback;
+      setFeedback(feedback, "");
+      try {
+        const provider = new GoogleAuthProvider();
+        const { user } = await signInWithPopup(auth, provider);
+        if (user) {
+          console.log("Google sign-in success:", user.uid, user.email);
+          setFeedback(feedback, "Signed in with Google.", "success");
+          close();
+        }
+      } catch (error) {
+        setFeedback(feedback, friendlyAuthError(error), "error");
+      }
+    };
+
+    googleButtons.forEach((button) => {
+      button.addEventListener("click", handleGoogleSignIn);
+    });
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
