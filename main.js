@@ -10,6 +10,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  updateDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
@@ -179,6 +180,7 @@ import {
           <div class="auth-profile" data-auth-profile hidden>
             <h4>Complete your profile</h4>
             <p class="auth-profile__intro">Add a few details so we can personalise your experience.</p>
+            <div class="auth-feedback" data-auth-feedback="profile" role="status" aria-live="polite"></div>
             <form class="auth-form auth-profile__form" data-auth-profile-form>
               <label>
                 <span>Name</span>
@@ -192,7 +194,7 @@ import {
                 <span>Address</span>
                 <input type="text" name="profile-address" autocomplete="street-address" placeholder="Street, City">
               </label>
-              <button type="button" class="btn" data-auth-profile-save>Save profile</button>
+              <button type="submit" class="btn" data-auth-profile-save>Save profile</button>
             </form>
           </div>
         </div>
@@ -216,7 +218,11 @@ import {
     const registerFeedback = modal.querySelector("[data-auth-feedback=\"register\"]");
     const googleButtons = modal.querySelectorAll("[data-auth-google]");
     const completeProfileSection = modal.querySelector("[data-auth-profile]");
+    const profileForm = completeProfileSection?.querySelector("[data-auth-profile-form]");
+    const profileSaveButton = completeProfileSection?.querySelector("[data-auth-profile-save]");
+    const profileFeedback = completeProfileSection?.querySelector("[data-auth-feedback=\"profile\"]");
     const body = document.body;
+    let pendingProfileCompletion = null;
 
     const setTab = (name) => {
       tabs.forEach((tab) => {
@@ -240,11 +246,15 @@ import {
     const resetProfileStep = () => {
       authTabs?.removeAttribute("hidden");
       panelsWrap?.removeAttribute("hidden");
+      pendingProfileCompletion = null;
       if (completeProfileSection) {
         completeProfileSection.classList.remove("is-active");
         completeProfileSection.hidden = true;
-        const profileForm = completeProfileSection.querySelector("[data-auth-profile-form]");
         profileForm?.reset?.();
+        if (profileFeedback) {
+          profileFeedback.textContent = "";
+          profileFeedback.dataset.state = "";
+        }
       }
     };
 
@@ -309,6 +319,12 @@ import {
       }
     };
 
+    const toggleProfileSubmitting = (isSubmitting) => {
+      if (!profileSaveButton) return;
+      profileSaveButton.disabled = isSubmitting;
+      profileSaveButton.textContent = isSubmitting ? "Saving..." : "Save profile";
+    };
+
     const showCompleteProfileForm = (initialValues = {}) => {
       if (!completeProfileSection) return;
       const { name = "", phone = "", address = "" } = initialValues;
@@ -335,6 +351,14 @@ import {
         "auth/weak-password": "Password should be at least 6 characters."
       };
       return messages[code] || "Something went wrong. Please try again.";
+    };
+
+    const isProfileComplete = (profile) => {
+      if (!profile) return false;
+      const { name, phone, address } = profile;
+      return [name, phone, address].every((value) => (
+        typeof value === "string" && value.trim() !== ""
+      ));
     };
 
     const applyProfile = (profile) => {
@@ -428,6 +452,7 @@ import {
       const source = event.currentTarget?.dataset.authGoogle || "login";
       const feedback = source === "register" ? registerFeedback : loginFeedback;
       setFeedback(feedback, "");
+      setFeedback(profileFeedback, "");
       try {
         const provider = new GoogleAuthProvider();
         const { user } = await signInWithPopup(auth, provider);
@@ -437,10 +462,21 @@ import {
             "",
             { name: user.displayName || "" }
           );
-          applyProfile(profile);
-          console.log("Google sign-in success:", user.uid, user.email);
-          setFeedback(feedback, "Signed in with Google.", "success");
-          close();
+          if (isProfileComplete(profile)) {
+            applyProfile(profile);
+            console.log("Google sign-in success:", user.uid, user.email);
+            setFeedback(feedback, "Signed in with Google.", "success");
+            close();
+          } else {
+            pendingProfileCompletion = profile;
+            showCompleteProfileForm({
+              name: profile.name || user.displayName || "",
+              phone: profile.phone || "",
+              address: profile.address || ""
+            });
+            console.log("Google sign-in pending profile completion:", user.uid);
+            setFeedback(feedback, "Almost there—please complete your profile.", "success");
+          }
         }
       } catch (error) {
         console.error("Google sign-in error:", error);
@@ -448,13 +484,58 @@ import {
       }
     };
 
+    const handleProfileSave = async (event) => {
+      event.preventDefault();
+      if (!profileForm) return;
+      const user = auth.currentUser;
+      const formData = new FormData(profileForm);
+      const name = (formData.get("profile-name") || "").trim();
+      const phone = (formData.get("profile-phone") || "").trim();
+      const address = (formData.get("profile-address") || "").trim();
+      setFeedback(profileFeedback, "");
+
+      if (!user) {
+        setFeedback(profileFeedback, "Please sign in again to save your profile.", "error");
+        return;
+      }
+      if (!name || !phone || !address) {
+        setFeedback(profileFeedback, "Name, phone, and address are required.", "error");
+        return;
+      }
+
+      toggleProfileSubmitting(true);
+      try {
+        await updateDoc(doc(db, "users", user.uid), { name, phone, address });
+        const updatedProfile = {
+          ...(pendingProfileCompletion || currentUserProfile || {}),
+          uid: user.uid,
+          name,
+          phone,
+          address
+        };
+        pendingProfileCompletion = null;
+        applyProfile(updatedProfile);
+        close();
+      } catch (error) {
+        console.error("Profile save error:", error);
+        setFeedback(profileFeedback, "Could not save your profile. Please try again.", "error");
+      } finally {
+        toggleProfileSubmitting(false);
+      }
+    };
+
     googleButtons.forEach((button) => {
       button.addEventListener("click", handleGoogleSignIn);
     });
 
+    profileForm?.addEventListener("submit", handleProfileSave);
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         applyProfile(null);
+        return;
+      }
+      if (pendingProfileCompletion && pendingProfileCompletion.uid === user.uid) {
         return;
       }
       try {
