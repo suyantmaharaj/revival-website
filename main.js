@@ -148,26 +148,51 @@ import {
             <div class="auth-panel" role="tabpanel" data-auth-panel="register">
               <form class="auth-form" data-auth-form="register">
                 <div class="auth-feedback" data-auth-feedback="register" role="status" aria-live="polite"></div>
-                <label>
-                  <span>Name</span>
-                  <input type="text" name="register-name" autocomplete="name" placeholder="Your name" required>
-                </label>
-                <label>
-                  <span>Email</span>
-                  <input type="email" name="register-email" autocomplete="email" placeholder="you@example.com" required>
-                </label>
-                <label>
-                  <span>Password</span>
-                  <input type="password" name="register-password" autocomplete="new-password" placeholder="Create a password" required>
-                </label>
-                <label>
-                  <span>Phone</span>
-                  <input type="tel" name="register-phone" autocomplete="tel" placeholder="+27 62 495 2909" required>
-                </label>
-                <label>
-                  <span>Address</span>
-                  <input type="text" name="register-address" autocomplete="street-address" placeholder="Street, City" required>
-                </label>
+                <div class="auth-form__row">
+                  <div class="auth-form__column">
+                    <label>
+                      <span>Name</span>
+                      <input type="text" name="register-name" autocomplete="name" placeholder="Your name" required>
+                    </label>
+                    <label>
+                      <span>Email</span>
+                      <input type="email" name="register-email" autocomplete="email" placeholder="you@example.com" required>
+                    </label>
+                    <label>
+                      <span>Password</span>
+                      <input type="password" name="register-password" autocomplete="new-password" placeholder="Create a password" required>
+                    </label>
+                    <label>
+                      <span>Phone</span>
+                      <input type="tel" name="register-phone" autocomplete="tel" placeholder="+27 62 495 2909" required>
+                    </label>
+                  </div>
+                  <div class="auth-form__address">
+                    <p class="auth-form__address-title">Address</p>
+                    <div class="auth-form__address-grid">
+                      <label class="full">
+                        <span>Street Address</span>
+                        <input type="text" name="register-street" autocomplete="street-address" placeholder="123 Main Rd" required>
+                      </label>
+                      <label>
+                        <span>Suburb</span>
+                        <input type="text" name="register-suburb" autocomplete="address-level3" placeholder="Claremont" required>
+                      </label>
+                      <label>
+                        <span>City</span>
+                        <input type="text" name="register-city" autocomplete="address-level2" placeholder="Cape Town" required>
+                      </label>
+                      <label>
+                        <span>Province</span>
+                        <input type="text" name="register-province" autocomplete="address-level1" placeholder="Western Cape" required>
+                      </label>
+                      <label>
+                        <span>Postal Code</span>
+                        <input type="text" name="register-postal" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{4,6}" placeholder="7708" required>
+                      </label>
+                    </div>
+                  </div>
+                </div>
                 <button type="button" class="auth-google" data-auth-google="register">
                   <span class="auth-google__icon" aria-hidden="true">
                     <img src="/assets/Google_%22G%22_logo.svg.png" alt="">
@@ -183,18 +208,43 @@ import {
             <p class="auth-profile__intro">Add a few details so we can personalise your experience.</p>
             <div class="auth-feedback" data-auth-feedback="profile" role="status" aria-live="polite"></div>
             <form class="auth-form auth-profile__form" data-auth-profile-form>
-              <label>
-                <span>Name</span>
-                <input type="text" name="profile-name" autocomplete="name" placeholder="Your name">
-              </label>
-              <label>
-                <span>Phone</span>
-                <input type="tel" name="profile-phone" autocomplete="tel" placeholder="+27 62 495 2909">
-              </label>
-              <label>
-                <span>Address</span>
-                <input type="text" name="profile-address" autocomplete="street-address" placeholder="Street, City">
-              </label>
+              <div class="auth-form__row">
+                <div class="auth-form__column">
+                  <label>
+                    <span>Name</span>
+                    <input type="text" name="profile-name" autocomplete="name" placeholder="Your name">
+                  </label>
+                  <label>
+                    <span>Phone</span>
+                    <input type="tel" name="profile-phone" autocomplete="tel" placeholder="+27 62 495 2909">
+                  </label>
+                </div>
+                <div class="auth-form__address">
+                  <p class="auth-form__address-title">Address</p>
+                  <div class="auth-form__address-grid">
+                    <label class="full">
+                      <span>Street Address</span>
+                      <input type="text" name="profile-street" autocomplete="street-address" placeholder="123 Main Rd" required>
+                    </label>
+                    <label>
+                      <span>Suburb</span>
+                      <input type="text" name="profile-suburb" autocomplete="address-level3" placeholder="Claremont" required>
+                    </label>
+                    <label>
+                      <span>City</span>
+                      <input type="text" name="profile-city" autocomplete="address-level2" placeholder="Cape Town" required>
+                    </label>
+                    <label>
+                      <span>Province</span>
+                      <input type="text" name="profile-province" autocomplete="address-level1" placeholder="Western Cape" required>
+                    </label>
+                    <label>
+                      <span>Postal Code</span>
+                      <input type="text" name="profile-postal" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{4,6}" placeholder="7708" required>
+                    </label>
+                  </div>
+                </div>
+              </div>
               <button type="submit" class="btn" data-auth-profile-save>Save profile</button>
             </form>
           </div>
@@ -328,13 +378,29 @@ import {
 
     const showCompleteProfileForm = (initialValues = {}) => {
       if (!completeProfileSection) return;
-      const { name = "", phone = "", address = "" } = initialValues;
+      const {
+        name = "",
+        phone = "",
+        street = "",
+        suburb = "",
+        city = "",
+        province = "",
+        postalCode = ""
+      } = initialValues;
       const nameInput = completeProfileSection.querySelector("[name=\"profile-name\"]");
       const phoneInput = completeProfileSection.querySelector("[name=\"profile-phone\"]");
-      const addressInput = completeProfileSection.querySelector("[name=\"profile-address\"]");
+      const streetInput = completeProfileSection.querySelector("[name=\"profile-street\"]");
+      const suburbInput = completeProfileSection.querySelector("[name=\"profile-suburb\"]");
+      const cityInput = completeProfileSection.querySelector("[name=\"profile-city\"]");
+      const provinceInput = completeProfileSection.querySelector("[name=\"profile-province\"]");
+      const postalInput = completeProfileSection.querySelector("[name=\"profile-postal\"]");
       if (nameInput) nameInput.value = name;
       if (phoneInput) phoneInput.value = phone;
-      if (addressInput) addressInput.value = address;
+      if (streetInput) streetInput.value = street;
+      if (suburbInput) suburbInput.value = suburb;
+      if (cityInput) cityInput.value = city;
+      if (provinceInput) provinceInput.value = province;
+      if (postalInput) postalInput.value = postalCode;
       authTabs?.setAttribute("hidden", "true");
       panelsWrap?.setAttribute("hidden", "true");
       completeProfileSection.hidden = false;
@@ -356,10 +422,11 @@ import {
 
     const isProfileComplete = (profile) => {
       if (!profile) return false;
-      const { name, phone, address } = profile;
-      return [name, phone, address].every((value) => (
-        typeof value === "string" && value.trim() !== ""
+      const hasValue = (value) => typeof value === "string" && value.trim() !== "";
+      const addressFieldsComplete = ["street", "suburb", "city", "province", "postalCode"].every((key) => (
+        hasValue(profile[key])
       ));
+      return hasValue(profile.name) && hasValue(profile.phone) && addressFieldsComplete;
     };
 
     const applyProfile = (profile) => {
@@ -371,26 +438,74 @@ import {
       }
     };
 
-    const buildUserDoc = (overrides = {}) => ({
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      role: "customer",
-      createdAt: serverTimestamp(),
-      ...overrides
-    });
+    const composeAddress = (parts = {}) => {
+      const {
+        street = "",
+        suburb = "",
+        city = "",
+        province = "",
+        postalCode = "",
+        fallbackAddress = ""
+      } = parts;
+      const segments = [street, suburb, city, province].map((value) => value?.trim()).filter(Boolean);
+      const addressCore = segments.join(", ");
+      const trimmedPostal = postalCode?.trim();
+      const address = trimmedPostal ? [addressCore, trimmedPostal].filter(Boolean).join(", ") : addressCore;
+      return address || fallbackAddress || "";
+    };
+
+    const buildUserDoc = (overrides = {}) => {
+      const base = {
+        name: "",
+        email: "",
+        phone: "",
+        street: "",
+        suburb: "",
+        city: "",
+        province: "",
+        postalCode: "",
+        address: "",
+        role: "customer",
+        createdAt: serverTimestamp(),
+        ...overrides
+      };
+      return {
+        ...base,
+        address: composeAddress({
+          street: base.street,
+          suburb: base.suburb,
+          city: base.city,
+          province: base.province,
+          postalCode: base.postalCode,
+          fallbackAddress: base.address
+        })
+      };
+    };
 
     const fetchOrCreateUserProfile = async (user, fallbackEmail = "", overrides = {}) => {
       const ref = doc(db, "users", user.uid);
       const snap = await getDoc(ref);
       if (snap.exists()) {
-        return { profile: { uid: user.uid, ...snap.data() }, wasCreated: false };
+        const data = snap.data();
+        return {
+          profile: {
+            uid: user.uid,
+            ...data,
+            province: data.province || "",
+            address: composeAddress({ ...data, fallbackAddress: data.address || "" })
+          },
+          wasCreated: false
+        };
       }
       const payload = buildUserDoc({
         name: overrides.name ?? "",
         email: user.email || fallbackEmail || "",
         phone: overrides.phone ?? "",
+        street: overrides.street ?? "",
+        suburb: overrides.suburb ?? "",
+        city: overrides.city ?? "",
+        province: overrides.province ?? "",
+        postalCode: overrides.postalCode ?? "",
         address: overrides.address ?? ""
       });
       await setDoc(ref, payload);
@@ -407,11 +522,24 @@ import {
       const email = (formData.get("register-email") || "").trim();
       const password = (formData.get("register-password") || "").trim();
       const phone = (formData.get("register-phone") || "").trim();
-      const address = (formData.get("register-address") || "").trim();
+      const street = (formData.get("register-street") || "").trim();
+      const suburb = (formData.get("register-suburb") || "").trim();
+      const city = (formData.get("register-city") || "").trim();
+      const province = (formData.get("register-province") || "").trim();
+      const postalCode = (formData.get("register-postal") || "").trim();
 
       try {
         const { user } = await createUserWithEmailAndPassword(auth, email, password);
-        const payload = buildUserDoc({ name, email, phone, address });
+        const payload = buildUserDoc({
+          name,
+          email,
+          phone,
+          street,
+          suburb,
+          city,
+          province,
+          postalCode
+        });
         await setDoc(doc(db, "users", user.uid), payload);
         applyProfile({ uid: user.uid, ...payload });
         await sendWelcomeEmail(email, name);
@@ -477,7 +605,11 @@ import {
             showCompleteProfileForm({
               name: profile.name || user.displayName || "",
               phone: profile.phone || "",
-              address: profile.address || ""
+              street: profile.street || "",
+              suburb: profile.suburb || "",
+              city: profile.city || "",
+              province: profile.province || "",
+              postalCode: profile.postalCode || ""
             });
             console.log("Google sign-in pending profile completion:", user.uid);
             setFeedback(feedback, "Almost there—please complete your profile.", "success");
@@ -496,26 +628,45 @@ import {
       const formData = new FormData(profileForm);
       const name = (formData.get("profile-name") || "").trim();
       const phone = (formData.get("profile-phone") || "").trim();
-      const address = (formData.get("profile-address") || "").trim();
+      const street = (formData.get("profile-street") || "").trim();
+      const suburb = (formData.get("profile-suburb") || "").trim();
+      const city = (formData.get("profile-city") || "").trim();
+      const province = (formData.get("profile-province") || "").trim();
+      const postalCode = (formData.get("profile-postal") || "").trim();
+      const address = composeAddress({ street, suburb, city, province, postalCode });
       setFeedback(profileFeedback, "");
 
       if (!user) {
         setFeedback(profileFeedback, "Please sign in again to save your profile.", "error");
         return;
       }
-      if (!name || !phone || !address) {
-        setFeedback(profileFeedback, "Name, phone, and address are required.", "error");
+      if (!name || !phone || !street || !suburb || !city || !province || !postalCode) {
+        setFeedback(profileFeedback, "Name, phone, and full address details are required.", "error");
         return;
       }
 
       toggleProfileSubmitting(true);
       try {
-        await updateDoc(doc(db, "users", user.uid), { name, phone, address });
+        await updateDoc(doc(db, "users", user.uid), {
+          name,
+          phone,
+          street,
+          suburb,
+          city,
+          province,
+          postalCode,
+          address
+        });
         const updatedProfile = {
           ...(pendingProfileCompletion || currentUserProfile || {}),
           uid: user.uid,
           name,
           phone,
+          street,
+          suburb,
+          city,
+          province,
+          postalCode,
           address
         };
         pendingProfileCompletion = null;

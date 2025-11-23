@@ -128,14 +128,47 @@
             </div>
             <div class="auth-panel" role="tabpanel" data-auth-panel="register">
               <form class="auth-form">
-                <label>
-                  <span>Email</span>
-                  <input type="email" name="register-email" autocomplete="email" placeholder="you@example.com" required>
-                </label>
-                <label>
-                  <span>Password</span>
-                  <input type="password" name="register-password" autocomplete="new-password" placeholder="Create a password" required>
-                </label>
+                <div class="auth-form__row">
+                  <div class="auth-form__column">
+                    <label>
+                      <span>Name</span>
+                      <input type="text" name="register-name" autocomplete="name" placeholder="Your name" required>
+                    </label>
+                    <label>
+                      <span>Email</span>
+                      <input type="email" name="register-email" autocomplete="email" placeholder="you@example.com" required>
+                    </label>
+                    <label>
+                      <span>Password</span>
+                      <input type="password" name="register-password" autocomplete="new-password" placeholder="Create a password" required>
+                    </label>
+                  </div>
+                  <div class="auth-form__address">
+                    <p class="auth-form__address-title">Address</p>
+                    <div class="auth-form__address-grid">
+                      <label class="full">
+                        <span>Street Address</span>
+                        <input type="text" name="register-street" autocomplete="street-address" placeholder="123 Main Rd" required>
+                      </label>
+                      <label>
+                        <span>Suburb</span>
+                        <input type="text" name="register-suburb" autocomplete="address-level3" placeholder="Claremont" required>
+                      </label>
+                      <label>
+                        <span>City</span>
+                        <input type="text" name="register-city" autocomplete="address-level2" placeholder="Cape Town" required>
+                      </label>
+                      <label>
+                        <span>Province</span>
+                        <input type="text" name="register-province" autocomplete="address-level1" placeholder="Western Cape" required>
+                      </label>
+                      <label>
+                        <span>Postal Code</span>
+                        <input type="text" name="register-postal" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{4,6}" placeholder="7708" required>
+                      </label>
+                    </div>
+                  </div>
+                </div>
                 <button type="button" class="auth-google">
                   <span class="auth-google__icon" aria-hidden="true">
                     <img src="/assets/Google_%22G%22_logo.svg.png" alt="">
