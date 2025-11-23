@@ -248,6 +248,44 @@ import {
               <button type="submit" class="btn" data-auth-profile-save>Save profile</button>
             </form>
           </div>
+          <div class="auth-account" data-auth-account hidden>
+            <div class="auth-account__header">
+              <div>
+                <h4>My Account</h4>
+                <p class="auth-profile__intro">Update your contact details.</p>
+              </div>
+              <p class="auth-account__meta" data-auth-member-since></p>
+            </div>
+            <div class="auth-feedback" data-auth-feedback="account" role="status" aria-live="polite"></div>
+            <form class="auth-form auth-account__form" data-auth-account-form>
+              <div class="auth-form__row">
+                <div class="auth-form__column">
+                  <label>
+                    <span>Name</span>
+                    <input type="text" name="account-name" autocomplete="name" placeholder="Your name" disabled>
+                  </label>
+                  <label>
+                    <span>Email</span>
+                    <input type="email" name="account-email" autocomplete="email" placeholder="you@example.com" required>
+                  </label>
+                  <label>
+                    <span>Phone</span>
+                    <input type="tel" name="account-phone" autocomplete="tel" placeholder="+27 62 495 2909" required>
+                  </label>
+                </div>
+                <div class="auth-form__address">
+                  <p class="auth-form__address-title">Address</p>
+                  <div class="auth-form__address-grid">
+                    <label class="full">
+                      <span>Full Address</span>
+                      <input type="text" name="account-address" autocomplete="street-address" placeholder="Street, suburb, city, province" required>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn" data-auth-account-save>Save changes</button>
+            </form>
+          </div>
         </div>
       `;
       document.body.appendChild(modal);
@@ -272,6 +310,11 @@ import {
     const profileForm = completeProfileSection?.querySelector("[data-auth-profile-form]");
     const profileSaveButton = completeProfileSection?.querySelector("[data-auth-profile-save]");
     const profileFeedback = completeProfileSection?.querySelector("[data-auth-feedback=\"profile\"]");
+    const accountSection = modal.querySelector("[data-auth-account]");
+    const accountForm = accountSection?.querySelector("[data-auth-account-form]");
+    const accountSaveButton = accountSection?.querySelector("[data-auth-account-save]");
+    const accountFeedback = modal.querySelector("[data-auth-feedback=\"account\"]");
+    const memberSinceLabel = modal.querySelector("[data-auth-member-since]");
     const body = document.body;
     let pendingProfileCompletion = null;
 
@@ -309,17 +352,41 @@ import {
       }
     };
 
+    const resetAccountSection = () => {
+      if (!accountSection) return;
+      accountSection.classList.remove("is-active");
+      accountSection.hidden = true;
+      accountForm?.reset?.();
+      setFeedback(accountFeedback, "");
+      if (memberSinceLabel) {
+        memberSinceLabel.textContent = "";
+      }
+      authTabs?.removeAttribute("hidden");
+      panelsWrap?.removeAttribute("hidden");
+    };
+
     const open = () => {
       resetProfileStep();
-      setTab("login");
+      resetAccountSection();
+      const shouldShowAccount = Boolean(currentUserProfile);
+      if (shouldShowAccount) {
+        showAccountSection(currentUserProfile);
+      } else {
+        setTab("login");
+      }
       modal.setAttribute("data-open", "true");
       modal.setAttribute("aria-hidden", "false");
       body.classList.add("modal-open");
-      tabs[0]?.focus({ preventScroll: true });
+      if (shouldShowAccount) {
+        accountForm?.querySelector("input:not([disabled])")?.focus({ preventScroll: true });
+      } else {
+        tabs[0]?.focus({ preventScroll: true });
+      }
     };
     const close = () => {
       if (modal.getAttribute("data-open") !== "true") return;
       resetProfileStep();
+      resetAccountSection();
       modal.setAttribute("data-open", "false");
       modal.setAttribute("aria-hidden", "true");
       body.classList.remove("modal-open");
@@ -374,6 +441,45 @@ import {
       if (!profileSaveButton) return;
       profileSaveButton.disabled = isSubmitting;
       profileSaveButton.textContent = isSubmitting ? "Saving..." : "Save profile";
+    };
+
+    const toggleAccountSubmitting = (isSubmitting) => {
+      if (!accountSaveButton) return;
+      accountSaveButton.disabled = isSubmitting;
+      accountSaveButton.textContent = isSubmitting ? "Saving..." : "Save changes";
+    };
+
+    const formatMemberSince = (value) => {
+      if (!value) return "";
+      try {
+        const date = value.toDate ? value.toDate() : (value instanceof Date ? value : new Date(value));
+        if (Number.isNaN(date.getTime())) return "";
+        return date.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+      } catch (error) {
+        console.warn("Could not format createdAt", error);
+        return "";
+      }
+    };
+
+    const showAccountSection = (profile = {}) => {
+      if (!accountSection) return;
+      authTabs?.setAttribute("hidden", "true");
+      panelsWrap?.setAttribute("hidden", "true");
+      accountSection.hidden = false;
+      accountSection.classList.add("is-active");
+      const nameInput = accountForm?.querySelector("[name=\"account-name\"]");
+      const emailInput = accountForm?.querySelector("[name=\"account-email\"]");
+      const phoneInput = accountForm?.querySelector("[name=\"account-phone\"]");
+      const addressInput = accountForm?.querySelector("[name=\"account-address\"]");
+      if (nameInput) nameInput.value = profile.name || "";
+      if (emailInput) emailInput.value = profile.email || "";
+      if (phoneInput) phoneInput.value = profile.phone || "";
+      if (addressInput) addressInput.value = profile.address || "";
+      if (memberSinceLabel) {
+        const since = formatMemberSince(profile.createdAt);
+        memberSinceLabel.textContent = since ? `Member since ${since}` : "";
+      }
+      setFeedback(accountFeedback, "");
     };
 
     const showCompleteProfileForm = (initialValues = {}) => {
@@ -680,11 +786,51 @@ import {
       }
     };
 
+    const handleAccountSave = async (event) => {
+      event.preventDefault();
+      if (!accountForm) return;
+      const user = auth.currentUser;
+      const formData = new FormData(accountForm);
+      const email = (formData.get("account-email") || "").trim();
+      const phone = (formData.get("account-phone") || "").trim();
+      const address = (formData.get("account-address") || "").trim();
+      setFeedback(accountFeedback, "");
+
+      if (!user) {
+        setFeedback(accountFeedback, "Please sign in again to update your profile.", "error");
+        return;
+      }
+      if (!email || !phone || !address) {
+        setFeedback(accountFeedback, "Email, phone, and address are required.", "error");
+        return;
+      }
+
+      toggleAccountSubmitting(true);
+      try {
+        await updateDoc(doc(db, "users", user.uid), { email, phone, address });
+        const updatedProfile = {
+          ...(currentUserProfile || {}),
+          uid: user.uid,
+          email,
+          phone,
+          address
+        };
+        applyProfile(updatedProfile);
+        setFeedback(accountFeedback, "Profile updated.", "success");
+      } catch (error) {
+        console.error("Account update error:", error);
+        setFeedback(accountFeedback, "Could not save changes. Please try again.", "error");
+      } finally {
+        toggleAccountSubmitting(false);
+      }
+    };
+
     googleButtons.forEach((button) => {
       button.addEventListener("click", handleGoogleSignIn);
     });
 
     profileForm?.addEventListener("submit", handleProfileSave);
+    accountForm?.addEventListener("submit", handleAccountSave);
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
