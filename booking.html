@@ -1283,6 +1283,68 @@
       obs.observe(sec, {attributes:true, attributeFilter:['class']});
     });
 
+    // ====== Prefill from Firebase user profile ======
+    async function initAuthPrefill(){
+      try {
+        const [{ auth, db }, { onAuthStateChanged }, { doc, getDoc }] = await Promise.all([
+          import("./firebase-config.js"),
+          import("https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js"),
+          import("https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js")
+        ]);
+
+        onAuthStateChanged(auth, async (user) => {
+          if (!user) return;
+          try {
+            const snap = await getDoc(doc(db, "users", user.uid));
+            if (!snap.exists()) return;
+            applyProfilePrefill(snap.data());
+          } catch (err) {
+            console.warn("Could not prefill booking from profile", err);
+          }
+        });
+      } catch (err) {
+        console.warn("Auth prefill init failed", err);
+      }
+    }
+
+    function applyProfilePrefill(profile = {}){
+      const next = { ...state.customer };
+      const phoneDigits = String(profile.phone || "").replace(/\D/g, "").slice(0, 10);
+      const postalDigits = String(profile.postalCode || profile.postal || "").replace(/\D/g, "").slice(0, 4);
+      let changed = false;
+
+      const assignIfEmpty = (key, value) => {
+        if (!value) return;
+        if (!next[key]) {
+          next[key] = value;
+          changed = true;
+        }
+      };
+
+      assignIfEmpty("fullName", profile.name || "");
+      assignIfEmpty("email", profile.email || "");
+      assignIfEmpty("phone", phoneDigits);
+      assignIfEmpty("address1", profile.address || "");
+      assignIfEmpty("suburb", profile.suburb || "");
+      assignIfEmpty("city", profile.city || "");
+      assignIfEmpty("postal", postalDigits);
+
+      if (!changed) return;
+      state.customer = next;
+      saveState();
+      fullName.value = state.customer.fullName;
+      phone.value = state.customer.phone;
+      email.value = state.customer.email;
+      address1.value = state.customer.address1;
+      suburb.value = state.customer.suburb;
+      city.value = state.customer.city;
+      postal.value = state.customer.postal;
+      updateEmailRequiredUI();
+      renderSummary();
+    }
+
+    initAuthPrefill();
+
   })();
   </script>
 </body>
