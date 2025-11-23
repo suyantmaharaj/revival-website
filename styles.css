@@ -683,6 +683,12 @@ body.nav-open .nav-overlay{opacity:1;pointer-events:auto}
   transform:rotate(45deg);
   margin-left:6px;
 }
+.header-login--greeting .header-login__caret{
+  width:6px;
+  height:6px;
+  margin-left:2px;
+  transform:rotate(45deg) translateY(-3px);
+}
 .account-menu{
   position:absolute;
   right:0;
