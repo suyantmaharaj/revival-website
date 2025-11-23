@@ -29,6 +29,7 @@ import {
       : document.addEventListener("DOMContentLoaded", fn)
   );
   let currentUserProfile = null;
+  const PROVINCE_LOCK = "Western Cape";
 
   ready(() => {
     initNav();
@@ -184,7 +185,7 @@ import {
                       </label>
                       <label>
                         <span>Province</span>
-                        <input type="text" name="register-province" autocomplete="address-level1" placeholder="Western Cape" required>
+                        <input type="text" name="register-province" autocomplete="address-level1" placeholder="Western Cape" value="Western Cape" readonly aria-readonly="true">
                       </label>
                       <label>
                         <span>Postal Code</span>
@@ -236,7 +237,7 @@ import {
                     </label>
                     <label>
                       <span>Province</span>
-                      <input type="text" name="profile-province" autocomplete="address-level1" placeholder="Western Cape" required>
+                      <input type="text" name="profile-province" autocomplete="address-level1" placeholder="Western Cape" value="Western Cape" readonly aria-readonly="true">
                     </label>
                     <label>
                       <span>Postal Code</span>
@@ -304,11 +305,11 @@ import {
     const loginForm = modal.querySelector("[data-auth-form=\"login\"]");
     const registerForm = modal.querySelector("[data-auth-form=\"register\"]");
     const loginFeedback = modal.querySelector("[data-auth-feedback=\"login\"]");
-    const registerFeedback = modal.querySelector("[data-auth-feedback=\"register\"]");
-    const googleButtons = modal.querySelectorAll("[data-auth-google]");
-    const completeProfileSection = modal.querySelector("[data-auth-profile]");
-    const profileForm = completeProfileSection?.querySelector("[data-auth-profile-form]");
-    const profileSaveButton = completeProfileSection?.querySelector("[data-auth-profile-save]");
+      const registerFeedback = modal.querySelector("[data-auth-feedback=\"register\"]");
+      const googleButtons = modal.querySelectorAll("[data-auth-google]");
+      const completeProfileSection = modal.querySelector("[data-auth-profile]");
+      const profileForm = completeProfileSection?.querySelector("[data-auth-profile-form]");
+      const profileSaveButton = completeProfileSection?.querySelector("[data-auth-profile-save]");
     const profileFeedback = completeProfileSection?.querySelector("[data-auth-feedback=\"profile\"]");
     const accountSection = modal.querySelector("[data-auth-account]");
     const accountForm = accountSection?.querySelector("[data-auth-account-form]");
@@ -490,7 +491,7 @@ import {
         street = "",
         suburb = "",
         city = "",
-        province = "",
+        province = PROVINCE_LOCK,
         postalCode = ""
       } = initialValues;
       const nameInput = completeProfileSection.querySelector("[name=\"profile-name\"]");
@@ -568,7 +569,7 @@ import {
         street: "",
         suburb: "",
         city: "",
-        province: "",
+        province: PROVINCE_LOCK,
         postalCode: "",
         address: "",
         role: "customer",
@@ -597,7 +598,7 @@ import {
           profile: {
             uid: user.uid,
             ...data,
-            province: data.province || "",
+            province: data.province || PROVINCE_LOCK,
             address: composeAddress({ ...data, fallbackAddress: data.address || "" })
           },
           wasCreated: false
@@ -631,7 +632,7 @@ import {
       const street = (formData.get("register-street") || "").trim();
       const suburb = (formData.get("register-suburb") || "").trim();
       const city = (formData.get("register-city") || "").trim();
-      const province = (formData.get("register-province") || "").trim();
+      const province = PROVINCE_LOCK;
       const postalCode = (formData.get("register-postal") || "").trim();
 
       try {
@@ -737,7 +738,7 @@ import {
       const street = (formData.get("profile-street") || "").trim();
       const suburb = (formData.get("profile-suburb") || "").trim();
       const city = (formData.get("profile-city") || "").trim();
-      const province = (formData.get("profile-province") || "").trim();
+      const province = PROVINCE_LOCK;
       const postalCode = (formData.get("profile-postal") || "").trim();
       const address = composeAddress({ street, suburb, city, province, postalCode });
       setFeedback(profileFeedback, "");
