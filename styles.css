@@ -668,13 +668,25 @@ body.nav-open .nav-overlay{opacity:1;pointer-events:auto}
   box-shadow:none;
   text-transform:none;
   letter-spacing:normal;
-  padding:0;
-  cursor:default;
+  padding:8px 10px;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:700;
+}
+.header-login--greeting .header-login__caret{display:inline-flex;}
+.header-login__caret{
+  display:none;
+  width:10px;
+  height:10px;
+  border-right:2px solid currentColor;
+  border-bottom:2px solid currentColor;
+  transform:rotate(45deg);
+  margin-left:6px;
 }
 .account-menu{
   position:absolute;
   right:0;
-  margin-top:8px;
+  top:calc(100% + 8px);
   background:#0f0f13;
   border:1px solid var(--line);
   border-radius:10px;

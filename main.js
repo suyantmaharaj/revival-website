@@ -102,6 +102,7 @@ import {
           </svg>
         </span>
         <span class="header-login__label">Login</span>
+        <span class="header-login__caret" aria-hidden="true"></span>
       `;
       actions.appendChild(trigger);
       const accountMenu = document.createElement("div");
@@ -416,16 +417,22 @@ import {
       body.classList.remove("modal-open");
     };
 
+    const setMenuExpanded = (expanded) => {
+      authTrigger?.setAttribute("aria-expanded", String(expanded));
+    };
+
     const closeAccountMenu = () => {
       if (!accountMenu) return;
       accountMenu.setAttribute("hidden", "true");
       accountMenu.setAttribute("data-open", "false");
+      setMenuExpanded(false);
     };
     const toggleAccountMenu = () => {
       if (!accountMenu) return;
       const isOpen = accountMenu.getAttribute("data-open") === "true";
       accountMenu.hidden = isOpen;
       accountMenu.setAttribute("data-open", isOpen ? "false" : "true");
+      setMenuExpanded(!isOpen);
     };
 
     openers.forEach((trigger) => {
@@ -470,9 +477,11 @@ import {
       if (isLoggedIn) {
         authTrigger.removeAttribute("aria-label");
         authTrigger.removeAttribute("data-auth-open");
+        authTrigger.setAttribute("aria-expanded", String(accountMenu?.getAttribute("data-open") === "true"));
       } else {
         authTrigger.setAttribute("aria-label", "Open login modal");
         authTrigger.setAttribute("data-auth-open", "true");
+        authTrigger.setAttribute("aria-expanded", "false");
       }
       if (accountMenu) {
         accountMenu.hidden = !isLoggedIn;
