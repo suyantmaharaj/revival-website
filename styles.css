@@ -950,6 +950,176 @@ body.nav-open .nav-overlay{opacity:1;pointer-events:auto}
 }
 .auth-google__icon img{display:block; width:100%; height:100%; object-fit:contain}
 
+.auth-modal--account .auth-tabs,
+.auth-modal--account .auth-panels{
+  display:none;
+}
+.auth-modal--account .auth-modal__dialog{
+  max-width:640px;
+}
+.auth-modal--account .auth-modal__header{
+  margin-bottom:6px;
+}
+.auth-account{
+  display:none;
+  margin-top:10px;
+}
+.auth-account.is-active{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.auth-account__header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px 10px;
+  padding:14px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:linear-gradient(140deg, rgba(199,167,104,.12), rgba(255,255,255,.02));
+  box-shadow:0 16px 40px rgba(0,0,0,.38);
+}
+.auth-account__title{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex:1;
+  min-width:0;
+}
+.auth-account__text{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+}
+.auth-account__avatar{
+  width:52px;
+  height:52px;
+  border-radius:16px;
+  display:grid;
+  place-items:center;
+  background:radial-gradient(circle at 30% 30%, rgba(199,167,104,.75), rgba(199,167,104,.15));
+  color:#0b0b0c;
+  font-weight:800;
+  font-size:18px;
+  letter-spacing:.08em;
+}
+.auth-account__header h4{
+  margin:6px 0 2px;
+  font-size:22px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.auth-account__header .auth-profile__intro{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+.auth-account__meta{
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+  min-width:0;
+}
+.auth-account__edit{
+  margin-left:auto;
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.04);
+  color:#fff;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:transform .2s ease, border-color .2s ease, background .2s ease;
+}
+.auth-account__edit:hover,
+.auth-account__edit:focus-visible{
+  background:rgba(255,255,255,.08);
+  border-color:rgba(199,167,104,.55);
+  transform:translateY(-1px);
+}
+.auth-account__stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:10px;
+}
+.auth-account__stat{
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:rgba(255,255,255,.02);
+  box-shadow:0 10px 26px rgba(0,0,0,.28);
+}
+.auth-account__stat p{
+  margin:0 0 6px;
+  color:var(--muted);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  font-size:11px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.auth-account__stat strong{
+  display:block;
+  font-size:16px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.auth-account__stat strong[data-auth-account-address]{
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
+  word-break:break-word;
+}
+.auth-account__form{
+  margin-top:4px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(255,255,255,.02);
+  box-shadow:0 14px 36px rgba(0,0,0,.32);
+}
+.auth-account__form .auth-form__row{
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+}
+.auth-account__form input{
+  background:rgba(255,255,255,.02);
+  border:1px solid var(--line);
+  color:var(--text);
+  padding:12px 14px;
+  border-radius:10px;
+}
+.auth-account__actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.auth-account__form .btn{
+  width:auto;
+  align-self:flex-end;
+}
+.auth-account input[disabled]{
+  background:#1a1a1d;
+  color:var(--muted);
+  border-color:#1f1f24;
+  cursor:not-allowed;
+}
+.auth-account input[readonly]{
+  background:#1a1a1d;
+  color:var(--muted);
+  border-color:#1f1f24;
+  cursor:not-allowed;
+}
+
 body.modal-open{overflow:hidden}
 
 /* HERO (slideshow) */
@@ -1785,6 +1955,10 @@ label{font-size:14px;color:var(--muted)}
   .inline{grid-template-columns:1fr}
   .insight-grid{grid-template-columns:1fr}
   .package-grid{grid-template-columns:1fr}
+  .auth-account__header{flex-direction:column;align-items:flex-start}
+  .auth-account__stats{grid-template-columns:1fr}
+  .auth-account__form .auth-form__row{grid-template-columns:1fr}
+  .auth-account__form .btn{width:100%}
 }
 @media (max-width: 480px){
   .hero h2{font-size:30px}

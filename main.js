@@ -127,9 +127,8 @@ import {
         <div class="auth-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
           <button type="button" class="auth-modal__close" aria-label="Close login modal" data-auth-close>&times;</button>
           <div class="auth-modal__header">
-            <p class="pill">Account</p>
-            <h3 id="authModalTitle">Access Revival</h3>
-            <p class="auth-modal__intro">Sign in or create an account to manage bookings.</p>
+            <h3 id="authModalTitle" data-auth-header-title>Access Revival</h3>
+            <p class="auth-modal__intro" data-auth-header-intro>Sign in or create an account to manage bookings.</p>
           </div>
           <div class="auth-tabs" role="tablist" aria-label="Authentication">
             <button class="auth-tab is-active" type="button" role="tab" aria-selected="true" data-auth-tab="login">Login</button>
@@ -261,41 +260,79 @@ import {
           </div>
           <div class="auth-account" data-auth-account hidden>
             <div class="auth-account__header">
-              <div>
-                <h4>My Account</h4>
-                <p class="auth-profile__intro">Update your contact details.</p>
+              <div class="auth-account__title">
+                <div class="auth-account__avatar" aria-hidden="true" data-auth-account-initial>R</div>
+                <div class="auth-account__text">
+                  <h4 data-auth-account-name>Account details</h4>
+                  <p class="auth-account__meta" data-auth-member-since></p>
+                </div>
               </div>
-              <p class="auth-account__meta" data-auth-member-since></p>
+              <button type="button" class="auth-account__edit" data-auth-account-edit>Edit details</button>
             </div>
-            <div class="auth-feedback" data-auth-feedback="account" role="status" aria-live="polite"></div>
-            <form class="auth-form auth-account__form" data-auth-account-form>
-              <div class="auth-form__row">
-                <div class="auth-form__column">
-                  <label>
-                    <span>Name</span>
-                    <input type="text" name="account-name" autocomplete="name" placeholder="Your name" disabled>
-                  </label>
-                  <label>
-                    <span>Email</span>
-                    <input type="email" name="account-email" autocomplete="email" placeholder="you@example.com" required>
-                  </label>
-                  <label>
-                    <span>Phone</span>
-                    <input type="tel" name="account-phone" autocomplete="tel" placeholder="+27 62 495 2909" required>
-                  </label>
+              <div class="auth-account__stats" data-auth-account-stats>
+                <div class="auth-account__stat">
+                  <p>Primary Email</p>
+                  <strong data-auth-account-email title="you@example.com">you@example.com</strong>
                 </div>
-                <div class="auth-form__address">
-                  <p class="auth-form__address-title">Address</p>
-                  <div class="auth-form__address-grid">
-                    <label class="full">
-                      <span>Full Address</span>
-                      <input type="text" name="account-address" autocomplete="street-address" placeholder="Street, suburb, city, province" required>
-                    </label>
-                  </div>
+                <div class="auth-account__stat">
+                  <p>Phone</p>
+                  <strong data-auth-account-phone title="+27 62 495 2909">+27 62 495 2909</strong>
+                </div>
+                <div class="auth-account__stat">
+                  <p>Address</p>
+                  <strong data-auth-account-address title="Street, suburb, city, province">Street, suburb, city, province</strong>
                 </div>
               </div>
-              <button type="submit" class="btn" data-auth-account-save>Save changes</button>
-            </form>
+              <div class="auth-feedback" data-auth-feedback="account" role="status" aria-live="polite"></div>
+              <div class="auth-account__form" data-auth-account-form-wrap hidden>
+                <form class="auth-form" data-auth-account-form>
+                  <div class="auth-form__row">
+                    <div class="auth-form__column">
+                      <label>
+                        <span>Name</span>
+                        <input type="text" name="account-name" autocomplete="name" placeholder="Your name" disabled>
+                      </label>
+                      <label>
+                        <span>Email</span>
+                        <input type="email" name="account-email" autocomplete="email" placeholder="you@example.com" required>
+                      </label>
+                      <label>
+                        <span>Phone</span>
+                        <input type="tel" name="account-phone" autocomplete="tel" placeholder="+27 62 495 2909" required>
+                      </label>
+                    </div>
+                    <div class="auth-form__address">
+                      <p class="auth-form__address-title">Address</p>
+                      <div class="auth-form__address-grid">
+                        <label class="full">
+                          <span>Street Address</span>
+                          <input type="text" name="account-street" autocomplete="street-address" placeholder="123 Main Rd" required>
+                        </label>
+                        <label>
+                          <span>Suburb</span>
+                          <input type="text" name="account-suburb" autocomplete="address-level3" placeholder="Claremont" required>
+                        </label>
+                        <label>
+                          <span>City</span>
+                          <input type="text" name="account-city" autocomplete="address-level2" placeholder="Cape Town" required>
+                        </label>
+                        <label>
+                          <span>Province</span>
+                          <input type="text" name="account-province" autocomplete="address-level1" placeholder="Western Cape" value="Western Cape" readonly aria-readonly="true">
+                        </label>
+                        <label>
+                          <span>Postal Code</span>
+                          <input type="text" name="account-postal" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{4,6}" placeholder="7708" required>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="auth-account__actions">
+                  <button type="button" class="btn outline" data-auth-account-cancel>Cancel</button>
+                  <button type="submit" class="btn" data-auth-account-save>Save changes</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       `;
@@ -310,6 +347,8 @@ import {
     const panelsWrap = modal.querySelector(".auth-panels");
     const tabs = modal.querySelectorAll("[data-auth-tab]");
     const panels = modal.querySelectorAll("[data-auth-panel]");
+    const headerTitle = modal.querySelector("[data-auth-header-title]");
+    const headerIntro = modal.querySelector("[data-auth-header-intro]");
     const authTrigger = document.querySelector("[data-auth-open]");
     const authTriggerLabel = authTrigger?.querySelector(".header-login__label");
     const loginForm = modal.querySelector("[data-auth-form=\"login\"]");
@@ -337,11 +376,31 @@ import {
     }
     const accountSection = modal.querySelector("[data-auth-account]");
     const accountForm = accountSection?.querySelector("[data-auth-account-form]");
+    const accountFormWrap = accountSection?.querySelector("[data-auth-account-form-wrap]");
     const accountSaveButton = accountSection?.querySelector("[data-auth-account-save]");
     const accountFeedback = modal.querySelector("[data-auth-feedback=\"account\"]");
     const memberSinceLabel = modal.querySelector("[data-auth-member-since]");
+    const accountNameLabel = modal.querySelector("[data-auth-account-name]");
+    const accountEmailLabel = modal.querySelector("[data-auth-account-email]");
+    const accountPhoneLabel = modal.querySelector("[data-auth-account-phone]");
+    const accountAddressLabel = modal.querySelector("[data-auth-account-address]");
+    const accountInitial = modal.querySelector("[data-auth-account-initial]");
+    const accountStats = modal.querySelector("[data-auth-account-stats]");
+    const accountEditButton = modal.querySelector("[data-auth-account-edit]");
+    const accountCancelButton = modal.querySelector("[data-auth-account-cancel]");
     const body = document.body;
     let pendingProfileCompletion = null;
+
+    const HEADER_COPY = {
+      default: {
+        title: "Access Revival",
+        intro: "Sign in or create an account to manage bookings."
+      },
+      account: {
+        title: "My Account",
+        intro: ""
+      }
+    };
 
     const setTab = (name) => {
       tabs.forEach((tab) => {
@@ -356,7 +415,31 @@ import {
         panel.hidden = !isActive;
       });
     };
+
+    const setHeaderMode = (mode = "default") => {
+      const copy = HEADER_COPY[mode] || HEADER_COPY.default;
+      modal.classList.toggle("auth-modal--account", mode === "account");
+      if (headerTitle) headerTitle.textContent = copy.title;
+      if (headerIntro) headerIntro.textContent = copy.intro;
+      if (mode !== "account" && accountNameLabel) {
+        accountNameLabel.textContent = "Account details";
+      }
+    };
+
+    const setAccountEditing = (editing) => {
+      accountSection?.classList.toggle("is-editing", editing);
+      if (accountFormWrap) accountFormWrap.hidden = !editing;
+      if (accountStats) accountStats.hidden = editing;
+      if (accountEditButton) accountEditButton.hidden = editing;
+      if (accountCancelButton) accountCancelButton.hidden = !editing;
+      if (editing) {
+        accountForm?.querySelector("[name=\"account-email\"]")?.focus({ preventScroll: true });
+      }
+    };
+
     setTab("login");
+    setHeaderMode("default");
+    setAccountEditing(false);
 
     tabs.forEach((tab) => {
       tab.addEventListener("click", () => setTab(tab.dataset.authTab));
@@ -388,6 +471,8 @@ import {
       }
       authTabs?.removeAttribute("hidden");
       panelsWrap?.removeAttribute("hidden");
+      setHeaderMode("default");
+      setAccountEditing(false);
     };
 
     const open = () => {
@@ -398,6 +483,7 @@ import {
         showAccountSection(currentUserProfile);
       } else {
         setTab("login");
+        setHeaderMode("default");
       }
       modal.setAttribute("data-open", "true");
       modal.setAttribute("aria-hidden", "false");
@@ -533,6 +619,8 @@ import {
 
     const showAccountSection = (profile = {}) => {
       if (!accountSection) return;
+      setHeaderMode("account");
+      setAccountEditing(false);
       authTabs?.setAttribute("hidden", "true");
       panelsWrap?.setAttribute("hidden", "true");
       accountSection.hidden = false;
@@ -540,11 +628,47 @@ import {
       const nameInput = accountForm?.querySelector("[name=\"account-name\"]");
       const emailInput = accountForm?.querySelector("[name=\"account-email\"]");
       const phoneInput = accountForm?.querySelector("[name=\"account-phone\"]");
-      const addressInput = accountForm?.querySelector("[name=\"account-address\"]");
+      const streetInput = accountForm?.querySelector("[name=\"account-street\"]");
+      const suburbInput = accountForm?.querySelector("[name=\"account-suburb\"]");
+      const cityInput = accountForm?.querySelector("[name=\"account-city\"]");
+      const provinceInput = accountForm?.querySelector("[name=\"account-province\"]");
+      const postalInput = accountForm?.querySelector("[name=\"account-postal\"]");
       if (nameInput) nameInput.value = profile.name || "";
       if (emailInput) emailInput.value = profile.email || "";
       if (phoneInput) phoneInput.value = profile.phone || "";
-      if (addressInput) addressInput.value = profile.address || "";
+      if (streetInput) streetInput.value = profile.street || "";
+      if (suburbInput) suburbInput.value = profile.suburb || "";
+      if (cityInput) cityInput.value = profile.city || "";
+      if (provinceInput) provinceInput.value = profile.province || PROVINCE_LOCK;
+      if (postalInput) postalInput.value = profile.postalCode || "";
+      const addressValue = composeAddress({
+        street: profile.street,
+        suburb: profile.suburb,
+        city: profile.city,
+        province: profile.province,
+        postalCode: profile.postalCode,
+        fallbackAddress: profile.address
+      }) || "Add your address";
+      const nameValue = profile.name || "My account";
+      const emailValue = profile.email || "Add your email";
+      const phoneValue = profile.phone || "Add your phone";
+      if (accountNameLabel) accountNameLabel.textContent = nameValue;
+      if (accountEmailLabel) {
+        accountEmailLabel.textContent = emailValue;
+        accountEmailLabel.setAttribute("title", emailValue);
+      }
+      if (accountPhoneLabel) {
+        accountPhoneLabel.textContent = phoneValue;
+        accountPhoneLabel.setAttribute("title", phoneValue);
+      }
+      if (accountAddressLabel) {
+        accountAddressLabel.textContent = addressValue;
+        accountAddressLabel.setAttribute("title", addressValue);
+      }
+      if (accountInitial) {
+        const source = (profile.name || profile.email || "R").trim();
+        accountInitial.textContent = (source[0] || "R").toUpperCase();
+      }
       if (memberSinceLabel) {
         const since = formatMemberSince(profile.createdAt);
         memberSinceLabel.textContent = since ? `Member since ${since}` : "";
@@ -863,29 +987,49 @@ import {
       const formData = new FormData(accountForm);
       const email = (formData.get("account-email") || "").trim();
       const phone = (formData.get("account-phone") || "").trim();
-      const address = (formData.get("account-address") || "").trim();
+      const street = (formData.get("account-street") || "").trim();
+      const suburb = (formData.get("account-suburb") || "").trim();
+      const city = (formData.get("account-city") || "").trim();
+      const province = PROVINCE_LOCK;
+      const postalCode = (formData.get("account-postal") || "").trim();
+      const address = composeAddress({ street, suburb, city, province, postalCode });
       setFeedback(accountFeedback, "");
 
       if (!user) {
         setFeedback(accountFeedback, "Please sign in again to update your profile.", "error");
         return;
       }
-      if (!email || !phone || !address) {
-        setFeedback(accountFeedback, "Email, phone, and address are required.", "error");
+      if (!email || !phone || !street || !suburb || !city || !province || !postalCode) {
+        setFeedback(accountFeedback, "Email, phone, and full address details are required.", "error");
         return;
       }
 
       toggleAccountSubmitting(true);
       try {
-        await updateDoc(doc(db, "users", user.uid), { email, phone, address });
+        await updateDoc(doc(db, "users", user.uid), {
+          email,
+          phone,
+          street,
+          suburb,
+          city,
+          province,
+          postalCode,
+          address
+        });
         const updatedProfile = {
           ...(currentUserProfile || {}),
           uid: user.uid,
           email,
           phone,
+          street,
+          suburb,
+          city,
+          province,
+          postalCode,
           address
         };
         applyProfile(updatedProfile);
+        showAccountSection(updatedProfile);
         setFeedback(accountFeedback, "Profile updated.", "success");
       } catch (error) {
         console.error("Account update error:", error);
@@ -901,6 +1045,16 @@ import {
 
     profileForm?.addEventListener("submit", handleProfileSave);
     accountForm?.addEventListener("submit", handleAccountSave);
+
+    accountEditButton?.addEventListener("click", () => {
+      setAccountEditing(true);
+    });
+    accountCancelButton?.addEventListener("click", () => {
+      setAccountEditing(false);
+      if (currentUserProfile) {
+        showAccountSection(currentUserProfile);
+      }
+    });
 
     const accountMenuButtons = accountMenu?.querySelectorAll("[data-account-menu]");
     accountMenuButtons?.forEach((btn) => {
