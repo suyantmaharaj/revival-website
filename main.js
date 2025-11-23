@@ -5,7 +5,8 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  signOut
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 import {
   doc,
@@ -103,6 +104,14 @@ import {
         <span class="header-login__label">Login</span>
       `;
       actions.appendChild(trigger);
+      const accountMenu = document.createElement("div");
+      accountMenu.className = "account-menu";
+      accountMenu.setAttribute("hidden", "true");
+      accountMenu.innerHTML = `
+        <button type="button" class="account-menu__item" data-account-menu="account">My Account</button>
+        <button type="button" class="account-menu__item" data-account-menu="logout">Log out</button>
+      `;
+      actions.appendChild(accountMenu);
       nav.appendChild(actions);
     }
 
@@ -306,11 +315,25 @@ import {
     const registerForm = modal.querySelector("[data-auth-form=\"register\"]");
     const loginFeedback = modal.querySelector("[data-auth-feedback=\"login\"]");
       const registerFeedback = modal.querySelector("[data-auth-feedback=\"register\"]");
-      const googleButtons = modal.querySelectorAll("[data-auth-google]");
-      const completeProfileSection = modal.querySelector("[data-auth-profile]");
-      const profileForm = completeProfileSection?.querySelector("[data-auth-profile-form]");
-      const profileSaveButton = completeProfileSection?.querySelector("[data-auth-profile-save]");
+    const googleButtons = modal.querySelectorAll("[data-auth-google]");
+    const completeProfileSection = modal.querySelector("[data-auth-profile]");
+    const profileForm = completeProfileSection?.querySelector("[data-auth-profile-form]");
+    const profileSaveButton = completeProfileSection?.querySelector("[data-auth-profile-save]");
     const profileFeedback = completeProfileSection?.querySelector("[data-auth-feedback=\"profile\"]");
+    let accountMenu = document.querySelector(".account-menu");
+    if (!accountMenu && nav) {
+      const actions = nav.querySelector(".nav-actions");
+      if (actions) {
+        accountMenu = document.createElement("div");
+        accountMenu.className = "account-menu";
+        accountMenu.setAttribute("hidden", "true");
+        accountMenu.innerHTML = `
+          <button type="button" class="account-menu__item" data-account-menu="account">My Account</button>
+          <button type="button" class="account-menu__item" data-account-menu="logout">Log out</button>
+        `;
+        actions.appendChild(accountMenu);
+      }
+    }
     const accountSection = modal.querySelector("[data-auth-account]");
     const accountForm = accountSection?.querySelector("[data-auth-account-form]");
     const accountSaveButton = accountSection?.querySelector("[data-auth-account-save]");
@@ -393,9 +416,25 @@ import {
       body.classList.remove("modal-open");
     };
 
+    const closeAccountMenu = () => {
+      if (!accountMenu) return;
+      accountMenu.setAttribute("hidden", "true");
+      accountMenu.setAttribute("data-open", "false");
+    };
+    const toggleAccountMenu = () => {
+      if (!accountMenu) return;
+      const isOpen = accountMenu.getAttribute("data-open") === "true";
+      accountMenu.hidden = isOpen;
+      accountMenu.setAttribute("data-open", isOpen ? "false" : "true");
+    };
+
     openers.forEach((trigger) => {
       trigger.addEventListener("click", (event) => {
         event.preventDefault();
+        if (trigger.dataset.authState === "logged-in") {
+          toggleAccountMenu();
+          return;
+        }
         open();
       });
     });
@@ -408,15 +447,36 @@ import {
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") close();
     });
+    document.addEventListener("click", (event) => {
+      if (!accountMenu) return;
+      if (event.target === accountMenu || accountMenu.contains(event.target)) return;
+      if (event.target === authTrigger || authTrigger?.contains(event.target)) return;
+      closeAccountMenu();
+    });
 
     const defaultSubmitLabels = {
       login: "Login",
       register: "Create Account"
     };
 
-    const setAuthButtonLabel = (label) => {
-      if (!authTriggerLabel) return;
-      authTriggerLabel.textContent = label || "Login";
+    const setAuthButtonLabel = (label, isLoggedIn = false) => {
+      if (!authTrigger) return;
+      const firstName = (label || "").split(" ")[0] || "Login";
+      if (authTriggerLabel) {
+        authTriggerLabel.textContent = isLoggedIn ? `Hi, ${firstName}` : (label || "Login");
+      }
+      authTrigger.setAttribute("data-auth-state", isLoggedIn ? "logged-in" : "logged-out");
+      authTrigger.classList.toggle("header-login--greeting", isLoggedIn);
+      if (isLoggedIn) {
+        authTrigger.removeAttribute("aria-label");
+        authTrigger.removeAttribute("data-auth-open");
+      } else {
+        authTrigger.setAttribute("aria-label", "Open login modal");
+        authTrigger.setAttribute("data-auth-open", "true");
+      }
+      if (accountMenu) {
+        accountMenu.hidden = !isLoggedIn;
+      }
     };
 
     const setFeedback = (target, message, tone = "") => {
@@ -539,9 +599,9 @@ import {
     const applyProfile = (profile) => {
       currentUserProfile = profile;
       if (profile) {
-        setAuthButtonLabel(profile.name || "My Account");
+        setAuthButtonLabel(profile.name || "My Account", true);
       } else {
-        setAuthButtonLabel("Login");
+        setAuthButtonLabel("Login", false);
       }
     };
 
@@ -832,6 +892,28 @@ import {
 
     profileForm?.addEventListener("submit", handleProfileSave);
     accountForm?.addEventListener("submit", handleAccountSave);
+
+    const accountMenuButtons = accountMenu?.querySelectorAll("[data-account-menu]");
+    accountMenuButtons?.forEach((btn) => {
+      const action = btn.dataset.accountMenu;
+      if (action === "account") {
+        btn.addEventListener("click", () => {
+          closeAccountMenu();
+          open();
+        });
+      }
+      if (action === "logout") {
+        btn.addEventListener("click", async () => {
+          closeAccountMenu();
+          try {
+            await signOut(auth);
+            applyProfile(null);
+          } catch (error) {
+            console.error("Logout failed", error);
+          }
+        });
+      }
+    });
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
