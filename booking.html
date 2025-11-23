@@ -1324,7 +1324,8 @@
       assignIfEmpty("fullName", profile.name || "");
       assignIfEmpty("email", profile.email || "");
       assignIfEmpty("phone", phoneDigits);
-      assignIfEmpty("address1", profile.address || "");
+      const streetOnly = profile.street || String(profile.address || "").split(",")[0]?.trim() || "";
+      assignIfEmpty("address1", streetOnly);
       assignIfEmpty("suburb", profile.suburb || "");
       assignIfEmpty("city", profile.city || "");
       assignIfEmpty("postal", postalDigits);
