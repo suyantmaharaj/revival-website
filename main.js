@@ -816,7 +816,6 @@ import {
       event.preventDefault();
       if (!registerForm) return;
       setFeedback(registerFeedback, "");
-      toggleSubmitting(registerForm, true, "register");
       const formData = new FormData(registerForm);
       const name = (formData.get("register-name") || "").trim();
       const email = (formData.get("register-email") || "").trim();
@@ -827,6 +826,45 @@ import {
       const city = (formData.get("register-city") || "").trim();
       const province = PROVINCE_LOCK;
       const postalCode = (formData.get("register-postal") || "").trim();
+
+      const validateRegisterInputs = () => {
+        const lettersSpacesHyphens = /^[A-Za-z][A-Za-z\\s-]{1,}$/;
+        if (!name || !lettersSpacesHyphens.test(name)) {
+          return "Please enter your name using letters, spaces, or hyphens only.";
+        }
+        if (!email) {
+          return "Email is required.";
+        }
+        if (!password || password.length < 6) {
+          return "Password must be at least 6 characters.";
+        }
+        const phoneDigits = phone.replace(/\\D/g, "");
+        if (phoneDigits.length !== 10) {
+          return "Phone number must be 10 digits.";
+        }
+        if (!street || street.length < 5 || !/[A-Za-z]/.test(street) || !/\\d/.test(street)) {
+          return "Street address should include a number and street name.";
+        }
+        if (!suburb || !lettersSpacesHyphens.test(suburb)) {
+          return "Suburb should use letters, spaces, or hyphens.";
+        }
+        if (!city || !lettersSpacesHyphens.test(city)) {
+          return "City should use letters, spaces, or hyphens.";
+        }
+        if (!postalCode || !/^\\d{4,6}$/.test(postalCode)) {
+          return "Postal code must be 4-6 digits.";
+        }
+        return "";
+      };
+
+      const validationMessage = validateRegisterInputs();
+      if (validationMessage) {
+        setFeedback(registerFeedback, validationMessage, "error");
+        toggleSubmitting(registerForm, false, "register");
+        return;
+      }
+
+      toggleSubmitting(registerForm, true, "register");
 
       try {
         const { user } = await createUserWithEmailAndPassword(auth, email, password);
