@@ -41,6 +41,22 @@ import {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
+  const getOtpInputs = () => Array.from(document.querySelectorAll("[data-otp-input]"));
+
+  function clearOtpInputs() {
+    const inputs = getOtpInputs();
+    inputs.forEach((input) => {
+      input.value = "";
+    });
+    inputs[0]?.focus();
+  }
+
+  function readOtpValue() {
+    return getOtpInputs()
+      .map((input) => (input.value || "").trim())
+      .join("");
+  }
+
   ready(() => {
     initNav();
     initAuthModal();
@@ -48,12 +64,42 @@ import {
     const verifyOtpButton = document.getElementById("verify-otp-button");
     sendOtpButton?.addEventListener("click", handleSendOtp);
     verifyOtpButton?.addEventListener("click", handleVerifyOtp);
+    initOtpInputs();
     initReveal();
     initHeroSlideshow();
     initHeroTilt();
     initInventoryEmptyState();
     stampYear();
   });
+
+  function initOtpInputs() {
+    const inputs = getOtpInputs();
+    inputs.forEach((input, index) => {
+      input.addEventListener("input", (event) => {
+        const value = event.target.value.replace(/\\D/g, "").slice(0, 1);
+        event.target.value = value;
+        if (value && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Backspace" && !input.value && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+      input.addEventListener("paste", (event) => {
+        const paste = (event.clipboardData?.getData("text") || "").replace(/\\D/g, "").slice(0, inputs.length);
+        if (!paste) return;
+        event.preventDefault();
+        paste.split("").forEach((digit, idx) => {
+          if (inputs[idx]) {
+            inputs[idx].value = digit;
+          }
+        });
+        inputs[Math.min(paste.length, inputs.length) - 1]?.focus();
+      });
+    });
+  }
 
   async function handleSendOtp(){
     const nameInput = document.getElementById("register-name");
@@ -70,6 +116,7 @@ import {
     currentOtpEmail = email.toLowerCase();
     otpExpiresAt = Date.now() + 10 * 60 * 1000;
     emailVerified = false;
+    clearOtpInputs();
 
     try {
       await sendOtpEmail(email, name, otp);
@@ -86,9 +133,8 @@ import {
 
   function handleVerifyOtp(){
     const emailInput = document.getElementById("register-email");
-    const otpInput = document.getElementById("otp-input");
     const email = (emailInput?.value || "").trim().toLowerCase();
-    const code = (otpInput?.value || "").trim();
+    const code = readOtpValue();
 
     if (!currentOtp || !currentOtpEmail || !otpExpiresAt) {
       alert("Please request a verification code first.");
@@ -100,6 +146,10 @@ import {
     }
     if (Date.now() > otpExpiresAt) {
       alert("The verification code has expired. Please request a new one.");
+      return;
+    }
+    if (code.length !== 6) {
+      alert("Please enter the 6-digit verification code.");
       return;
     }
     if (code !== currentOtp) {
@@ -243,8 +293,15 @@ import {
                     </label>
                     <button type="button" id="send-otp-button">Send verification code</button>
                     <div id="otp-section" style="display:none; margin-top:12px;">
-                      <label for="otp-input">Enter verification code</label>
-                      <input type="text" id="otp-input" maxlength="6" />
+                      <label for="otp-input-1">Enter verification code</label>
+                      <div class="otp-inputs" id="otp-inputs" style="display:flex; gap:8px; margin:8px 0;">
+                        <input type="text" id="otp-input-1" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
+                        <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
+                        <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
+                        <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
+                        <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
+                        <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
+                      </div>
                       <button type="button" id="verify-otp-button">Verify email</button>
                     </div>
                     <label>
