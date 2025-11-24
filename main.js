@@ -57,13 +57,51 @@ import {
       .join("");
   }
 
+  const resetOtpState = () => {
+    currentOtp = null;
+    currentOtpEmail = null;
+    otpExpiresAt = null;
+    emailVerified = false;
+    clearOtpInputs();
+  };
+
+  async function sendVerificationCode(email, name = "") {
+    if (!email) throw new Error("Email is required to send verification.");
+    const otp = generateOtp();
+    currentOtp = otp;
+    currentOtpEmail = email.toLowerCase();
+    otpExpiresAt = Date.now() + 10 * 60 * 1000;
+    emailVerified = false;
+    clearOtpInputs();
+    await sendOtpEmail(currentOtpEmail, name, otp);
+  }
+
+  function validateOtpEntry(email) {
+    const normalizedEmail = (email || "").trim().toLowerCase();
+    const code = readOtpValue();
+
+    if (!currentOtp || !currentOtpEmail || !otpExpiresAt) {
+      return { valid: false, message: "Please tap Create Account to request a new verification code." };
+    }
+    if (!normalizedEmail || normalizedEmail !== currentOtpEmail) {
+      return { valid: false, message: "The email does not match the verification request." };
+    }
+    if (Date.now() > otpExpiresAt) {
+      return { valid: false, message: "The verification code has expired. Tap Create Account again to resend." };
+    }
+    if (code.length !== 6) {
+      return { valid: false, message: "Please enter the 6-digit verification code." };
+    }
+    if (code !== currentOtp) {
+      return { valid: false, message: "The verification code is incorrect." };
+    }
+
+    return { valid: true, code };
+  }
+
   ready(() => {
     initNav();
     initAuthModal();
-    const sendOtpButton = document.getElementById("send-otp-button");
-    const verifyOtpButton = document.getElementById("verify-otp-button");
-    sendOtpButton?.addEventListener("click", handleSendOtp);
-    verifyOtpButton?.addEventListener("click", handleVerifyOtp);
     initOtpInputs();
     initReveal();
     initHeroSlideshow();
@@ -76,7 +114,7 @@ import {
     const inputs = getOtpInputs();
     inputs.forEach((input, index) => {
       input.addEventListener("input", (event) => {
-        const value = event.target.value.replace(/\\D/g, "").slice(0, 1);
+        const value = event.target.value.replace(/\D/g, "").slice(0, 1);
         event.target.value = value;
         if (value && index < inputs.length - 1) {
           inputs[index + 1].focus();
@@ -88,7 +126,7 @@ import {
         }
       });
       input.addEventListener("paste", (event) => {
-        const paste = (event.clipboardData?.getData("text") || "").replace(/\\D/g, "").slice(0, inputs.length);
+        const paste = (event.clipboardData?.getData("text") || "").replace(/\D/g, "").slice(0, inputs.length);
         if (!paste) return;
         event.preventDefault();
         paste.split("").forEach((digit, idx) => {
@@ -99,70 +137,6 @@ import {
         inputs[Math.min(paste.length, inputs.length) - 1]?.focus();
       });
     });
-  }
-
-  async function handleSendOtp(){
-    const nameInput = document.getElementById("register-name");
-    const emailInput = document.getElementById("register-email");
-    const name = (nameInput?.value || "").trim();
-    const email = (emailInput?.value || "").trim();
-    if (!email) {
-      alert("Please enter your email to receive a verification code.");
-      return;
-    }
-
-    const otp = generateOtp();
-    currentOtp = otp;
-    currentOtpEmail = email.toLowerCase();
-    otpExpiresAt = Date.now() + 10 * 60 * 1000;
-    emailVerified = false;
-    clearOtpInputs();
-
-    try {
-      await sendOtpEmail(email, name, otp);
-      const otpSection = document.getElementById("otp-section");
-      if (otpSection) {
-        otpSection.style.display = "block";
-      }
-      alert("We sent a verification code to your email.");
-    } catch (error) {
-      console.error("Error sending OTP:", error);
-      alert("We couldn't send the verification code. Please try again.");
-    }
-  }
-
-  function handleVerifyOtp(){
-    const emailInput = document.getElementById("register-email");
-    const email = (emailInput?.value || "").trim().toLowerCase();
-    const code = readOtpValue();
-
-    if (!currentOtp || !currentOtpEmail || !otpExpiresAt) {
-      alert("Please request a verification code first.");
-      return;
-    }
-    if (!email || email !== currentOtpEmail) {
-      alert("The email does not match the verification request.");
-      return;
-    }
-    if (Date.now() > otpExpiresAt) {
-      alert("The verification code has expired. Please request a new one.");
-      return;
-    }
-    if (code.length !== 6) {
-      alert("Please enter the 6-digit verification code.");
-      return;
-    }
-    if (code !== currentOtp) {
-      alert("The verification code is incorrect.");
-      return;
-    }
-
-    emailVerified = true;
-    const otpSection = document.getElementById("otp-section");
-    if (otpSection) {
-      otpSection.style.display = "none";
-    }
-    alert("Email verified successfully.");
   }
 
   function initNav(){
@@ -291,19 +265,6 @@ import {
                       <span>Email</span>
                       <input type="email" id="register-email" name="register-email" autocomplete="email" placeholder="you@example.com" required>
                     </label>
-                    <button type="button" id="send-otp-button">Send verification code</button>
-                    <div id="otp-section" style="display:none; margin-top:12px;">
-                      <label for="otp-input-1">Enter verification code</label>
-                      <div class="otp-inputs" id="otp-inputs" style="display:flex; gap:8px; margin:8px 0;">
-                        <input type="text" id="otp-input-1" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
-                        <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
-                        <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
-                        <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
-                        <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
-                        <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input>
-                      </div>
-                      <button type="button" id="verify-otp-button">Verify email</button>
-                    </div>
                     <label>
                       <span>Password</span>
                       <input type="password" name="register-password" autocomplete="new-password" placeholder="Create a password" required>
@@ -347,6 +308,25 @@ import {
                 </button>
                 <button type="submit" class="btn" data-auth-submit="register">Create Account</button>
               </form>
+            </div>
+          </div>
+          <div class="auth-verify" data-auth-verify hidden>
+            <div class="auth-verify__header">
+              <h4>Verify your email</h4>
+              <p>We sent a 6-digit code to <strong data-verify-email>you@example.com</strong>. Enter it to finish creating your account.</p>
+            </div>
+            <div class="otp-inputs" data-otp-inputs>
+              <input type="text" id="otp-input-1" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input aria-label="Verification code digit 1">
+              <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input aria-label="Verification code digit 2">
+              <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input aria-label="Verification code digit 3">
+              <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input aria-label="Verification code digit 4">
+              <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input aria-label="Verification code digit 5">
+              <input type="text" inputmode="numeric" pattern="\\d*" maxlength="1" class="otp-input" data-otp-input aria-label="Verification code digit 6">
+            </div>
+            <div class="auth-feedback" data-auth-feedback="verify" role="status" aria-live="polite"></div>
+            <div class="auth-verify__actions">
+              <button type="button" class="btn outline" data-verify-back>Back</button>
+              <button type="button" class="btn" id="verify-otp-button" data-verify-submit>Verify & Create Account</button>
             </div>
           </div>
           <div class="auth-profile" data-auth-profile hidden>
@@ -491,6 +471,11 @@ import {
     const registerForm = modal.querySelector("[data-auth-form=\"register\"]");
     const loginFeedback = modal.querySelector("[data-auth-feedback=\"login\"]");
       const registerFeedback = modal.querySelector("[data-auth-feedback=\"register\"]");
+    const verifySection = modal.querySelector("[data-auth-verify]");
+    const verifyEmailLabel = modal.querySelector("[data-verify-email]");
+    const verifyFeedback = modal.querySelector("[data-auth-feedback=\"verify\"]");
+    const verifyBackButton = modal.querySelector("[data-verify-back]");
+    const verifySubmitButton = modal.querySelector("[data-verify-submit]");
     const googleButtons = modal.querySelectorAll("[data-auth-google]");
     const completeProfileSection = modal.querySelector("[data-auth-profile]");
     const profileForm = completeProfileSection?.querySelector("[data-auth-profile-form]");
@@ -526,11 +511,16 @@ import {
     const accountCancelButton = modal.querySelector("[data-auth-account-cancel]");
     const body = document.body;
     let pendingProfileCompletion = null;
+    let pendingRegistration = null;
 
     const HEADER_COPY = {
       default: {
         title: "Access Revival",
         intro: "Sign in or create an account to manage bookings."
+      },
+      verify: {
+        title: "Verify your email",
+        intro: "Enter the 6-digit code we just sent to continue."
       },
       account: {
         title: "My Account",
@@ -571,6 +561,29 @@ import {
       if (editing) {
         accountForm?.querySelector("[name=\"account-email\"]")?.focus({ preventScroll: true });
       }
+    };
+
+    const showVerifyStep = (email) => {
+      if (!verifySection) return;
+      setHeaderMode("verify");
+      authTabs?.setAttribute("hidden", "true");
+      panelsWrap?.setAttribute("hidden", "true");
+      verifySection.hidden = false;
+      verifySection.classList.add("is-active");
+      if (verifyEmailLabel) verifyEmailLabel.textContent = email || "";
+      clearOtpInputs();
+      verifySection.querySelector("[data-otp-input]")?.focus({ preventScroll: true });
+    };
+
+    const resetVerifyStep = () => {
+      if (!verifySection) return;
+      verifySection.classList.remove("is-active");
+      verifySection.hidden = true;
+      setFeedback(verifyFeedback, "");
+      authTabs?.removeAttribute("hidden");
+      panelsWrap?.removeAttribute("hidden");
+      setHeaderMode("default");
+      clearOtpInputs();
     };
 
     setTab("login");
@@ -614,6 +627,9 @@ import {
     const open = () => {
       resetProfileStep();
       resetAccountSection();
+      resetVerifyStep();
+      resetOtpState();
+      pendingRegistration = null;
       const shouldShowAccount = Boolean(currentUserProfile);
       if (shouldShowAccount) {
         showAccountSection(currentUserProfile);
@@ -634,6 +650,9 @@ import {
       if (modal.getAttribute("data-open") !== "true") return;
       resetProfileStep();
       resetAccountSection();
+      resetVerifyStep();
+      resetOtpState();
+      pendingRegistration = null;
       modal.setAttribute("data-open", "false");
       modal.setAttribute("aria-hidden", "true");
       body.classList.remove("modal-open");
@@ -739,6 +758,12 @@ import {
       if (!accountSaveButton) return;
       accountSaveButton.disabled = isSubmitting;
       accountSaveButton.textContent = isSubmitting ? "Saving..." : "Save changes";
+    };
+
+    const toggleVerifySubmitting = (isSubmitting) => {
+      if (!verifySubmitButton) return;
+      verifySubmitButton.disabled = isSubmitting;
+      verifySubmitButton.textContent = isSubmitting ? "Verifying..." : "Verify & Create Account";
     };
 
     const formatMemberSince = (value) => {
@@ -964,7 +989,7 @@ import {
       const postalCode = (formData.get("register-postal") || "").trim();
 
       const validateRegisterInputs = () => {
-        const lettersSpacesHyphens = /^[A-Za-z][A-Za-z\\s-]{1,}$/;
+        const lettersSpacesHyphens = /^[A-Za-z][A-Za-z\s-]{1,}$/;
         if (!name || !lettersSpacesHyphens.test(name)) {
           return "Please enter your name using letters, spaces, or hyphens only.";
         }
@@ -974,11 +999,11 @@ import {
         if (!password || password.length < 6) {
           return "Password must be at least 6 characters.";
         }
-        const phoneDigits = phone.replace(/\\D/g, "");
+        const phoneDigits = phone.replace(/\D/g, "");
         if (phoneDigits.length !== 10) {
           return "Phone number must be 10 digits.";
         }
-        if (!street || street.length < 5 || !/[A-Za-z]/.test(street) || !/\\d/.test(street)) {
+        if (!street || street.length < 5 || !/[A-Za-z]/.test(street) || !/\d/.test(street)) {
           return "Street address should include a number and street name.";
         }
         if (!suburb || !lettersSpacesHyphens.test(suburb)) {
@@ -987,49 +1012,80 @@ import {
         if (!city || !lettersSpacesHyphens.test(city)) {
           return "City should use letters, spaces, or hyphens.";
         }
-        if (!postalCode || !/^\\d{4,6}$/.test(postalCode)) {
+        if (!postalCode || !/^\d{4,6}$/.test(postalCode)) {
           return "Postal code must be 4-6 digits.";
         }
         return "";
       };
 
-      const validationMessage = validateRegisterInputs();
+        const validationMessage = validateRegisterInputs();
       if (validationMessage) {
         setFeedback(registerFeedback, validationMessage, "error");
-        toggleSubmitting(registerForm, false, "register");
         return;
       }
+
+      const email = registerEmail.toLowerCase();
+      pendingRegistration = {
+        name,
+        email,
+        password,
+        phone,
+        street,
+        suburb,
+        city,
+        province,
+        postalCode
+      };
 
       toggleSubmitting(registerForm, true, "register");
 
       try {
-        const email = document.getElementById("register-email").value.trim().toLowerCase();
-        if (!emailVerified || email !== currentOtpEmail) {
-          alert("Please verify your email before creating your account.");
-          toggleSubmitting(registerForm, false, "register");
-          return;
-        }
-
-        const { user } = await createUserWithEmailAndPassword(auth, email, password);
-        const payload = buildUserDoc({
-          name,
-          email,
-          phone,
-          street,
-          suburb,
-          city,
-          province,
-          postalCode
-        });
-        await setDoc(doc(db, "users", user.uid), payload);
-        applyProfile({ uid: user.uid, ...payload });
-        await sendWelcomeEmail(email, name);
-        setFeedback(registerFeedback, "Account created successfully.", "success");
-        close();
+        await sendVerificationCode(email, name);
+        showVerifyStep(email);
+        setFeedback(registerFeedback, "");
+        setFeedback(verifyFeedback, "We sent a verification code to your email.", "success");
       } catch (error) {
-        setFeedback(registerFeedback, friendlyAuthError(error), "error");
+        console.error("Error sending verification code:", error);
+        setFeedback(registerFeedback, "We couldn't send the verification code. Please try again.", "error");
+        pendingRegistration = null;
       } finally {
         toggleSubmitting(registerForm, false, "register");
+      }
+    };
+
+    const handleVerifyOtp = async (event) => {
+      event.preventDefault?.();
+      if (!pendingRegistration) {
+        resetVerifyStep();
+        setTab("register");
+        setFeedback(registerFeedback, "Please fill in your details and tap Create Account to get a code.", "error");
+        return;
+      }
+
+      const otpCheck = validateOtpEntry(pendingRegistration.email);
+      if (!otpCheck.valid) {
+        setFeedback(verifyFeedback, otpCheck.message, "error");
+        return;
+      }
+
+      emailVerified = true;
+      toggleVerifySubmitting(true);
+
+      try {
+        const { password, ...profileFields } = pendingRegistration;
+        const payload = buildUserDoc(profileFields);
+        const { user } = await createUserWithEmailAndPassword(auth, profileFields.email, password);
+        await setDoc(doc(db, "users", user.uid), payload);
+        applyProfile({ uid: user.uid, ...payload });
+        await sendWelcomeEmail(profileFields.email, profileFields.name);
+        setFeedback(verifyFeedback, "Email verified. Signing you in...", "success");
+        close();
+      } catch (error) {
+        setFeedback(verifyFeedback, friendlyAuthError(error), "error");
+      } finally {
+        toggleVerifySubmitting(false);
+        resetOtpState();
+        pendingRegistration = null;
       }
     };
 
@@ -1057,6 +1113,14 @@ import {
 
     loginForm?.addEventListener("submit", handleLogin);
     registerForm?.addEventListener("submit", handleRegister);
+    verifySubmitButton?.addEventListener("click", handleVerifyOtp);
+    verifyBackButton?.addEventListener("click", () => {
+      pendingRegistration = null;
+      resetOtpState();
+      resetVerifyStep();
+      setTab("register");
+      registerForm?.querySelector("[name=\"register-name\"]")?.focus({ preventScroll: true });
+    });
 
     const handleGoogleSignIn = async (event) => {
       event.preventDefault();

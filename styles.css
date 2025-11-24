@@ -846,6 +846,62 @@ body.nav-open .nav-overlay{opacity:1;pointer-events:auto}
 }
 .auth-panel{display:none}
 .auth-panel.is-active{display:block}
+.otp-inputs{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin:12px 0;
+}
+.otp-input{
+  width:48px;
+  height:52px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.04);
+  color:#fff;
+  text-align:center;
+  font-size:20px;
+  font-weight:700;
+}
+.otp-input:focus-visible{
+  outline:2px solid rgba(199,167,104,.65);
+  border-color:rgba(199,167,104,.65);
+}
+.auth-verify{
+  display:none;
+  margin-top:14px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(255,255,255,.02);
+  box-shadow:0 18px 45px rgba(0,0,0,.4);
+}
+.auth-verify.is-active{
+  display:block;
+}
+.auth-verify__header h4{
+  margin:0 0 6px;
+  font-size:22px;
+  color:#fff;
+}
+.auth-verify__header p{
+  margin:0 0 10px;
+  color:var(--muted);
+  line-height:1.5;
+}
+.auth-verify__header strong{color:#fff;}
+.auth-verify__actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.auth-verify__actions .btn{
+  flex:1;
+  justify-content:center;
+}
+.auth-verify .auth-feedback{
+  margin:8px 0;
+}
 .auth-form{
   display:flex;
   flex-direction:column;

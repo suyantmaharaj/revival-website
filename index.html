@@ -135,6 +135,21 @@
       <a href="/contact.html">Contact</a>
       <a href="/booking.html" class="btn outline">Book Now</a>
     </nav>
+    <div class="nav-actions">
+      <button type="button" class="header-login" data-auth-open="true" aria-label="Open login modal">
+        <span class="header-login__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M9.5 6.5a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zm-1 0a5.5 5.5 0 1111 0 5.5 5.5 0 01-11 0zm1.83 7a5.64 5.64 0 00-1.72.28C6.99 14.35 6 15.57 6 17v2h16v-2c0-1.43-.99-2.65-2.61-3.22a5.64 5.64 0 00-1.72-.28H10.33z"/>
+          </svg>
+        </span>
+        <span class="header-login__label">Login</span>
+        <span class="header-login__caret" aria-hidden="true"></span>
+      </button>
+      <div class="account-menu" hidden>
+        <button type="button" class="account-menu__item" data-account-menu="account">My Account</button>
+        <button type="button" class="account-menu__item" data-account-menu="logout">Log out</button>
+      </div>
+    </div>
   </div>
 </header>
 <div class="nav-overlay" data-nav-overlay></div>
