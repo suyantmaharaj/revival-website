@@ -1,12 +1,19 @@
-import { functions } from "./firebase-config.js";
-import { httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-functions.js";
+emailjs.init("0Xb2U08LxmtL-sARN");
 
 export async function sendWelcomeEmail(email, name) {
+  if (!email) {
+    console.warn("sendWelcomeEmail skipped: email is required");
+    return;
+  }
+
+  const params = {
+    to_email: email,
+    to_name: name || "there",
+  };
+
   try {
-    const sendWelcome = httpsCallable(functions, "sendWelcomeEmail");
-    await sendWelcome({ email, name });
-    console.log("sendWelcomeEmail invoked for", email, name);
-  } catch (error) {
-    console.error("Error calling sendWelcomeEmail function:", error);
+    return await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", params);
+  } catch (err) {
+    console.error("sendWelcomeEmail failed", err);
   }
 }
