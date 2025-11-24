@@ -8,11 +8,11 @@ export async function sendWelcomeEmail(email, name) {
 
   const params = {
     to_email: email,
-    to_name: name || "there",
+    name: name || "there",
   };
 
   try {
-    return await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", params);
+    return await emailjs.send("service_onoip14", "template_9urh7za", params);
   } catch (err) {
     console.error("sendWelcomeEmail failed", err);
   }
