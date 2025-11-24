@@ -1,5 +1,6 @@
 import { auth, db } from "./firebase-config.js";
 import { sendWelcomeEmail } from "./mail.js";
+import { sendOtpEmail } from "./otp-mail.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -31,16 +32,88 @@ import {
   );
   let currentUserProfile = null;
   const PROVINCE_LOCK = "Western Cape";
+  let currentOtp = null;
+  let currentOtpEmail = null;
+  let otpExpiresAt = null;
+  let emailVerified = false;
+
+  function generateOtp() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
 
   ready(() => {
     initNav();
     initAuthModal();
+    const sendOtpButton = document.getElementById("send-otp-button");
+    const verifyOtpButton = document.getElementById("verify-otp-button");
+    sendOtpButton?.addEventListener("click", handleSendOtp);
+    verifyOtpButton?.addEventListener("click", handleVerifyOtp);
     initReveal();
     initHeroSlideshow();
     initHeroTilt();
     initInventoryEmptyState();
     stampYear();
   });
+
+  async function handleSendOtp(){
+    const nameInput = document.getElementById("register-name");
+    const emailInput = document.getElementById("register-email");
+    const name = (nameInput?.value || "").trim();
+    const email = (emailInput?.value || "").trim();
+    if (!email) {
+      alert("Please enter your email to receive a verification code.");
+      return;
+    }
+
+    const otp = generateOtp();
+    currentOtp = otp;
+    currentOtpEmail = email.toLowerCase();
+    otpExpiresAt = Date.now() + 10 * 60 * 1000;
+    emailVerified = false;
+
+    try {
+      await sendOtpEmail(email, name, otp);
+      const otpSection = document.getElementById("otp-section");
+      if (otpSection) {
+        otpSection.style.display = "block";
+      }
+      alert("We sent a verification code to your email.");
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      alert("We couldn't send the verification code. Please try again.");
+    }
+  }
+
+  function handleVerifyOtp(){
+    const emailInput = document.getElementById("register-email");
+    const otpInput = document.getElementById("otp-input");
+    const email = (emailInput?.value || "").trim().toLowerCase();
+    const code = (otpInput?.value || "").trim();
+
+    if (!currentOtp || !currentOtpEmail || !otpExpiresAt) {
+      alert("Please request a verification code first.");
+      return;
+    }
+    if (!email || email !== currentOtpEmail) {
+      alert("The email does not match the verification request.");
+      return;
+    }
+    if (Date.now() > otpExpiresAt) {
+      alert("The verification code has expired. Please request a new one.");
+      return;
+    }
+    if (code !== currentOtp) {
+      alert("The verification code is incorrect.");
+      return;
+    }
+
+    emailVerified = true;
+    const otpSection = document.getElementById("otp-section");
+    if (otpSection) {
+      otpSection.style.display = "none";
+    }
+    alert("Email verified successfully.");
+  }
 
   function initNav(){
     const toggle = document.querySelector("[data-nav-toggle]");
@@ -162,12 +235,18 @@ import {
                   <div class="auth-form__column">
                     <label>
                       <span>Name</span>
-                      <input type="text" name="register-name" autocomplete="name" placeholder="Your name" required>
+                      <input type="text" id="register-name" name="register-name" autocomplete="name" placeholder="Your name" required>
                     </label>
                     <label>
                       <span>Email</span>
-                      <input type="email" name="register-email" autocomplete="email" placeholder="you@example.com" required>
+                      <input type="email" id="register-email" name="register-email" autocomplete="email" placeholder="you@example.com" required>
                     </label>
+                    <button type="button" id="send-otp-button">Send verification code</button>
+                    <div id="otp-section" style="display:none; margin-top:12px;">
+                      <label for="otp-input">Enter verification code</label>
+                      <input type="text" id="otp-input" maxlength="6" />
+                      <button type="button" id="verify-otp-button">Verify email</button>
+                    </div>
                     <label>
                       <span>Password</span>
                       <input type="password" name="register-password" autocomplete="new-password" placeholder="Create a password" required>
@@ -818,7 +897,7 @@ import {
       setFeedback(registerFeedback, "");
       const formData = new FormData(registerForm);
       const name = (formData.get("register-name") || "").trim();
-      const email = (formData.get("register-email") || "").trim();
+      const registerEmail = (formData.get("register-email") || "").trim();
       const password = (formData.get("register-password") || "").trim();
       const phone = (formData.get("register-phone") || "").trim();
       const street = (formData.get("register-street") || "").trim();
@@ -832,7 +911,7 @@ import {
         if (!name || !lettersSpacesHyphens.test(name)) {
           return "Please enter your name using letters, spaces, or hyphens only.";
         }
-        if (!email) {
+        if (!registerEmail) {
           return "Email is required.";
         }
         if (!password || password.length < 6) {
@@ -867,6 +946,13 @@ import {
       toggleSubmitting(registerForm, true, "register");
 
       try {
+        const email = document.getElementById("register-email").value.trim().toLowerCase();
+        if (!emailVerified || email !== currentOtpEmail) {
+          alert("Please verify your email before creating your account.");
+          toggleSubmitting(registerForm, false, "register");
+          return;
+        }
+
         const { user } = await createUserWithEmailAndPassword(auth, email, password);
         const payload = buildUserDoc({
           name,
