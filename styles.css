@@ -976,7 +976,7 @@ body.nav-open .nav-overlay{opacity:1;pointer-events:auto}
   line-height:1.4;
 }
 .auth-google{
-  display:inline-flex;
+  display:none;
   align-items:center;
   justify-content:center;
   gap:10px;

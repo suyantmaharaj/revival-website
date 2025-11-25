@@ -243,7 +243,7 @@ import {
                   <span>Password</span>
                   <input type="password" name="login-password" autocomplete="current-password" placeholder="••••••••" required>
                 </label>
-                <button type="button" class="auth-google" data-auth-google="login">
+                <button type="button" class="auth-google" data-auth-google="login" hidden>
                   <span class="auth-google__icon" aria-hidden="true">
                     <img src="/assets/Google_%22G%22_logo.svg.png" alt="">
                   </span>
@@ -300,7 +300,7 @@ import {
                     </div>
                   </div>
                 </div>
-                <button type="button" class="auth-google" data-auth-google="register">
+                <button type="button" class="auth-google" data-auth-google="register" hidden>
                   <span class="auth-google__icon" aria-hidden="true">
                     <img src="/assets/Google_%22G%22_logo.svg.png" alt="">
                   </span>
