@@ -1,14 +1,18 @@
-import emailjs from "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
-
 const EMAILJS_PUBLIC_KEY = "0Xb2U08LxmtL-sARN";
 const EMAILJS_SERVICE_ID = "service_onoip14";
 const EMAILJS_OTP_TEMPLATE_ID = "template_xse8zll";
 
 let emailInitialized = false;
 function ensureEmailInitialized() {
-  if (emailInitialized) return;
-  emailjs.init(EMAILJS_PUBLIC_KEY);
+  const client = window.emailjs;
+  if (!client) {
+    console.error("EmailJS error:", "EmailJS client not loaded. Ensure the EmailJS script is included.");
+    return null;
+  }
+  if (emailInitialized) return client;
+  client.init(EMAILJS_PUBLIC_KEY);
   emailInitialized = true;
+  return client;
 }
 
 export async function sendOtpEmail(email, name, otpCode) {
@@ -17,7 +21,8 @@ export async function sendOtpEmail(email, name, otpCode) {
     return;
   }
 
-  ensureEmailInitialized();
+  const client = ensureEmailInitialized();
+  if (!client) return;
 
   const params = {
     to_email: email,
@@ -26,7 +31,7 @@ export async function sendOtpEmail(email, name, otpCode) {
   };
 
   try {
-    const result = await emailjs.send(
+    const result = await client.send(
       EMAILJS_SERVICE_ID,
       EMAILJS_OTP_TEMPLATE_ID,
       params

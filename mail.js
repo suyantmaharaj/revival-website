@@ -1,14 +1,18 @@
-import emailjs from "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
-
 const EMAILJS_PUBLIC_KEY = "0Xb2U08LxmtL-sARN";
 const EMAILJS_SERVICE_ID = "service_onoip14";
 const EMAILJS_WELCOME_TEMPLATE_ID = "template_9urh7za";
 
 let emailInitialized = false;
 function ensureEmailInitialized() {
-  if (emailInitialized) return;
-  emailjs.init(EMAILJS_PUBLIC_KEY);
+  const client = window.emailjs;
+  if (!client) {
+    console.error("EmailJS error:", "EmailJS client not loaded. Ensure the EmailJS script is included.");
+    return null;
+  }
+  if (emailInitialized) return client;
+  client.init(EMAILJS_PUBLIC_KEY);
   emailInitialized = true;
+  return client;
 }
 
 export async function sendWelcomeEmail(email, name) {
@@ -17,7 +21,8 @@ export async function sendWelcomeEmail(email, name) {
     return;
   }
 
-  ensureEmailInitialized();
+  const client = ensureEmailInitialized();
+  if (!client) return;
 
   const params = {
     to_email: email,
@@ -25,7 +30,7 @@ export async function sendWelcomeEmail(email, name) {
   };
 
   try {
-    return await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE_ID, params);
+    return await client.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE_ID, params);
   } catch (err) {
     console.error("EmailJS error:", JSON.stringify(err, Object.getOwnPropertyNames(err), 2));
     throw err;
