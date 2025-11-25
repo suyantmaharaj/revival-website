@@ -117,7 +117,7 @@
                   <span>Password</span>
                   <input type="password" name="login-password" autocomplete="current-password" placeholder="••••••••" required>
                 </label>
-                <button type="button" class="auth-google">
+                <button type="button" class="auth-google" hidden>
                   <span class="auth-google__icon" aria-hidden="true">
                     <img src="/assets/Google_%22G%22_logo.svg.png" alt="">
                   </span>
@@ -169,7 +169,7 @@
                     </div>
                   </div>
                 </div>
-                <button type="button" class="auth-google">
+                <button type="button" class="auth-google" hidden>
                   <span class="auth-google__icon" aria-hidden="true">
                     <img src="/assets/Google_%22G%22_logo.svg.png" alt="">
                   </span>
