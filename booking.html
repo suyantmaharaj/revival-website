@@ -93,7 +93,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-  <script defer src="/scripts.js"></script>
+  <script type="module" src="/firebase-config.js"></script>
+  <script type="module" src="/main.js"></script>
 
   <style>
     /* ====== Scoped booking UI that inherits your site variables ====== */
@@ -319,6 +320,21 @@
       <a href="/contact.html">Contact</a>
       <a href="/booking.html" aria-current="page" class="btn outline">Book Now</a>
     </nav>
+    <div class="nav-actions">
+      <button type="button" class="header-login" data-auth-open="true" aria-label="Open login modal">
+        <span class="header-login__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M9.5 6.5a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zm-1 0a5.5 5.5 0 1111 0 5.5 5.5 0 01-11 0zm1.83 7a5.64 5.64 0 00-1.72.28C6.99 14.35 6 15.57 6 17v2h16v-2c0-1.43-.99-2.65-2.61-3.22a5.64 5.64 0 00-1.72-.28H10.33z"/>
+          </svg>
+        </span>
+        <span class="header-login__label">Login</span>
+        <span class="header-login__caret" aria-hidden="true"></span>
+      </button>
+      <div class="account-menu" hidden>
+        <button type="button" class="account-menu__item" data-account-menu="account">My Account</button>
+        <button type="button" class="account-menu\__item" data-account-menu="logout">Log out</button>
+      </div>
+    </div>
     </div>
   </header>
   <div class="nav-overlay" data-nav-overlay></div>
@@ -1282,6 +1298,69 @@
       });
       obs.observe(sec, {attributes:true, attributeFilter:['class']});
     });
+
+    // ====== Prefill from Firebase user profile ======
+    async function initAuthPrefill(){
+      try {
+        const [{ auth, db }, { onAuthStateChanged }, { doc, getDoc }] = await Promise.all([
+          import("./firebase-config.js"),
+          import("https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js"),
+          import("https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js")
+        ]);
+
+        onAuthStateChanged(auth, async (user) => {
+          if (!user) return;
+          try {
+            const snap = await getDoc(doc(db, "users", user.uid));
+            if (!snap.exists()) return;
+            applyProfilePrefill(snap.data());
+          } catch (err) {
+            console.warn("Could not prefill booking from profile", err);
+          }
+        });
+      } catch (err) {
+        console.warn("Auth prefill init failed", err);
+      }
+    }
+
+    function applyProfilePrefill(profile = {}){
+      const next = { ...state.customer };
+      const phoneDigits = String(profile.phone || "").replace(/\D/g, "").slice(0, 10);
+      const postalDigits = String(profile.postalCode || profile.postal || "").replace(/\D/g, "").slice(0, 4);
+      let changed = false;
+
+      const assignIfEmpty = (key, value) => {
+        if (!value) return;
+        if (!next[key]) {
+          next[key] = value;
+          changed = true;
+        }
+      };
+
+      assignIfEmpty("fullName", profile.name || "");
+      assignIfEmpty("email", profile.email || "");
+      assignIfEmpty("phone", phoneDigits);
+      const streetOnly = profile.street || String(profile.address || "").split(",")[0]?.trim() || "";
+      assignIfEmpty("address1", streetOnly);
+      assignIfEmpty("suburb", profile.suburb || "");
+      assignIfEmpty("city", profile.city || "");
+      assignIfEmpty("postal", postalDigits);
+
+      if (!changed) return;
+      state.customer = next;
+      saveState();
+      fullName.value = state.customer.fullName;
+      phone.value = state.customer.phone;
+      email.value = state.customer.email;
+      address1.value = state.customer.address1;
+      suburb.value = state.customer.suburb;
+      city.value = state.customer.city;
+      postal.value = state.customer.postal;
+      updateEmailRequiredUI();
+      renderSummary();
+    }
+
+    initAuthPrefill();
 
   })();
   </script>
