@@ -26,6 +26,7 @@ export async function sendWelcomeEmail(email, name) {
 
   const params = {
     to_email: email,
+    email, // in case template uses a different variable name
     to_name: name || "there",
   };
 

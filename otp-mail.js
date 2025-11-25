@@ -26,6 +26,7 @@ export async function sendOtpEmail(email, name, otpCode) {
 
   const params = {
     to_email: email,
+    email, // in case template uses a different variable name
     to_name: name || "there",
     otp: otpCode,
   };
