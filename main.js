@@ -876,7 +876,8 @@ import {
         "auth/invalid-credential": "Invalid login details. Please try again.",
         "auth/wrong-password": "Incorrect password. Please try again.",
         "auth/user-not-found": "No account found with that email.",
-        "auth/weak-password": "Password should be at least 6 characters."
+        "auth/weak-password": "Password should be at least 6 characters.",
+        "auth/operation-not-allowed": "Email/password sign-in is not enabled. Please enable it in Firebase Auth settings."
       };
       return messages[code] || "Something went wrong. Please try again.";
     };
@@ -1077,11 +1078,33 @@ import {
         const { user } = await createUserWithEmailAndPassword(auth, profileFields.email, password);
         await setDoc(doc(db, "users", user.uid), payload);
         applyProfile({ uid: user.uid, ...payload });
-        await sendWelcomeEmail(profileFields.email, profileFields.name);
+        try {
+          await sendWelcomeEmail(profileFields.email, profileFields.name);
+        } catch (emailError) {
+          console.error("Welcome email send failed:", emailError);
+        }
         setFeedback(verifyFeedback, "Email verified. Signing you in...", "success");
         close();
+        window.location.href = "/";
       } catch (error) {
-        setFeedback(verifyFeedback, friendlyAuthError(error), "error");
+        console.error("Verify & create account error:", error);
+        if (error?.code === "auth/email-already-in-use") {
+          try {
+            const { email, password } = pendingRegistration || {};
+            const { user } = await signInWithEmailAndPassword(auth, email, password);
+            const { profile } = await fetchOrCreateUserProfile(user, email);
+            applyProfile(profile);
+            setFeedback(verifyFeedback, "Account already exists. Signing you in...", "success");
+            close();
+            window.location.href = "/";
+            return;
+          } catch (signInError) {
+            console.error("Sign-in after email-already-in-use failed:", signInError);
+            setFeedback(verifyFeedback, friendlyAuthError(signInError), "error");
+          }
+        } else {
+          setFeedback(verifyFeedback, friendlyAuthError(error), "error");
+        }
       } finally {
         toggleVerifySubmitting(false);
         resetOtpState();

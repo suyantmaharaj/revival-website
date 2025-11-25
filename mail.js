@@ -28,6 +28,7 @@ export async function sendWelcomeEmail(email, name) {
     to_email: email,
     email, // in case template uses a different variable name
     to_name: name || "there",
+    name: name || "there", // template uses {{name}}
   };
 
   try {
