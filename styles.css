@@ -621,6 +621,9 @@ body.nav-open .nav-overlay{opacity:1;pointer-events:auto}
   margin-left:auto;
   position:relative;
 }
+header .links a.btn.outline[href="/booking.html"]{
+  display:none;
+}
 .header-login{
   display:inline-flex;
   align-items:center;
