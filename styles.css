@@ -641,10 +641,6 @@ header .links a.btn.outline[href="/booking.html"]{
   transition:background .25s ease, border-color .25s ease, transform .25s ease;
   box-shadow:0 12px 28px rgba(0,0,0,.35);
 }
-.auth-disabled .header-login,
-.auth-disabled .auth-modal{
-  display:none !important;
-}
 .header-login:hover,
 .header-login:focus-visible{
   background:linear-gradient(140deg, rgba(255,255,255,.08), rgba(0,0,0,.8));

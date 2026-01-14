@@ -25,10 +25,6 @@ import {
  * - Dynamic year stamp in the footer
  */
 (function(){
-  const AUTH_ENABLED = false;
-  if (!AUTH_ENABLED) {
-    document.documentElement.classList.add("auth-disabled");
-  }
   const ready = (fn) => (
     document.readyState !== "loading"
       ? fn()
@@ -105,10 +101,8 @@ import {
 
   ready(() => {
     initNav();
-    if (AUTH_ENABLED) {
-      initAuthModal();
-      initOtpInputs();
-    }
+    initAuthModal();
+    initOtpInputs();
     initReveal();
     initHeroSlideshow();
     initHeroTilt();
@@ -189,7 +183,6 @@ import {
   }
 
   function initAuthModal(){
-    if (!AUTH_ENABLED) return;
     const nav = document.querySelector("header .nav");
     if (nav && !nav.querySelector("[data-auth-open]")){
       const actions = document.createElement("div");
